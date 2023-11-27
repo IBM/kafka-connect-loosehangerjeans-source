@@ -29,8 +29,6 @@ import org.apache.kafka.connect.source.SourceRecord;
  */
 public class StockMovement {
 
-    private static final String TOPIC_NAME = "STOCK.MOVEMENT";
-
     /** unique ID for this event */
     private String movementid;
 
@@ -64,7 +62,7 @@ public class StockMovement {
         this.quantity = quantity;
     }
 
-    public SourceRecord createSourceRecord() {
+    public SourceRecord createSourceRecord(String topicname) {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("movementid"), movementid);
         struct.put(SCHEMA.field("warehouse"),  warehouse);
@@ -74,7 +72,7 @@ public class StockMovement {
 
         return new SourceRecord(createSourcePartition(),
                                 createSourceOffset(),
-                                TOPIC_NAME,
+                                topicname,
                                 Schema.STRING_SCHEMA, movementid,
                                 SCHEMA,
                                 struct);

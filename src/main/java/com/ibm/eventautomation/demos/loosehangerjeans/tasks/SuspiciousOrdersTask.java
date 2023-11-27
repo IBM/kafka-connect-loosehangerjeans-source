@@ -96,7 +96,7 @@ public class SuspiciousOrdersTask extends DatagenTimerTask {
                                 Queue<SourceRecord> queue,
                                 Timer timer)
     {
-        super(orderGenerator, cancellationGenerator, queue, timer);
+        super(orderGenerator, cancellationGenerator, queue, timer, config);
 
         cancellationMinDelay = config.getInt(DatagenSourceConfig.CONFIG_SUSPICIOUSCANCELLATIONS_MIN_DELAY);
         cancellationMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_SUSPICIOUSCANCELLATIONS_MAX_DELAY);

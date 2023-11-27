@@ -32,8 +32,6 @@ import org.apache.kafka.connect.source.SourceRecord;
  */
 public class Order {
 
-    private static final String TOPIC_NAME = "ORDERS.NEW";
-
     /** unique ID for this order */
     private String id;
 
@@ -78,7 +76,7 @@ public class Order {
         this.region = region;
     }
 
-    public SourceRecord createSourceRecord(String origin) {
+    public SourceRecord createSourceRecord(String topicname, String origin) {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),          id);
         struct.put(SCHEMA.field("customer"),    customer.getName());
@@ -91,7 +89,7 @@ public class Order {
 
         return new SourceRecord(createSourcePartition(origin),
                                 createSourceOffset(),
-                                TOPIC_NAME,
+                                topicname,
                                 Schema.STRING_SCHEMA, id,
                                 SCHEMA,
                                 struct);

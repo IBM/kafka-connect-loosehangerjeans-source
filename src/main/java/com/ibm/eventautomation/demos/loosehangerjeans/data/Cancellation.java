@@ -29,8 +29,6 @@ import org.apache.kafka.connect.source.SourceRecord;
  */
 public class Cancellation {
 
-    private static final String TOPIC_NAME = "CANCELLATIONS";
-
     /** unique ID for this event */
     private String id;
 
@@ -59,7 +57,7 @@ public class Cancellation {
         this.timestamp = timestamp;
     }
 
-    public SourceRecord createSourceRecord(String origin) {
+    public SourceRecord createSourceRecord(String topicname, String origin) {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),         id);
         struct.put(SCHEMA.field("orderid"),    order.getId());
@@ -68,7 +66,7 @@ public class Cancellation {
 
         return new SourceRecord(createSourcePartition(origin),
                                 createSourceOffset(timestamp),
-                                TOPIC_NAME,
+                                topicname,
                                 Schema.STRING_SCHEMA, id,
                                 SCHEMA,
                                 struct);

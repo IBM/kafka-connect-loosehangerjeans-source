@@ -29,8 +29,6 @@ import org.apache.kafka.connect.source.SourceRecord;
  */
 public class NewCustomer {
 
-    private static final String TOPIC_NAME = "CUSTOMERS.NEW";
-
     /** time that the event was recorded */
     private String timestamp;
 
@@ -50,7 +48,7 @@ public class NewCustomer {
         this.customer = customer;
     }
 
-    public SourceRecord createSourceRecord(String origin) {
+    public SourceRecord createSourceRecord(String topicname, String origin) {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("customerid"),   customer.getId());
         struct.put(SCHEMA.field("customername"), customer.getName());
@@ -58,7 +56,7 @@ public class NewCustomer {
 
         return new SourceRecord(createSourcePartition(origin),
                                 createSourceOffset(),
-                                TOPIC_NAME,
+                                topicname,
                                 Schema.STRING_SCHEMA, customer.getId(),
                                 SCHEMA,
                                 struct);

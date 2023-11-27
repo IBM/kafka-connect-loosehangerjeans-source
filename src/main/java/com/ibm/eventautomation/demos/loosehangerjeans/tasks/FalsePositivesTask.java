@@ -75,6 +75,9 @@ public class FalsePositivesTask extends DatagenTimerTask {
      */
     private double maxPriceVariation;
 
+    /** Name of the topic to produce order events to. */
+    private String topicname;
+
 
     public FalsePositivesTask(AbstractConfig config,
                               OrderGenerator orderGenerator,
@@ -82,7 +85,7 @@ public class FalsePositivesTask extends DatagenTimerTask {
                               Queue<SourceRecord> queue,
                               Timer timer)
     {
-        super(orderGenerator, cancellationGenerator, queue, timer);
+        super(orderGenerator, cancellationGenerator, queue, timer, config);
 
         cancellationMinDelay = config.getInt(DatagenSourceConfig.CONFIG_SUSPICIOUSCANCELLATIONS_MIN_DELAY);
         cancellationMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_SUSPICIOUSCANCELLATIONS_MAX_DELAY);
@@ -93,6 +96,8 @@ public class FalsePositivesTask extends DatagenTimerTask {
         largeOrderMaxItems = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_LARGE_MAX);
 
         maxPriceVariation = config.getDouble(DatagenSourceConfig.CONFIG_DYNAMICPRICING_PRICE_CHANGE_MAX);
+        
+        this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ORDERS);
     }
 
 
@@ -101,7 +106,7 @@ public class FalsePositivesTask extends DatagenTimerTask {
     public void run() {
         // make the initial large order
         Order initialOrder = orderGenerator.generate(largeOrderMinItems, largeOrderMaxItems);
-        queue.add(initialOrder.createSourceRecord(ORIGIN));
+        queue.add(initialOrder.createSourceRecord(topicname, ORIGIN));
 
         // schedule the order cancellation
         cancelOrder(initialOrder, ORIGIN,

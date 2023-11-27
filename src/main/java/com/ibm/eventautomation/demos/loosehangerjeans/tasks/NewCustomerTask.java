@@ -74,13 +74,16 @@ public class NewCustomerTask extends DatagenTimerTask {
      */
     private double duplicatesRatio;
 
+    /** Name of the topic to produce customer registration events to. */
+    private String topicname;
+
 
     public NewCustomerTask(AbstractConfig config,
                            OrderGenerator orderGenerator,
                            Queue<SourceRecord> queue,
                            Timer timer)
     {
-        super(orderGenerator, queue, timer);
+        super(orderGenerator, queue, timer, config);
 
         generator = new NewCustomerGenerator(config);
 
@@ -89,6 +92,8 @@ public class NewCustomerTask extends DatagenTimerTask {
         firstOrderMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_NEWCUSTOMERS_ORDER_MAX_DELAY);
 
         this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_NEWCUSTOMERS);
+        
+        this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_CUSTOMERS);
     }
 
 
@@ -96,7 +101,7 @@ public class NewCustomerTask extends DatagenTimerTask {
     public void run() {
         // create the new customer
         NewCustomer newCustomer = generator.generate();
-        SourceRecord rec = newCustomer.createSourceRecord(ORIGIN);
+        SourceRecord rec = newCustomer.createSourceRecord(topicname, ORIGIN);
         queue.add(rec);
 
         // optionally, duplicate the new customer event

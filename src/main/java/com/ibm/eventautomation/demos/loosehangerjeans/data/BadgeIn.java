@@ -29,8 +29,6 @@ import org.apache.kafka.connect.source.SourceRecord;
  */
 public class BadgeIn {
 
-    private static final String TOPIC_NAME = "DOOR.BADGEIN";
-
     /** unique ID for this event */
     private String recordId;
 
@@ -59,7 +57,7 @@ public class BadgeIn {
         this.employee = employee;
     }
 
-    public SourceRecord createSourceRecord() {
+    public SourceRecord createSourceRecord(String topicname) {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("recordid"),  recordId);
         struct.put(SCHEMA.field("door"),      doorLocation);
@@ -68,7 +66,7 @@ public class BadgeIn {
 
         return new SourceRecord(createSourcePartition(),
                                 createSourceOffset(),
-                                TOPIC_NAME,
+                                topicname,
                                 Schema.STRING_SCHEMA, recordId,
                                 SCHEMA,
                                 struct);

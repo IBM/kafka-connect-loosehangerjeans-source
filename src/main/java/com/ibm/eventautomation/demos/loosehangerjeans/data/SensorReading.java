@@ -28,8 +28,6 @@ import org.apache.kafka.connect.source.SourceRecord;
  */
 public class SensorReading {
 
-    private static final String TOPIC_NAME = "SENSOR.READINGS";
-
     /** unique id for the sensor that captured the reading */
     private String sensorid;
 
@@ -59,7 +57,7 @@ public class SensorReading {
         this.humidity = humidity;
     }
 
-    public SourceRecord createSourceRecord() {
+    public SourceRecord createSourceRecord(String topicname) {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("sensorid"),    sensorid);
         struct.put(SCHEMA.field("sensortime"),  timestamp);
@@ -68,7 +66,7 @@ public class SensorReading {
 
         return new SourceRecord(createSourcePartition(),
                                 createSourceOffset(),
-                                TOPIC_NAME,
+                                topicname,
                                 Schema.STRING_SCHEMA, sensorid,
                                 SCHEMA,
                                 struct);

@@ -84,6 +84,9 @@ public class NormalOrdersTask extends DatagenTimerTask {
      */
     private double duplicatesRatio;
 
+    /** Name of the topic to produce order events to. */
+    private String topicname;
+
 
     public NormalOrdersTask(AbstractConfig config,
                             OrderGenerator orderGenerator,
@@ -91,7 +94,7 @@ public class NormalOrdersTask extends DatagenTimerTask {
                             Queue<SourceRecord> queue,
                             Timer timer)
     {
-        super(orderGenerator, cancellationGenerator, queue, timer);
+        super(orderGenerator, cancellationGenerator, queue, timer, config);
 
         cancellationRatio = config.getDouble(DatagenSourceConfig.CONFIG_CANCELLATIONS_RATIO);
         cancellationMinDelay = config.getInt(DatagenSourceConfig.CONFIG_CANCELLATIONS_MIN_DELAY);
@@ -101,6 +104,8 @@ public class NormalOrdersTask extends DatagenTimerTask {
         maxItems = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_LARGE_MAX);
 
         this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_ORDERS);
+        
+        this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ORDERS);
     }
 
 
@@ -108,7 +113,7 @@ public class NormalOrdersTask extends DatagenTimerTask {
     public void run() {
         // generate a random order
         Order order = orderGenerator.generate(minItems, maxItems);
-        SourceRecord rec = order.createSourceRecord(ORIGIN);
+        SourceRecord rec = order.createSourceRecord(topicname, ORIGIN);
         queue.add(rec);
 
         // possibly duplicate it

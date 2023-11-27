@@ -53,18 +53,22 @@ public class BadgeInTask extends TimerTask {
      * Setting this to 1 will mean every message is produced twice.
      */
     private double duplicatesRatio;
+    
+    /** Name of the topic to produce door badge-in events to. */
+    private String topicname;
 
 
     public BadgeInTask(AbstractConfig config, Queue<SourceRecord> queue) {
         this.generator = new BadgeInGenerator(config);
         this.queue = queue;
         this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_BADGEINS);
+        this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_BADGEINS);
     }
 
 
     @Override
     public void run() {
-        SourceRecord rec = generator.generate().createSourceRecord();
+        SourceRecord rec = generator.generate().createSourceRecord(topicname);
         queue.add(rec);
 
         if (Generators.shouldDo(duplicatesRatio)) {

@@ -8,10 +8,10 @@ It produces messages simulating the following events:
 | -------------- | --------------- |
 | `DOOR.BADGEIN`  | An employee using their id badge to go through a door |
 | `CANCELLATIONS` | An order being cancelled |
-| `CUSTOMERS.NEW` | A new customer has registered on the website | 
-| `ORDERS.NEW`    | An order has been placed | 
-| `SENSOR.READINGS` | A sensor reading captured from an IoT sensor | 
-| `STOCK.MOVEMENT` | Stock shipment received by a warehouse |  
+| `CUSTOMERS.NEW` | A new customer has registered on the website |
+| `ORDERS.NEW`    | An order has been placed |
+| `SENSOR.READINGS` | A sensor reading captured from an IoT sensor |
+| `STOCK.MOVEMENT` | Stock shipment received by a warehouse |
 
 
 Avro schemas and sample messages for each of these topics can be found in the `./doc` folder.
@@ -64,6 +64,16 @@ spec:
     key.converter.schemas.enable: false
     value.converter: org.apache.kafka.connect.json.JsonConverter
     value.converter.schemas.enable: false
+
+    #
+    # name of the topics to produce to
+    #
+    topic.name.orders: ORDERS.NEW
+    topic.name.cancellations: CANCELLATIONS
+    topic.name.stockmovements: STOCK.MOVEMENT
+    topic.name.badgeins: DOOR.BADGEIN
+    topic.name.newcustomers: CUSTOMERS.NEW
+    topic.name.sensorreadings: SENSOR.READINGS
 
     #
     # format of timestamps to produce

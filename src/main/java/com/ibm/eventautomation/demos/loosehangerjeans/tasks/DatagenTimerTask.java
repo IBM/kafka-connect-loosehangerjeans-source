@@ -19,10 +19,12 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Customer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
@@ -43,6 +45,11 @@ public abstract class DatagenTimerTask extends TimerTask {
     /** Helper class for generating {@link Cancellation} objects */
     protected final CancellationGenerator cancellationGenerator;
 
+    /** Name of the topic to produce order events to. */
+    private final String ordersTopicName;
+    /** Name of the topic to produce order cancellation events to. */
+    private final String cancellationsTopicName;
+            
     /**
      * Queue of messages waiting to be delivered to Kafka.
      *  Generated messages will be added to this queue.
@@ -51,27 +58,37 @@ public abstract class DatagenTimerTask extends TimerTask {
 
     /** Used to schedule message-generation tasks. */
     private final Timer timer;
+    
+    
 
 
     protected DatagenTimerTask(OrderGenerator orderGenerator,
                                CancellationGenerator cancellationGenerator,
                                Queue<SourceRecord> queue,
-                               Timer generateTimer)
+                               Timer generateTimer, 
+                               AbstractConfig config)
     {
         this.orderGenerator = orderGenerator;
         this.cancellationGenerator = cancellationGenerator;
         this.queue = queue;
         this.timer = generateTimer;
+        
+        this.ordersTopicName = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ORDERS);
+        this.cancellationsTopicName = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_CANCELLATIONS);
     }
 
     protected DatagenTimerTask(OrderGenerator orderGenerator,
                                Queue<SourceRecord> queue,
-                               Timer generateTimer)
+                               Timer generateTimer, 
+                               AbstractConfig config)
     {
         this.orderGenerator = orderGenerator;
         this.cancellationGenerator = null;
         this.queue = queue;
         this.timer = generateTimer;
+        
+        this.ordersTopicName = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ORDERS);
+        this.cancellationsTopicName = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_CANCELLATIONS);
     }
 
 
@@ -86,7 +103,7 @@ public abstract class DatagenTimerTask extends TimerTask {
             public void run() {
                 SourceRecord rec = cancellationGenerator
                                     .generate(order)
-                                    .createSourceRecord(origin);
+                                    .createSourceRecord(cancellationsTopicName, origin);
                 queue.add(rec);
 
                 if (cancellationGenerator.shouldDuplicate()) {
@@ -104,7 +121,7 @@ public abstract class DatagenTimerTask extends TimerTask {
             @Override
             public void run() {
                 Order order = orderGenerator.generate(customer);
-                queue.add(order.createSourceRecord(origin));
+                queue.add(order.createSourceRecord(ordersTopicName, origin));
             }
         }, delay);
     }
@@ -146,7 +163,7 @@ public abstract class DatagenTimerTask extends TimerTask {
                                                       region,
                                                       productDescription,
                                                       customer);
-                queue.add(order.createSourceRecord(origin));
+                queue.add(order.createSourceRecord(ordersTopicName, origin));
 
                 if (cancelDelayMin != null && cancelDelayMax != null) {
                     cancelOrder(order, origin, cancelDelayMin, cancelDelayMax);

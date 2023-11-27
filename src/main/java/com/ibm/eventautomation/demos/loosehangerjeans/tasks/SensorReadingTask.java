@@ -54,17 +54,21 @@ public class SensorReadingTask extends TimerTask {
      */
     private double duplicatesRatio;
 
+    /** Name of the topic to produce sensor readings to. */
+    private String topicname;
 
+    
     public SensorReadingTask(AbstractConfig config, Queue<SourceRecord> queue) {
         this.generator = new SensorReadingGenerator(config);
         this.queue = queue;
         this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_SENSORREADINGS);
+        this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_SENSORREADINGS);
     }
 
 
     @Override
     public void run() {
-        SourceRecord rec = generator.generate().createSourceRecord();
+        SourceRecord rec = generator.generate().createSourceRecord(topicname);
         queue.add(rec);
 
         if (Generators.shouldDo(duplicatesRatio)) {

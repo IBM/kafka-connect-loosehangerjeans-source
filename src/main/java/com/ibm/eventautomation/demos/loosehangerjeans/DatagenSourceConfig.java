@@ -33,6 +33,14 @@ public class DatagenSourceConfig {
     private static final String CONFIG_GROUP_FORMATS = "Formats";
     public static final String CONFIG_FORMATS_TIMESTAMPS = "formats.timestamps";
 
+    private static final String CONFIG_GROUP_TOPICNAMES = "Topic names";
+    public static final String CONFIG_TOPICNAME_ORDERS         = "topic.name.orders";
+    public static final String CONFIG_TOPICNAME_CANCELLATIONS  = "topic.name.cancellations";
+    public static final String CONFIG_TOPICNAME_STOCKMOVEMENTS = "topic.name.stockmovements";
+    public static final String CONFIG_TOPICNAME_BADGEINS       = "topic.name.badgeins";
+    public static final String CONFIG_TOPICNAME_CUSTOMERS      = "topic.name.newcustomers";
+    public static final String CONFIG_TOPICNAME_SENSORREADINGS = "topic.name.sensorreadings";
+    
     private static final String CONFIG_GROUP_LOCATIONS = "Locations";
     public static final String CONFIG_LOCATIONS_REGIONS = "locations.regions";
     public static final String CONFIG_LOCATIONS_WAREHOUSES = "locations.warehouses";
@@ -109,6 +117,51 @@ public class DatagenSourceConfig {
                     "Format to use for timestamps generated for events.",
                     CONFIG_GROUP_FORMATS, 1, Width.LONG, "Timestamp format")
         //
+        // names of topics to produce messages to
+        //
+        .define(CONFIG_TOPICNAME_ORDERS, 
+                    Type.STRING, 
+                    "ORDERS.NEW",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for order events", 
+                    CONFIG_GROUP_TOPICNAMES, 1, Width.LONG, "Orders topic")        
+        .define(CONFIG_TOPICNAME_CANCELLATIONS, 
+                    Type.STRING, 
+                    "CANCELLATIONS",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for cancellation events", 
+                    CONFIG_GROUP_TOPICNAMES, 2, Width.LONG, "Cancellations topic")
+        .define(CONFIG_TOPICNAME_STOCKMOVEMENTS, 
+                    Type.STRING, 
+                    "STOCK.MOVEMENT",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for stock movement events", 
+                    CONFIG_GROUP_TOPICNAMES, 3, Width.LONG, "Stock movements topic")
+        .define(CONFIG_TOPICNAME_BADGEINS, 
+                    Type.STRING, 
+                    "DOOR.BADGEIN",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for door badge-in events", 
+                    CONFIG_GROUP_TOPICNAMES, 4, Width.LONG, "Door badge-ins topic")
+        .define(CONFIG_TOPICNAME_CUSTOMERS, 
+                    Type.STRING, 
+                    "CUSTOMERS.NEW",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for customer registration events", 
+                    CONFIG_GROUP_TOPICNAMES, 5, Width.LONG, "Customers topic")
+        .define(CONFIG_TOPICNAME_SENSORREADINGS, 
+                    Type.STRING, 
+                    "SENSOR.READINGS",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for sensor reading events", 
+                    CONFIG_GROUP_TOPICNAMES, 6, Width.LONG, "Sensor readings topic")
+        //
         // how to generate locations
         //
         .define(CONFIG_LOCATIONS_REGIONS,
@@ -124,7 +177,7 @@ public class DatagenSourceConfig {
                     new ValidTermsList(),
                     Importance.LOW,
                     "List of warehouses to use for generated locations. Warehouse names cannot contain spaces.",
-                    CONFIG_GROUP_LOCATIONS, 2, Width.MEDIUM, "Regions")
+                    CONFIG_GROUP_LOCATIONS, 2, Width.MEDIUM, "Warehouses")
         //
         // How to generate product names
         //
