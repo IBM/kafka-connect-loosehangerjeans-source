@@ -43,6 +43,7 @@ public class SensorReading {
     /** schema for the events - all fields are required */
     private static final Schema SCHEMA = SchemaBuilder.struct()
         .name("sensorreading")
+        .version(1)
             .field("sensortime",  Schema.STRING_SCHEMA)
             .field("sensorid",    Schema.STRING_SCHEMA)
             .field("temperature", Schema.FLOAT64_SCHEMA)

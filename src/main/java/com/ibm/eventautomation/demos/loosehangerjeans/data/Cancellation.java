@@ -44,6 +44,7 @@ public class Cancellation {
     /** schema for the events - all fields are required */
     private static final Schema SCHEMA = SchemaBuilder.struct()
         .name("cancellation")
+        .version(1)
             .field("id",         Schema.STRING_SCHEMA)
             .field("orderid",    Schema.STRING_SCHEMA)
             .field("canceltime", Schema.STRING_SCHEMA)

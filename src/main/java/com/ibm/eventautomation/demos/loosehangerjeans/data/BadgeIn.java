@@ -44,6 +44,7 @@ public class BadgeIn {
     /** schema for the events - all fields are required */
     private static final Schema SCHEMA = SchemaBuilder.struct()
         .name("badgein")
+        .version(1)
             .field("recordid",  Schema.STRING_SCHEMA)
             .field("door",      Schema.STRING_SCHEMA)
             .field("employee",  Schema.STRING_SCHEMA)

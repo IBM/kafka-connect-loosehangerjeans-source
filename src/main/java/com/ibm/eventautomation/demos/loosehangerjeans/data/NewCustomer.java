@@ -38,6 +38,7 @@ public class NewCustomer {
     /** schema for the events - all fields are required */
     private static final Schema SCHEMA = SchemaBuilder.struct()
         .name("customer")
+        .version(1)
             .field("customerid",   Schema.STRING_SCHEMA)
             .field("customername", Schema.STRING_SCHEMA)
             .field("registered",   Schema.STRING_SCHEMA)

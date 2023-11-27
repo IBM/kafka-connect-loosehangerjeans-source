@@ -47,6 +47,7 @@ public class StockMovement {
     /** schema for the events - all fields are required */
     private static final Schema SCHEMA = SchemaBuilder.struct()
         .name("stockmovement")
+        .version(1)
             .field("movementid", Schema.STRING_SCHEMA)
             .field("warehouse",  Schema.STRING_SCHEMA)
             .field("product",    Schema.STRING_SCHEMA)
