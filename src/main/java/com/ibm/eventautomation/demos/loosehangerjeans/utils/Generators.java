@@ -15,7 +15,7 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.utils;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -64,8 +64,8 @@ public class Generators {
      *
      * @param maxOffset - maximum delay to introduce in seconds
      */
-    public static LocalDateTime nowWithRandomOffset(int maxOffset) {
-        final LocalDateTime now = LocalDateTime.now();
+    public static ZonedDateTime nowWithRandomOffset(int maxOffset) {
+        final ZonedDateTime now = ZonedDateTime.now();
         if (maxOffset == 0) {
             return now;
         }
