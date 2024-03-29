@@ -34,7 +34,7 @@ public class StockMovementGenerator {
     private final List<String> warehouses;
 
     /** helper class to randomly generate the name of a product */
-    private ProductGenerator productDescriptionGenerator;
+    private ProductGenerator productGenerator;
 
     /** formatter for event timestamps */
     private final DateTimeFormatter timestampFormatter;
@@ -56,7 +56,7 @@ public class StockMovementGenerator {
 
     public StockMovementGenerator(AbstractConfig config)
     {
-        this.productDescriptionGenerator = new ProductGenerator(config);
+        this.productGenerator = new ProductGenerator(config);
 
         this.warehouses = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_WAREHOUSES);
 
@@ -71,7 +71,7 @@ public class StockMovementGenerator {
         return new StockMovement(UUID.randomUUID().toString(),
                                  timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
                                  Generators.randomItem(warehouses),
-                                 productDescriptionGenerator.generate(),
+                                 productGenerator.generate().getDescription(),
                                  // stock movement quantities are always
                                  //  multiples of ten
                                  quantity - (quantity % 10));

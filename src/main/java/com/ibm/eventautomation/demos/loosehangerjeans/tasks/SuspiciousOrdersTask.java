@@ -40,7 +40,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
  * It will generate:
  *  - multiple large orders
  *  - small order for the same product
- *  - cancellations for all of the large orders
+ *  - cancellations for all the large orders
  */
 public class SuspiciousOrdersTask extends DatagenTimerTask {
 

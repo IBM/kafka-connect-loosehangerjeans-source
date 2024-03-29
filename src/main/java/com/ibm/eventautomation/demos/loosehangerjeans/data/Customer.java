@@ -24,32 +24,30 @@ import com.github.javafaker.Faker;
  */
 public class Customer {
 
-    /** unique id for the customer */
-    private String id;
+    /** Unique id for the customer. */
+    private final String id;
 
-    /** full name, including any title and suffixes (e.g. "Jr") */
-    private String name;
+    /** Full name, including any title and suffixes (e.g. "Jr"). */
+    private final String name;
 
-    /** Create a customer using the provided details */
+    /** Creates a customer using the provided details. */
     public Customer(String id, String name) {
         this.id = id;
         this.name = name;
     }
     /**
-     * Create an object to represent the customer with the
-     *  provided name. Generates a uuid for the customer id.
+     * Creates an object to represent the customer with the
+     *  provided name. Generates an uuid for the customer id.
      */
     public Customer(String name) {
-        this.id = UUID.randomUUID().toString();
-        this.name = name;
+        this(UUID.randomUUID().toString(), name);
     }
     /**
      * Uses the provided faker object to create a
      *  customer.
      */
     public Customer(Faker faker) {
-        this.id = UUID.randomUUID().toString();
-        this.name = faker.name().fullName();
+        this(UUID.randomUUID().toString(), faker.name().fullName());
     }
 
 

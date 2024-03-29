@@ -1,0 +1,168 @@
+/**
+ * Copyright 2024 IBM Corp. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+package com.ibm.eventautomation.demos.loosehangerjeans.generators;
+
+import com.github.javafaker.Faker;
+import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.*;
+import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.common.config.AbstractConfig;
+
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+/**
+ * Generates an {@link OnlineOrder} event using randomly generated data.
+ */
+public class OnlineOrderGenerator {
+
+    /** Locale used for the data generation. */
+    private static final Locale DEFAULT_LOCALE = Locale.US;
+
+    /** Minimum number of products to order. */
+    private final int minProducts;
+
+    /** Maximum number of products to order. */
+    private final int maxProducts;
+
+    /** Minimum number of emails for the customer who makes the order. */
+    private final int minEmails;
+
+    /** Maximum number of emails for the customer who makes the order. */
+    private final int maxEmails;
+
+    /** Minimum number of phones in an address for the given order. */
+    private final int minPhones;
+
+    /** Maximum number of phones in an address for the given order. */
+    private final int maxPhones;
+
+    /**
+     * Ratio of orders that use the same address as shipping and billing address.
+     *
+     * Between 0.0 and 1.0.
+     *
+     * Setting this to 0 will mean no events will use the same address as shipping and billing address.
+     * Setting this to 1 will mean every event uses the same address as shipping and billing address.
+     */
+    private final double reuseAddressRatio;
+
+    /** Helper class to randomly generate the details of a product. */
+    private final ProductGenerator productGenerator;
+
+    /** Formatter for event timestamps. */
+    private final DateTimeFormatter timestampFormatter;
+
+    /**
+     * Generator can simulate a delay in events being produced
+     *  to Kafka by putting a timestamp in the message payload
+     *  that is earlier than the current time.
+     *
+     * The amount of the delay will be randomized to simulate
+     *  a delay due to network or infrastructure reasons.
+     *
+     * This value is the maximum delay (in seconds) that it will
+     *  use. (Setting this to 0 will mean all events are
+     *  produced with the current time).
+     */
+    private final int MAX_DELAY_SECS;
+
+    /** Helper class used to generate data such as names, emails, phone numbers, addresses etc. */
+    private final Faker faker = new Faker(DEFAULT_LOCALE);
+
+    // TODO Documentation
+    public OnlineOrderGenerator(AbstractConfig config) {
+        this.productGenerator = new ProductGenerator(config);
+
+        this.minProducts = config.getInt(DatagenSourceConfig.CONFIG_ONLINEORDERS_PRODUCTS_MIN);
+        this.maxProducts = config.getInt(DatagenSourceConfig.CONFIG_ONLINEORDERS_PRODUCTS_MAX);
+
+        this.minEmails = config.getInt(DatagenSourceConfig.CONFIG_ONLINEORDERS_CUSTOMER_EMAILS_MIN);
+        this.maxEmails = config.getInt(DatagenSourceConfig.CONFIG_ONLINEORDERS_CUSTOMER_EMAILS_MAX);
+
+        this.minPhones = config.getInt(DatagenSourceConfig.CONFIG_ONLINEORDERS_ADDRESS_PHONES_MIN);
+        this.maxPhones = config.getInt(DatagenSourceConfig.CONFIG_ONLINEORDERS_ADDRESS_PHONES_MAX);
+
+        this.reuseAddressRatio = config.getDouble(DatagenSourceConfig.CONFIG_ONLINEORDERS_REUSE_ADDRESS_RATIO);
+
+        this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS_LTZ));
+        this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_ONLINEORDERS);
+    }
+
+    /** Generates a random online order. */
+    public OnlineOrder generate() {
+        // Generate some products randomly.
+        int productCount = Generators.randomInt(minProducts, maxProducts);
+        List<String> products = new ArrayList<>();
+        for (int i = 0; i < productCount; i++) {
+            products.add(productGenerator.generate().getDescription());
+        }
+
+        // Generate a username randomly for the customer.
+        String username = faker.name().username();
+        String[] nameParts = username.split("\\.");
+        // Compute the corresponding full name.
+        String fullName = StringUtils.capitalize(nameParts[0]) + " " + StringUtils.capitalize(nameParts[1]);
+
+        // Generate some emails randomly for this customer.
+        int emailCount = Generators.randomInt(minEmails, maxEmails);
+        List<String> emails = new ArrayList<>();
+        // Use the customer username for the first email.
+        emails.add(faker.internet().safeEmailAddress(username));
+        for (int i = 1; i < emailCount; i++) {
+            // Generate other emails.
+            emails.add(faker.internet().safeEmailAddress());
+        }
+
+        // Generate the customer.
+        OnlineCustomer customer = new OnlineCustomer(fullName, emails);
+
+        // Generate a random shipping address.
+        Address shippingAddress = generateAddress();
+
+        // Possibly reuse the shipping address as billing address.
+        Address billingAddress = Generators.shouldDo(reuseAddressRatio) ? shippingAddress : generateAddress();
+
+        return new OnlineOrder(timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
+                customer,
+                products,
+                new OnlineAddress(shippingAddress, billingAddress));
+    }
+
+    private Address generateAddress() {
+        // Generate some phone numbers randomly.
+        int phoneCount = Generators.randomInt(minPhones, maxPhones);
+        List<String> phones = null;
+        if (phoneCount > 0 ) {
+            phones = new ArrayList<>();
+            for (int i = 0; i < phoneCount; i++) {
+                phones.add(faker.phoneNumber().cellPhone());
+            }
+        }
+        // Generate the address.
+        com.github.javafaker.Address fakerAddress = faker.address();
+        // Generate a random address.
+        return new Address(Integer.valueOf(fakerAddress.streetAddressNumber()),
+                fakerAddress.streetName(),
+                fakerAddress.cityName(),
+                fakerAddress.zipCode(),
+                new Country(DEFAULT_LOCALE.getCountry(), DEFAULT_LOCALE.getDisplayCountry()),
+                phones);
+    }
+}
