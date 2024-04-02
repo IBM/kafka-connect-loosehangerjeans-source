@@ -4,14 +4,16 @@ Kafka Connect source connector used for generating simulated events for demos an
 
 It produces messages simulating the following events:
 
-| **Topic name** | **Description** |
-| -------------- | --------------- |
-| `DOOR.BADGEIN`  | An employee using their id badge to go through a door |
-| `CANCELLATIONS` | An order being cancelled |
-| `CUSTOMERS.NEW` | A new customer has registered on the website |
-| `ORDERS.NEW`    | An order has been placed |
-| `SENSOR.READINGS` | A sensor reading captured from an IoT sensor |
-| `STOCK.MOVEMENT` | Stock shipment received by a warehouse |
+| **Topic name**      | **Description**                                       |
+|---------------------|-------------------------------------------------------|
+| `DOOR.BADGEIN`      | An employee using their id badge to go through a door |
+| `CANCELLATIONS`     | An order being cancelled                              |
+| `CUSTOMERS.NEW`     | A new customer has registered on the website          |
+| `ORDERS.NEW`        | An order has been placed                              |
+| `SENSOR.READINGS`   | A sensor reading captured from an IoT sensor          |
+| `STOCK.MOVEMENT`    | Stock shipment received by a warehouse                |
+| `ONLINE.ORDERS.NEW` | An online order has been placed                       |
+| `OUT.OF.STOCK`      | A product has run out-of-stock                        |   
 
 
 Avro schemas and sample messages for each of these topics can be found in the `./doc` folder.
@@ -74,11 +76,14 @@ spec:
     topic.name.badgeins: DOOR.BADGEIN
     topic.name.newcustomers: CUSTOMERS.NEW
     topic.name.sensorreadings: SENSOR.READINGS
+    topic.name.onlineorders: ONLINE.ORDERS.NEW
+    topic.name.outofstocks: OUT.OF.STOCK
+    
 
     #
     # format of timestamps to produce
     #
-    #    default is chosen to be suitable for use with Event Processing
+    #    default is chosen to be suitable for use with Event Processing,
     #    but you could modify this if you want to demo how to reformat
     #    timestamps to be compatible with Event Processing
     #
@@ -86,6 +91,9 @@ spec:
     #           ignore this config option
     #
     formats.timestamps: yyyy-MM-dd HH:mm:ss.SSS
+    # format of timestamps with local time zone
+    #    NOTE: this format is used by default for online orders 
+    formats.timestamps.ltz: yyyy-MM-dd HH:mm:ss.SSS'Z'
 
     #
     # how often events should be created
@@ -102,8 +110,10 @@ spec:
     timings.ms.badgeins: 600              # sub-second
     # new customer events
     timings.ms.newcustomers: 543400       # a little over 9 minutes
-    # sensor reading events
+    # sensor reading events
     timings.ms.sensorreadings: 27000      # every 27 seconds
+    # online orders
+    timings.ms.onlineorders: 30000        # every 30 seconds
 
     #
     # how much of a delay to introduce when producing events
@@ -134,6 +144,10 @@ spec:
     eventdelays.newcustomers.secs.max: 0       # payload time matches event time by default
     # sensor readings events
     eventdelays.sensorreadings.secs.max: 300   # payload time can be up to 5 minutes (300 secs) behind event time
+    # online orders
+    eventdelays.onlineorders.secs.max: 0       # payload time matches event time by default
+    # out-of-stock events
+    eventdelays.outofstocks.secs.max: 0        # payload time matches event time by default
 
     #
     # how many events should be duplicated
@@ -159,6 +173,10 @@ spec:
     duplicates.newcustomers.ratio: 0       # events not duplicated
     # sensor reading events
     duplicates.sensorreadings.ratio: 0     # events not duplicated
+    # online orders
+    duplicates.onlineorders.ratio: 0       # events not duplicated
+    # out-of-stock events
+    duplicates.outofstocks.ratio: 0        # events not duplicated
 
     #
     # product names to use in events
@@ -238,7 +256,44 @@ spec:
     #  should they wait before making their order
     newcustomers.order.delay.ms.min: 180000     # wait at least 3 minutes
     newcustomers.order.delay.ms.max: 1380000    # order within 23 minutes
-
+    
+    #
+    # online orders
+    #
+    #  these events are intended to represent orders for several products, 
+    #   illustrating the use of complex objects and primitive arrays
+    #
+    # number of products to include in an online order: between 1 and 5 (inclusive)
+    onlineorders.products.min: 1
+    onlineorders.products.max: 5
+    # number of emails for the customer who makes an online order: between 1 and 2 (inclusive)
+    onlineorders.customer.emails.min: 1
+    onlineorders.customer.emails.max: 2
+    # number of phones in an address for an online order: between 0 and 2 (inclusive)
+    #    NOTE: in case of 0 phone number, `null` is generated in the events as value for the `phones` property
+    onlineorders.address.phones.min: 0
+    onlineorders.address.phones.max: 2
+    # how many online orders use the same address as shipping and billing address
+    #  between 0.0 and 1.0 : 0.0 means no online order will use the same address as shipping and billing address
+    #                        1.0 means all online orders will use the same address as shipping and billing address
+    onlineorders.reuse.address.ratio: 0.55
+    # how many online orders have at least one product that runs out-of-stock after the order has been placed
+    #  between 0.0 and 1.0 : 0.0 means no online order has some product that runs out-of-stock
+    #                        1.0 means all online orders have products that run out-of-stock
+    onlineorders.outofstock.ratio: 0.22 
+    
+    #
+    # out-of-stocks
+    #
+    #  these events are intended to represent products that run out-of-stock in online orders
+    #
+    # how long after an out-of-stock should the restocking happen (in days)
+    outofstocks.restocking.delay.days.min: 1  # 1 day
+    outofstocks.restocking.delay.days.max: 5  # 5 days
+    # how long after an online order should the out-of-stock happen (in milliseconds)
+    outofstocks.delay.ms.min: 300000   # 5 minutes
+    outofstocks.delay.ms.max: 7200000  # 2 hours
+  
     #
     # locations that are referred to in generated events
     #
@@ -246,9 +301,9 @@ spec:
     locations.warehouses: North,South,West,East,Central
 ```
 
-For example, if you want to theme the demo to be based on products in a different industry, you could adjust product names/styles/materials/name to match your demo (the options don't need to actually be "styles" or "materials" - they just need to be lists that will make sense when combined into a single string).
+For example, if you want to theme the demo to be based on products in a different industry, you could adjust product sizes/materials/styles/name to match your demo (the options don't need to actually be "sizes", "materials" or "styles" - they just need to be lists that will make sense when combined into a single string).
 
-You may also want to modify the prices.min and prices.max to match the sort of products in your demo.
+You may also want to modify the prices.min and prices.max values to match the sort of products in your demo.
 
 
 ## Build

@@ -61,7 +61,7 @@ public class CancellationGenerator {
      * Setting this to 0 will mean no events are duplicated.
      * Setting this to 1 will mean every message is produced twice.
      */
-    private double duplicatesRatio;
+    private final double duplicatesRatio;
 
 
     public CancellationGenerator(AbstractConfig config)

@@ -35,10 +35,13 @@ public class OnlineOrderGenerator {
     /** Locale used for the data generation. */
     private static final Locale DEFAULT_LOCALE = Locale.US;
 
-    /** Minimum number of products to order. */
+    /** Helper class to randomly generate the details of a product. */
+    private final ProductGenerator productGenerator;
+
+    /** Minimum number of products to include in the order. */
     private final int minProducts;
 
-    /** Maximum number of products to order. */
+    /** Maximum number of products to include in the order. */
     private final int maxProducts;
 
     /** Minimum number of emails for the customer who makes the order. */
@@ -63,11 +66,21 @@ public class OnlineOrderGenerator {
      */
     private final double reuseAddressRatio;
 
-    /** Helper class to randomly generate the details of a product. */
-    private final ProductGenerator productGenerator;
-
     /** Formatter for event timestamps. */
     private final DateTimeFormatter timestampFormatter;
+
+    /**
+     * Generator can simulate a source of events that offers
+     *  at-least-once delivery semantics by occasionally
+     *  producing duplicate messages.
+     *
+     * This value is the proportion of events that will be
+     *  duplicated, between 0.0 and 1.0.
+     *
+     * Setting this to 0 will mean no events are duplicated.
+     * Setting this to 1 will mean every message is produced twice.
+     */
+    private final double duplicatesRatio;
 
     /**
      * Generator can simulate a delay in events being produced
@@ -102,6 +115,9 @@ public class OnlineOrderGenerator {
         this.reuseAddressRatio = config.getDouble(DatagenSourceConfig.CONFIG_ONLINEORDERS_REUSE_ADDRESS_RATIO);
 
         this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS_LTZ));
+
+        this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_ONLINEORDERS);
+
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_ONLINEORDERS);
     }
 
@@ -143,6 +159,11 @@ public class OnlineOrderGenerator {
                 customer,
                 products,
                 new OnlineAddress(shippingAddress, billingAddress));
+    }
+
+    // TODO Documentation
+    public boolean shouldDuplicate() {
+        return Generators.shouldDo(duplicatesRatio);
     }
 
     private Address generateAddress() {

@@ -50,19 +50,6 @@ public class OnlineOrdersTask extends TimerTask {
     private final Timer timer;
 
     /**
-     * Generator can simulate a source of events that offers
-     *  at-least-once delivery semantics by occasionally
-     *  producing duplicate messages.
-     *
-     * This value is the proportion of events that will be
-     *  duplicated, between 0.0 and 1.0.
-     *
-     * Setting this to 0 will mean no events are duplicated.
-     * Setting this to 1 will mean every message is produced twice.
-     */
-    private final double duplicatesRatio;
-
-    /**
      * Ratio of orders that have at least one product that runs out-of-stock after the order has been placed.
      * Must be between 0.0 and 1.0.
      *
@@ -98,8 +85,6 @@ public class OnlineOrdersTask extends TimerTask {
         this.queue = queue;
         this.timer = generateTimer;
 
-        this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_ONLINEORDERS);
-
         this.outOfStockRatio = config.getDouble(DatagenSourceConfig.CONFIG_ONLINEORDERS_OUTOFSTOCK_RATIO);
         this.outOfStockMinDelay = config.getInt(DatagenSourceConfig.CONFIG_OUTOFSTOCKS_MIN_DELAY);
         this.outOfStockMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_OUTOFSTOCKS_MAX_DELAY);
@@ -117,7 +102,7 @@ public class OnlineOrdersTask extends TimerTask {
         queue.add(rec);
 
         // Possibly duplicate the event.
-        if (Generators.shouldDo(duplicatesRatio)) {
+        if (orderGenerator.shouldDuplicate()) {
             queue.add(rec);
         }
 
@@ -142,12 +127,10 @@ public class OnlineOrdersTask extends TimerTask {
                         .createSourceRecord(outOfStockTopicName);
                 queue.add(rec);
 
-                // TODO Implement duplication using the dedicated config property.
-                /*
+                // Possibly duplicate the event.
                 if (outOfStockGenerator.shouldDuplicate()) {
                     queue.add(rec);
                 }
-                 */
             }
         }, Generators.randomInt(outOfStockMinDelay, outOfStockMaxDelay));
     }

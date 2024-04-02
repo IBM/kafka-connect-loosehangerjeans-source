@@ -44,10 +44,10 @@ public class OutOfStock {
     /** Estimated restocking date.
      * Number of days from the unix epoch, 1 January 1970 00:00:00.000 UTC.
      */
-    private final long restockingDate;
+    private final int restockingDate;
 
     // TODO Documentation
-    public OutOfStock(String id, long timestamp, Product product, long restockingDate) {
+    public OutOfStock(String id, long timestamp, Product product, int restockingDate) {
         this.id = id;
         this.timestamp = timestamp;
         this.product = product;
@@ -55,7 +55,7 @@ public class OutOfStock {
     }
 
     // TODO Documentation
-    public OutOfStock(long timestamp, Product product, long restockingDate) {
+    public OutOfStock(long timestamp, Product product, int restockingDate) {
         this(UUID.randomUUID().toString(), timestamp, product, restockingDate);
     }
 
@@ -71,7 +71,7 @@ public class OutOfStock {
         return product;
     }
 
-    public long getRestockingDate() {
+    public int getRestockingDate() {
         return restockingDate;
     }
 
@@ -81,7 +81,7 @@ public class OutOfStock {
             .version(1)
             .field("id",                        Schema.STRING_SCHEMA)
             .field("product",                   Product.SCHEMA)
-            .field("restockingdate",            Schema.INT64_SCHEMA)
+            .field("restockingdate",            Schema.INT32_SCHEMA)
             .field("outofstocktime",            Schema.INT64_SCHEMA)
             .build();
 
@@ -90,7 +90,7 @@ public class OutOfStock {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),                  id);
         struct.put(SCHEMA.field("product"),             product.toStruct());
-        struct.put(SCHEMA.field("restockingdate"),         restockingDate);
+        struct.put(SCHEMA.field("restockingdate"),      restockingDate);
         struct.put(SCHEMA.field("outofstocktime"),      timestamp);
 
         return new SourceRecord(createSourcePartition(),

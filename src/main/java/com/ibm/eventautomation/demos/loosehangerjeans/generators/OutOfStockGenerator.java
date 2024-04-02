@@ -29,12 +29,25 @@ public class OutOfStockGenerator {
     /**
      * Minimum time (in days) between the time that the product was out-of-stock and the restocking date.
      */
-    private int restockingMinDelay;
+    private final int restockingMinDelay;
 
     /**
      * Maximum time (in days) between the time that the product was out-of-stock and the restocking date.
      */
-    private int restockingMaxDelay;
+    private final int restockingMaxDelay;
+
+    /**
+     * Generator can simulate a source of events that offers
+     *  at-least-once delivery semantics by occasionally
+     *  producing duplicate messages.
+     *
+     * This value is the proportion of events that will be
+     *  duplicated, between 0.0 and 1.0.
+     *
+     * Setting this to 0 will mean no events are duplicated.
+     * Setting this to 1 will mean every message is produced twice.
+     */
+    private final double duplicatesRatio;
 
     /**
      * Generator can simulate a delay in events being produced
@@ -54,6 +67,7 @@ public class OutOfStockGenerator {
     public OutOfStockGenerator(AbstractConfig config) {
         this.restockingMinDelay = config.getInt(DatagenSourceConfig.CONFIG_OUTOFSTOCKS_RESTOCKING_MIN_DELAY);
         this.restockingMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_OUTOFSTOCKS_RESTOCKING_MAX_DELAY);
+        this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_OUTOFSTOCKS);
 
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_OUTOFSTOCKS);
     }
@@ -63,7 +77,12 @@ public class OutOfStockGenerator {
         ZonedDateTime dateTime = Generators.nowWithRandomOffset(MAX_DELAY_SECS);
         long timestamp = dateTime.toInstant().toEpochMilli();
         int restockingDelay = Generators.randomInt(restockingMinDelay, restockingMaxDelay);
-        long restockingDate = dateTime.plusDays(restockingDelay).toLocalDate().toEpochDay();
+        int restockingDate = (int) dateTime.plusDays(restockingDelay).toLocalDate().toEpochDay();
         return new OutOfStock(timestamp, product, restockingDate);
+    }
+
+    // TODO Documentation
+    public boolean shouldDuplicate() {
+        return Generators.shouldDo(duplicatesRatio);
     }
 }
