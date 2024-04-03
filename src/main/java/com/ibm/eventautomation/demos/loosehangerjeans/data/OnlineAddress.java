@@ -19,7 +19,9 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 
-//TODO Documentation
+/**
+ * Information about the addresses (shipping and billing) used for an online order.
+ */
 public class OnlineAddress {
 
     /** Shipping address used for an online order. */
@@ -28,7 +30,7 @@ public class OnlineAddress {
     /** Billing address used for an online order. */
     private final Address billingAddress;
 
-    // TODO Documentation
+    /** Schema for the events - all fields are required. */
     static final Schema SCHEMA = SchemaBuilder.struct()
             .name("online_address")
             .version(1)
@@ -49,7 +51,7 @@ public class OnlineAddress {
         return billingAddress;
     }
 
-    // TODO Documentation
+    /** Creates a structure record to use in a Kafka event. */
     public Struct toStruct() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("shippingaddress"), shippingAddress.toStruct());

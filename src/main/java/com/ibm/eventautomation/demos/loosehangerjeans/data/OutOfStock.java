@@ -27,7 +27,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO Documentation
+/**
+ * Represents an event for a product that runs out-of-stock.
+ */
 public class OutOfStock {
 
     /** Unique ID for the out-of-stock event. */
@@ -46,7 +48,17 @@ public class OutOfStock {
      */
     private final int restockingDate;
 
-    // TODO Documentation
+    /** Schema for the events - all fields are required. */
+    private static final Schema SCHEMA = SchemaBuilder.struct()
+            .name("out-of-stock")
+            .version(1)
+            .field("id",                        Schema.STRING_SCHEMA)
+            .field("product",                   Product.SCHEMA)
+            .field("restockingdate",            Schema.INT32_SCHEMA)
+            .field("outofstocktime",            Schema.INT64_SCHEMA)
+            .build();
+
+    /** Creates an {@link OutOfStock} object using the provided details. */
     public OutOfStock(String id, long timestamp, Product product, int restockingDate) {
         this.id = id;
         this.timestamp = timestamp;
@@ -54,7 +66,9 @@ public class OutOfStock {
         this.restockingDate = restockingDate;
     }
 
-    // TODO Documentation
+    /** Creates an {@link OutOfStock} object using the provided details.
+     * The ID is generated randomly.
+     * */
     public OutOfStock(long timestamp, Product product, int restockingDate) {
         this(UUID.randomUUID().toString(), timestamp, product, restockingDate);
     }
@@ -75,17 +89,7 @@ public class OutOfStock {
         return restockingDate;
     }
 
-    // TODO Documentation
-    private static final Schema SCHEMA = SchemaBuilder.struct()
-            .name("out-of-stock")
-            .version(1)
-            .field("id",                        Schema.STRING_SCHEMA)
-            .field("product",                   Product.SCHEMA)
-            .field("restockingdate",            Schema.INT32_SCHEMA)
-            .field("outofstocktime",            Schema.INT64_SCHEMA)
-            .build();
-
-    // TODO Documentation
+    /** Creates a source record to pass to Kafka Connect for storage in Kafka. */
     public SourceRecord createSourceRecord(String topicname) {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),                  id);

@@ -31,7 +31,7 @@ public class OnlineCustomer extends Customer {
     /** Emails of the customer. */
     private final List<String> emails;
 
-    // TODO Documentation
+    /** Schema for the events - all fields are required. */
     public static final Schema SCHEMA = SchemaBuilder.struct()
             .name("online_customer")
             .version(1)
@@ -58,7 +58,7 @@ public class OnlineCustomer extends Customer {
         return emails;
     }
 
-    // TODO Documentation
+    /** Creates a structure record to use in a Kafka event. */
     public Struct toStruct() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),      getId());

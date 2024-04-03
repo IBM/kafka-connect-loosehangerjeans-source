@@ -26,7 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO Documentation
+/**
+ * Represents an event for a new online order that has been placed by
+ * a customer for several products.
+ * The event also includes a shipping and billing address which may
+ * be identical.
+ */
 public class OnlineOrder {
 
     /** Unique ID for this order. */
@@ -55,7 +60,7 @@ public class OnlineOrder {
             .field("ordertime",   Schema.STRING_SCHEMA)
             .build();
 
-    /** Creates an online order using the provided details. */
+    /** Creates an {@link OnlineOrder} using the provided details. */
     public OnlineOrder(String id, String timestamp, OnlineCustomer customer, List<String> products, OnlineAddress address) {
         this.id = id;
         this.timestamp = timestamp;
@@ -64,7 +69,9 @@ public class OnlineOrder {
         this.address = address;
     }
 
-    // TODO Documentation
+    /** Creates an {@link OnlineOrder} using the provided details.
+     * The ID is generated randomly.
+     * */
     public OnlineOrder(String timestamp, OnlineCustomer customer, List<String> products, OnlineAddress address) {
         this(UUID.randomUUID().toString(), timestamp, customer, products, address);
     }
@@ -89,7 +96,7 @@ public class OnlineOrder {
         return address;
     }
 
-    // TODO Documentation
+    /** Creates a source record to pass to Kafka Connect for storage in Kafka. */
     public SourceRecord createSourceRecord(String topicname) {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),          id);

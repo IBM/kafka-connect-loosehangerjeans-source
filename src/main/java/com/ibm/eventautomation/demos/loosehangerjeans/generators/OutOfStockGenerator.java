@@ -23,7 +23,9 @@ import org.apache.kafka.common.config.AbstractConfig;
 
 import java.time.ZonedDateTime;
 
-// TODO Documentation
+/**
+ * Generates an {@link OutOfStock} event for a given product using randomly generated data.
+ */
 public class OutOfStockGenerator {
 
     /**
@@ -63,7 +65,7 @@ public class OutOfStockGenerator {
      */
     private final int MAX_DELAY_SECS;
 
-    // TODO Documentation
+    /** Creates an {@link OutOfStockGenerator} using the provided configuration. */
     public OutOfStockGenerator(AbstractConfig config) {
         this.restockingMinDelay = config.getInt(DatagenSourceConfig.CONFIG_OUTOFSTOCKS_RESTOCKING_MIN_DELAY);
         this.restockingMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_OUTOFSTOCKS_RESTOCKING_MAX_DELAY);
@@ -72,7 +74,7 @@ public class OutOfStockGenerator {
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_OUTOFSTOCKS);
     }
 
-    // TODO Documentation
+    /** Generates a random out-of-stock for a given product. */
     public OutOfStock generate(Product product) {
         ZonedDateTime dateTime = Generators.nowWithRandomOffset(MAX_DELAY_SECS);
         long timestamp = dateTime.toInstant().toEpochMilli();
@@ -81,7 +83,6 @@ public class OutOfStockGenerator {
         return new OutOfStock(timestamp, product, restockingDate);
     }
 
-    // TODO Documentation
     public boolean shouldDuplicate() {
         return Generators.shouldDo(duplicatesRatio);
     }

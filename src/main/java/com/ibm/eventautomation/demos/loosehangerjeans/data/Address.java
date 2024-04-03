@@ -45,7 +45,7 @@ public class Address {
     /** A list of phone numbers. */
     private final List<String> phones;
 
-    // TODO Documentation
+    /** Schema for the events - the number, street and phones fields are optional. */
     public static final Schema SCHEMA = SchemaBuilder.struct()
             .name("address")
             .version(1)
@@ -91,7 +91,7 @@ public class Address {
         return phones;
     }
 
-    // TODO Documentation
+    /** Creates a structure record to use in a Kafka event. */
     public Struct toStruct() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("number"),      number);

@@ -15,7 +15,7 @@ public class Country {
     /** The name of the country */
     private final String name;
 
-    // TODO Documentation
+    /** Schema for the events - all fields are required. */
     public static final Schema SCHEMA = SchemaBuilder.struct()
             .name("country")
             .version(1)
@@ -29,7 +29,7 @@ public class Country {
         this.name = name;
     }
 
-    // TODO Documentation
+    /** Creates a structure record to use in a Kafka event. */
     public Struct toStruct() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("code"),    code);

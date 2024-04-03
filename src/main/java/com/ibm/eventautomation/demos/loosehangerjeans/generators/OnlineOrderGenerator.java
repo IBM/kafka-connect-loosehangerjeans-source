@@ -17,7 +17,11 @@ package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
 import com.github.javafaker.Faker;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.*;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Address;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Country;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineAddress;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineCustomer;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.config.AbstractConfig;
@@ -99,7 +103,7 @@ public class OnlineOrderGenerator {
     /** Helper class used to generate data such as names, emails, phone numbers, addresses etc. */
     private final Faker faker = new Faker(DEFAULT_LOCALE);
 
-    // TODO Documentation
+    /** Creates an {@link OnlineOrderGenerator} using the provided configuration. */
     public OnlineOrderGenerator(AbstractConfig config) {
         this.productGenerator = new ProductGenerator(config);
 
@@ -161,7 +165,6 @@ public class OnlineOrderGenerator {
                 new OnlineAddress(shippingAddress, billingAddress));
     }
 
-    // TODO Documentation
     public boolean shouldDuplicate() {
         return Generators.shouldDo(duplicatesRatio);
     }
@@ -179,7 +182,7 @@ public class OnlineOrderGenerator {
         // Generate the address.
         com.github.javafaker.Address fakerAddress = faker.address();
         // Generate a random address.
-        return new Address(Integer.valueOf(fakerAddress.streetAddressNumber()),
+        return new Address(Integer.parseInt(fakerAddress.streetAddressNumber()),
                 fakerAddress.streetName(),
                 fakerAddress.cityName(),
                 fakerAddress.zipCode(),

@@ -50,7 +50,6 @@ public class Customer {
         this(UUID.randomUUID().toString(), faker.name().fullName());
     }
 
-
     public String getId() {
         return id;
     }
