@@ -32,7 +32,7 @@ public class OnlineAddress {
 
     /** Schema for the events - all fields are required. */
     static final Schema SCHEMA = SchemaBuilder.struct()
-            .name("online_address")
+            .name("onlineaddress")
             .version(1)
             .field("shippingaddress", Address.SCHEMA)
             .field("billingaddress", Address.SCHEMA);

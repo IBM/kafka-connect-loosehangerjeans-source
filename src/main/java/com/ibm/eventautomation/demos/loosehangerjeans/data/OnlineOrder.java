@@ -51,7 +51,7 @@ public class OnlineOrder {
 
     /** Schema for the events - all fields are required. */
     private static final Schema SCHEMA = SchemaBuilder.struct()
-            .name("online_order")
+            .name("onlineorder")
             .version(1)
             .field("id",          Schema.STRING_SCHEMA)
             .field("customer",    OnlineCustomer.SCHEMA)

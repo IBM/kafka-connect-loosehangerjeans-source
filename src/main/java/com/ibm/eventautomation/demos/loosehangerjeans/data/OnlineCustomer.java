@@ -33,7 +33,7 @@ public class OnlineCustomer extends Customer {
 
     /** Schema for the events - all fields are required. */
     public static final Schema SCHEMA = SchemaBuilder.struct()
-            .name("online_customer")
+            .name("onlinecustomer")
             .version(1)
             .field("id",        Schema.STRING_SCHEMA)
             .field("name",      Schema.STRING_SCHEMA)
