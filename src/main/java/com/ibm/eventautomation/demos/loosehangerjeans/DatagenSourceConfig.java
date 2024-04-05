@@ -142,7 +142,7 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_FORMATS, 1, Width.LONG, "Timestamp format")
         .define(CONFIG_FORMATS_TIMESTAMPS_LTZ,
                     Type.STRING,
-                    "yyyy-MM-dd HH:mm:ss.SSS'Z'",
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
                     new NonEmptyString(),
                     Importance.LOW,
                     "Format to use for timestamps with local time zone generated for events.",

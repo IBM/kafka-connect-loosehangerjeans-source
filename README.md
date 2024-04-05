@@ -91,9 +91,9 @@ spec:
     #           ignore this config option
     #
     formats.timestamps: yyyy-MM-dd HH:mm:ss.SSS
-    # format of timestamps with local time zone
+    # format of timestamps with local time zone (UTC time in ISO 8601 format)
     #    NOTE: this format is used by default for online orders 
-    formats.timestamps.ltz: yyyy-MM-dd HH:mm:ss.SSS'Z'
+    formats.timestamps.ltz: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
 
     #
     # how often events should be created

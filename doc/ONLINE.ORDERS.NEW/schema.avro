@@ -12,14 +12,6 @@
       }
     },
     {
-      "name": "products",
-      "doc": "Descriptions of the ordered products",
-      "type": {
-        "type": "array",
-        "items": "string"
-      }
-    },
-    {
       "name": "customer",
       "doc": "Customer who made the online order",
       "type": {
@@ -48,6 +40,14 @@
             "doc": "Emails of the customer"
           }
         ]
+      }
+    },
+    {
+      "name": "products",
+      "doc": "Descriptions of the ordered products",
+      "type": {
+        "type": "array",
+        "items": "string"
       }
     },
     {
@@ -194,7 +194,7 @@
     },
     {
       "name": "ordertime",
-      "doc": "Time that the online order was made",
+      "doc": "Time that the online order was made (UTC time in ISO 8601 format)",
       "type": "string"
     }
   ]
