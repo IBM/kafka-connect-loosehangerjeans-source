@@ -35,7 +35,8 @@ public class OnlineAddress {
             .name("onlineaddress")
             .version(1)
             .field("shippingaddress", Address.SCHEMA)
-            .field("billingaddress", Address.SCHEMA);
+            .field("billingaddress", Address.SCHEMA)
+            .build();
 
     /** Creates a new OnlineAddress object with the given shipping and billing addresses. */
     public OnlineAddress(Address shippingAddress, Address billingAddress) {

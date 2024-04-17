@@ -194,14 +194,14 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_TOPICNAMES, 6, Width.LONG, "Sensor readings topic")
         .define(CONFIG_TOPICNAME_ONLINEORDERS,
                     Type.STRING,
-                    "ONLINE.ORDERS.NEW",
+                    "ORDERS.ONLINE",
                     new NonEmptyString(),
                     Importance.LOW,
                     "Name of the topic to use for online order events",
                     CONFIG_GROUP_TOPICNAMES, 7, Width.LONG, "Online orders topic")
         .define(CONFIG_TOPICNAME_OUTOFSTOCKS,
                     Type.STRING,
-                    "OUT.OF.STOCK",
+                    "STOCK.NOSTOCK",
                     new NonEmptyString(),
                     Importance.LOW,
                     "Name of the topic to use for out-of-stock events",

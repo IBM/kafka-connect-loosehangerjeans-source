@@ -12,8 +12,8 @@ It produces messages simulating the following events:
 | `ORDERS.NEW`        | An order has been placed                              |
 | `SENSOR.READINGS`   | A sensor reading captured from an IoT sensor          |
 | `STOCK.MOVEMENT`    | Stock shipment received by a warehouse                |
-| `ONLINE.ORDERS.NEW` | An online order has been placed                       |
-| `OUT.OF.STOCK`      | A product has run out-of-stock                        |   
+| `ORDERS.ONLINE`     | An online order has been placed                       |
+| `STOCK.NOSTOCK`     | A product has run out-of-stock                        |   
 
 
 Avro schemas and sample messages for each of these topics can be found in the `./doc` folder.
@@ -76,8 +76,8 @@ spec:
     topic.name.badgeins: DOOR.BADGEIN
     topic.name.newcustomers: CUSTOMERS.NEW
     topic.name.sensorreadings: SENSOR.READINGS
-    topic.name.onlineorders: ONLINE.ORDERS.NEW
-    topic.name.outofstocks: OUT.OF.STOCK
+    topic.name.onlineorders: ORDERS.ONLINE
+    topic.name.outofstocks: STOCK.NOSTOCK
     
 
     #
