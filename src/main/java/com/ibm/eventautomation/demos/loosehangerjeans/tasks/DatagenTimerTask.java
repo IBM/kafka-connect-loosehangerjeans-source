@@ -49,7 +49,7 @@ public abstract class DatagenTimerTask extends TimerTask {
     private final String ordersTopicName;
     /** Name of the topic to produce order cancellation events to. */
     private final String cancellationsTopicName;
-            
+
     /**
      * Queue of messages waiting to be delivered to Kafka.
      *  Generated messages will be added to this queue.
@@ -58,35 +58,35 @@ public abstract class DatagenTimerTask extends TimerTask {
 
     /** Used to schedule message-generation tasks. */
     private final Timer timer;
-    
-    
+
+
 
 
     protected DatagenTimerTask(OrderGenerator orderGenerator,
                                CancellationGenerator cancellationGenerator,
                                Queue<SourceRecord> queue,
-                               Timer generateTimer, 
+                               Timer generateTimer,
                                AbstractConfig config)
     {
         this.orderGenerator = orderGenerator;
         this.cancellationGenerator = cancellationGenerator;
         this.queue = queue;
         this.timer = generateTimer;
-        
+
         this.ordersTopicName = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ORDERS);
         this.cancellationsTopicName = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_CANCELLATIONS);
     }
 
     protected DatagenTimerTask(OrderGenerator orderGenerator,
                                Queue<SourceRecord> queue,
-                               Timer generateTimer, 
+                               Timer generateTimer,
                                AbstractConfig config)
     {
         this.orderGenerator = orderGenerator;
         this.cancellationGenerator = null;
         this.queue = queue;
         this.timer = generateTimer;
-        
+
         this.ordersTopicName = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ORDERS);
         this.cancellationsTopicName = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_CANCELLATIONS);
     }

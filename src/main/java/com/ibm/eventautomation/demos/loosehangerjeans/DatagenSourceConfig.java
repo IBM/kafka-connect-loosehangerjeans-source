@@ -31,7 +31,8 @@ import org.apache.kafka.common.config.ConfigException;
 public class DatagenSourceConfig {
 
     private static final String CONFIG_GROUP_FORMATS = "Formats";
-    public static final String CONFIG_FORMATS_TIMESTAMPS = "formats.timestamps";
+    public static final String CONFIG_FORMATS_TIMESTAMPS        = "formats.timestamps";
+    public static final String CONFIG_FORMATS_TIMESTAMPS_LTZ    = "formats.timestamps.ltz";
 
     private static final String CONFIG_GROUP_TOPICNAMES = "Topic names";
     public static final String CONFIG_TOPICNAME_ORDERS         = "topic.name.orders";
@@ -40,9 +41,11 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TOPICNAME_BADGEINS       = "topic.name.badgeins";
     public static final String CONFIG_TOPICNAME_CUSTOMERS      = "topic.name.newcustomers";
     public static final String CONFIG_TOPICNAME_SENSORREADINGS = "topic.name.sensorreadings";
-    
+    public static final String CONFIG_TOPICNAME_ONLINEORDERS   = "topic.name.onlineorders";
+    public static final String CONFIG_TOPICNAME_OUTOFSTOCKS    = "topic.name.outofstocks";
+
     private static final String CONFIG_GROUP_LOCATIONS = "Locations";
-    public static final String CONFIG_LOCATIONS_REGIONS = "locations.regions";
+    public static final String CONFIG_LOCATIONS_REGIONS    = "locations.regions";
     public static final String CONFIG_LOCATIONS_WAREHOUSES = "locations.warehouses";
 
     private static final String CONFIG_GROUP_PRODUCTS = "Products";
@@ -79,6 +82,22 @@ public class DatagenSourceConfig {
     public static final String CONFIG_NEWCUSTOMERS_ORDER_MIN_DELAY = "newcustomers.order.delay.ms.min";
     public static final String CONFIG_NEWCUSTOMERS_ORDER_MAX_DELAY = "newcustomers.order.delay.ms.max";
 
+    private static final String CONFIG_GROUP_ONLINEORDERS = "Online orders";
+    public static final String CONFIG_ONLINEORDERS_PRODUCTS_MIN         = "onlineorders.products.min";
+    public static final String CONFIG_ONLINEORDERS_PRODUCTS_MAX         = "onlineorders.products.max";
+    public static final String CONFIG_ONLINEORDERS_CUSTOMER_EMAILS_MIN  = "onlineorders.customer.emails.min";
+    public static final String CONFIG_ONLINEORDERS_CUSTOMER_EMAILS_MAX  = "onlineorders.customer.emails.max";
+    public static final String CONFIG_ONLINEORDERS_ADDRESS_PHONES_MIN   = "onlineorders.address.phones.min";
+    public static final String CONFIG_ONLINEORDERS_ADDRESS_PHONES_MAX   = "onlineorders.address.phones.max";
+    public static final String CONFIG_ONLINEORDERS_REUSE_ADDRESS_RATIO  = "onlineorders.reuse.address.ratio";
+    public static final String CONFIG_ONLINEORDERS_OUTOFSTOCK_RATIO     = "onlineorders.outofstock.ratio";
+
+    private static final String CONFIG_GROUP_OUTOFSTOCKS = "Out-of-stocks";
+    public static final String CONFIG_OUTOFSTOCKS_RESTOCKING_MIN_DELAY  = "outofstocks.restocking.delay.days.min";
+    public static final String CONFIG_OUTOFSTOCKS_RESTOCKING_MAX_DELAY  = "outofstocks.restocking.delay.days.max";
+    public static final String CONFIG_OUTOFSTOCKS_MIN_DELAY             = "outofstocks.delay.ms.min";
+    public static final String CONFIG_OUTOFSTOCKS_MAX_DELAY             = "outofstocks.delay.ms.max";
+
     private static final String CONFIG_GROUP_DELAYS = "Event delays";
     public static final String CONFIG_DELAYS_ORDERS         = "eventdelays.orders.secs.max";
     public static final String CONFIG_DELAYS_CANCELLATIONS  = "eventdelays.cancellations.secs.max";
@@ -86,6 +105,8 @@ public class DatagenSourceConfig {
     public static final String CONFIG_DELAYS_BADGEINS       = "eventdelays.badgeins.secs.max";
     public static final String CONFIG_DELAYS_NEWCUSTOMERS   = "eventdelays.newcustomers.secs.max";
     public static final String CONFIG_DELAYS_SENSORREADINGS = "eventdelays.sensorreadings.secs.max";
+    public static final String CONFIG_DELAYS_ONLINEORDERS   = "eventdelays.onlineorders.secs.max";
+    public static final String CONFIG_DELAYS_OUTOFSTOCKS    = "eventdelays.outofstocks.secs.max";
 
     private static final String CONFIG_GROUP_DUPLICATES = "Duplicate events";
     public static final String CONFIG_DUPLICATE_ORDERS         = "duplicates.orders.ratio";
@@ -94,6 +115,8 @@ public class DatagenSourceConfig {
     public static final String CONFIG_DUPLICATE_BADGEINS       = "duplicates.badgeins.ratio";
     public static final String CONFIG_DUPLICATE_NEWCUSTOMERS   = "duplicates.newcustomers.ratio";
     public static final String CONFIG_DUPLICATE_SENSORREADINGS = "duplicates.sensorreadings.ratio";
+    public static final String CONFIG_DUPLICATE_ONLINEORDERS   = "duplicates.onlineorders.ratio";
+    public static final String CONFIG_DUPLICATE_OUTOFSTOCKS    = "duplicates.outofstocks.ratio";
 
     private static final String CONFIG_GROUP_TIMES = "Timings";
     public static final String CONFIG_TIMES_ORDERS           = "timings.ms.orders";
@@ -103,6 +126,7 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TIMES_BADGEINS         = "timings.ms.badgeins";
     public static final String CONFIG_TIMES_NEWCUSTOMERS     = "timings.ms.newcustomers";
     public static final String CONFIG_TIMES_SENSORREADINGS   = "timings.ms.sensorreadings";
+    public static final String CONFIG_TIMES_ONLINEORDERS     = "timings.ms.onlineorders";
 
 
     public static final ConfigDef CONFIG_DEF = new ConfigDef()
@@ -116,51 +140,72 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Format to use for timestamps generated for events.",
                     CONFIG_GROUP_FORMATS, 1, Width.LONG, "Timestamp format")
+        .define(CONFIG_FORMATS_TIMESTAMPS_LTZ,
+                    Type.STRING,
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Format to use for timestamps with local time zone generated for events.",
+                    CONFIG_GROUP_FORMATS, 1, Width.LONG, "Timestamp format with local time zone")
         //
         // names of topics to produce messages to
         //
-        .define(CONFIG_TOPICNAME_ORDERS, 
-                    Type.STRING, 
+        .define(CONFIG_TOPICNAME_ORDERS,
+                    Type.STRING,
                     "ORDERS.NEW",
                     new NonEmptyString(),
                     Importance.LOW,
-                    "Name of the topic to use for order events", 
-                    CONFIG_GROUP_TOPICNAMES, 1, Width.LONG, "Orders topic")        
-        .define(CONFIG_TOPICNAME_CANCELLATIONS, 
-                    Type.STRING, 
+                    "Name of the topic to use for order events",
+                    CONFIG_GROUP_TOPICNAMES, 1, Width.LONG, "Orders topic")
+        .define(CONFIG_TOPICNAME_CANCELLATIONS,
+                    Type.STRING,
                     "CANCELLATIONS",
                     new NonEmptyString(),
                     Importance.LOW,
-                    "Name of the topic to use for cancellation events", 
+                    "Name of the topic to use for cancellation events",
                     CONFIG_GROUP_TOPICNAMES, 2, Width.LONG, "Cancellations topic")
-        .define(CONFIG_TOPICNAME_STOCKMOVEMENTS, 
-                    Type.STRING, 
+        .define(CONFIG_TOPICNAME_STOCKMOVEMENTS,
+                    Type.STRING,
                     "STOCK.MOVEMENT",
                     new NonEmptyString(),
                     Importance.LOW,
-                    "Name of the topic to use for stock movement events", 
+                    "Name of the topic to use for stock movement events",
                     CONFIG_GROUP_TOPICNAMES, 3, Width.LONG, "Stock movements topic")
-        .define(CONFIG_TOPICNAME_BADGEINS, 
-                    Type.STRING, 
+        .define(CONFIG_TOPICNAME_BADGEINS,
+                    Type.STRING,
                     "DOOR.BADGEIN",
                     new NonEmptyString(),
                     Importance.LOW,
-                    "Name of the topic to use for door badge-in events", 
+                    "Name of the topic to use for door badge-in events",
                     CONFIG_GROUP_TOPICNAMES, 4, Width.LONG, "Door badge-ins topic")
-        .define(CONFIG_TOPICNAME_CUSTOMERS, 
-                    Type.STRING, 
+        .define(CONFIG_TOPICNAME_CUSTOMERS,
+                    Type.STRING,
                     "CUSTOMERS.NEW",
                     new NonEmptyString(),
                     Importance.LOW,
-                    "Name of the topic to use for customer registration events", 
+                    "Name of the topic to use for customer registration events",
                     CONFIG_GROUP_TOPICNAMES, 5, Width.LONG, "Customers topic")
-        .define(CONFIG_TOPICNAME_SENSORREADINGS, 
-                    Type.STRING, 
+        .define(CONFIG_TOPICNAME_SENSORREADINGS,
+                    Type.STRING,
                     "SENSOR.READINGS",
                     new NonEmptyString(),
                     Importance.LOW,
-                    "Name of the topic to use for sensor reading events", 
+                    "Name of the topic to use for sensor reading events",
                     CONFIG_GROUP_TOPICNAMES, 6, Width.LONG, "Sensor readings topic")
+        .define(CONFIG_TOPICNAME_ONLINEORDERS,
+                    Type.STRING,
+                    "ORDERS.ONLINE",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for online order events",
+                    CONFIG_GROUP_TOPICNAMES, 7, Width.LONG, "Online orders topic")
+        .define(CONFIG_TOPICNAME_OUTOFSTOCKS,
+                    Type.STRING,
+                    "STOCK.NOSTOCK",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for out-of-stock events",
+                    CONFIG_GROUP_TOPICNAMES, 8, Width.LONG, "Out-of-stocks topic")
         //
         // how to generate locations
         //
@@ -354,6 +399,96 @@ public class DatagenSourceConfig {
                     "Maximum delay before a new customer (who is going to make an immediate order) should create their first order, in milliseconds. Must be at least 30000.",
                     CONFIG_GROUP_NEWCUSTOMERS, 3, Width.SHORT, "New customers immediate-order max delay")
         //
+        // Generating online orders
+        //
+        .define(CONFIG_ONLINEORDERS_PRODUCTS_MIN,
+                    Type.INT,
+                    1,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Minimum number of products in an online order. Must be greater than 0.",
+                    CONFIG_GROUP_ONLINEORDERS, 1, Width.SHORT, "Min product count")
+        .define(CONFIG_ONLINEORDERS_PRODUCTS_MAX,
+                    Type.INT,
+                    5,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Maximum number of products in an online order. Must be greater than 0.",
+                    CONFIG_GROUP_ONLINEORDERS, 2, Width.SHORT, "Max product count")
+        .define(CONFIG_ONLINEORDERS_CUSTOMER_EMAILS_MIN,
+                    Type.INT,
+                    1,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Minimum number of emails for a customer in an online order. Must be greater than 0.",
+                    CONFIG_GROUP_ONLINEORDERS, 3, Width.SHORT, "Min customer email count")
+        .define(CONFIG_ONLINEORDERS_CUSTOMER_EMAILS_MAX,
+                    Type.INT,
+                    2,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Maximum number of emails for a customer in an online order. Must be greater than 0.",
+                    CONFIG_GROUP_ONLINEORDERS, 4, Width.SHORT, "Max customer email count")
+        .define(CONFIG_ONLINEORDERS_ADDRESS_PHONES_MIN,
+                    Type.INT,
+                    0,
+                    Range.atLeast(0),
+                    Importance.LOW,
+                    "Minimum number of phones in an address for an online order. Must be at least 0.",
+                    CONFIG_GROUP_ONLINEORDERS, 5, Width.SHORT, "Min address phone count")
+        .define(CONFIG_ONLINEORDERS_ADDRESS_PHONES_MAX,
+                    Type.INT,
+                    2,
+                    Range.atLeast(0),
+                    Importance.LOW,
+                    "Maximum number of phones in an address for an online order. Must be at least 0.",
+                    CONFIG_GROUP_ONLINEORDERS, 6, Width.SHORT, "Max address phone count")
+        .define(CONFIG_ONLINEORDERS_REUSE_ADDRESS_RATIO,
+                    Type.DOUBLE,
+                    0.55,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Ratio of orders that use the same address as shipping and billing address. Must be between 0 and 1.",
+                    CONFIG_GROUP_NEWCUSTOMERS, 7, Width.SHORT, "Reuse address ratio")
+        .define(CONFIG_ONLINEORDERS_OUTOFSTOCK_RATIO,
+                    Type.DOUBLE,
+                    0.22,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Ratio of orders that have at least one product that runs out-of-stock after the order has been placed. Must be between 0 and 1.",
+                    CONFIG_GROUP_CANCELLATIONS, 8, Width.SHORT, "Out-of-stock product ratio")
+        //
+        // Generating out-of-stock events
+        //
+        .define(CONFIG_OUTOFSTOCKS_RESTOCKING_MIN_DELAY,
+                    Type.INT,
+                    1, // 1 day
+                    Range.atLeast(1),  // 1 day
+                    Importance.LOW,
+                    "Minimum delay (in *days*) between the time that the product was out-of-stock and the restocking date. Must be at least 1.",
+                    CONFIG_GROUP_OUTOFSTOCKS, 1, Width.SHORT, "Out-of-stock events - restocking min delay")
+        .define(CONFIG_OUTOFSTOCKS_RESTOCKING_MAX_DELAY,
+                    Type.INT,
+                    5, // 5 days
+                    Range.atLeast(3),  // 3 days
+                    Importance.LOW,
+                    "Maximum delay (in *days*) between the time that the product was out-of-stock and the restocking date. Must be at least 3.",
+                    CONFIG_GROUP_OUTOFSTOCKS, 2, Width.SHORT, "Out-of-stock events - restocking max delay")
+        .define(CONFIG_OUTOFSTOCKS_MIN_DELAY,
+                    Type.INT,
+                    300_000, // 5 minutes
+                    Range.atLeast(60_000), // 1 minute
+                    Importance.LOW,
+                    "Minimum delay before an out-of-stock event is generated after an order has been placed, in milliseconds. Must be at least 60000.",
+                    CONFIG_GROUP_OUTOFSTOCKS, 3, Width.SHORT, "Min out-of-stock event delay")
+        .define(CONFIG_OUTOFSTOCKS_MAX_DELAY,
+                    Type.INT,
+                    7_200_000, // 2 hours
+                    Range.atLeast(120_000), // 2 minutes
+                    Importance.LOW,
+                    "Maximum delay before an out-of-stock event is generated after an order has been placed, in milliseconds. Must be at least 120000.",
+                    CONFIG_GROUP_OUTOFSTOCKS, 4, Width.SHORT, "Max out-of-stock event delay")
+        //
         // how long to delay messages before producing them to Kafka
         //
         .define(CONFIG_DELAYS_ORDERS,
@@ -361,43 +496,57 @@ public class DatagenSourceConfig {
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
-                    "Maximum delay (in *seconds*) to produce new order events (this is the maximum difference allowed the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    "Maximum delay (in *seconds*) to produce new order events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 1, Width.SHORT, "Order events - max produce delay")
         .define(CONFIG_DELAYS_CANCELLATIONS,
                     Type.INT,
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
-                    "Maximum delay (in *seconds*) to produce cancellation events (this is the maximum difference allowed the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    "Maximum delay (in *seconds*) to produce cancellation events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 2, Width.SHORT, "Cancellation events - max produce delay")
         .define(CONFIG_DELAYS_STOCKMOVEMENTS,
                     Type.INT,
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
-                    "Maximum delay (in *seconds*) to produce stock movement events (this is the maximum difference allowed the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    "Maximum delay (in *seconds*) to produce stock movement events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 3, Width.SHORT, "Stock movement events - max produce delay")
         .define(CONFIG_DELAYS_BADGEINS,
                     Type.INT,
                     180,  // payload time can be up to 3 minutes behind event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
-                    "Maximum delay (in *seconds*) to produce badge events (this is the maximum difference allowed the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    "Maximum delay (in *seconds*) to produce badge events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 4, Width.SHORT, "Badge events - max produce delay")
         .define(CONFIG_DELAYS_NEWCUSTOMERS,
                     Type.INT,
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
-                    "Maximum delay (in *seconds*) to produce customer registration events (this is the maximum difference allowed the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    "Maximum delay (in *seconds*) to produce customer registration events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 5, Width.SHORT, "New customer events - max produce delay")
         .define(CONFIG_DELAYS_SENSORREADINGS,
                     Type.INT,
                     300, // payload time can be up to 5 minutes behind event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
-                    "Maximum delay (in *seconds*) to produce sensor reading events (this is the maximum difference allowed the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
-                    CONFIG_GROUP_DELAYS, 5, Width.SHORT, "Sensor reading events - max produce delay")
+                    "Maximum delay (in *seconds*) to produce sensor reading events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    CONFIG_GROUP_DELAYS, 6, Width.SHORT, "Sensor reading events - max produce delay")
+        .define(CONFIG_DELAYS_ONLINEORDERS,
+                    Type.INT,
+                    0, // payload time matching event time by default
+                    Range.between(0, 900),  // up to 15 mins max
+                    Importance.LOW,
+                    "Maximum delay (in *seconds*) to produce new online order events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    CONFIG_GROUP_DELAYS, 7, Width.SHORT, "Online order events - max produce delay")
+        .define(CONFIG_DELAYS_OUTOFSTOCKS,
+                    Type.INT,
+                    0, // payload time matching event time by default
+                    Range.between(0, 900),  // up to 15 mins max
+                    Importance.LOW,
+                    "Maximum delay (in *seconds*) to produce new out-of-stock events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    CONFIG_GROUP_DELAYS, 8, Width.SHORT, "Out-of-stock events - max produce delay")
         //
         // likelihood of producing duplicate messages
         //
@@ -420,21 +569,21 @@ public class DatagenSourceConfig {
                     0.1,   // duplicate approximately 10 percent of the stock movement events by default
                     Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
                     Importance.LOW,
-                    "Ratio of cancellation events that should be duplicated. Must be between 0 and 1.",
+                    "Ratio of stock movement events that should be duplicated. Must be between 0 and 1.",
                     CONFIG_GROUP_DUPLICATES, 3, Width.SHORT, "Duplicate stock movement events ratio")
         .define(CONFIG_DUPLICATE_BADGEINS,
                     Type.DOUBLE,
                     0,   // don't create duplicate events by default
                     Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
                     Importance.LOW,
-                    "Ratio of cancellation events that should be duplicated. Must be between 0 and 1.",
+                    "Ratio of badge events that should be duplicated. Must be between 0 and 1.",
                     CONFIG_GROUP_DUPLICATES, 4, Width.SHORT, "Duplicate badge events ratio")
         .define(CONFIG_DUPLICATE_NEWCUSTOMERS,
                     Type.DOUBLE,
                     0,   // don't create duplicate events by default
                     Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
                     Importance.LOW,
-                    "Ratio of cancellation events that should be duplicated. Must be between 0 and 1.",
+                    "Ratio of new customer events that should be duplicated. Must be between 0 and 1.",
                     CONFIG_GROUP_DUPLICATES, 5, Width.SHORT, "Duplicate new customer events ratio")
         .define(CONFIG_DUPLICATE_SENSORREADINGS,
                     Type.DOUBLE,
@@ -442,7 +591,21 @@ public class DatagenSourceConfig {
                     Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
                     Importance.LOW,
                     "Ratio of sensor reading events that should be duplicated. Must be between 0 and 1.",
-                    CONFIG_GROUP_DUPLICATES, 5, Width.SHORT, "Duplicate sensor events ratio")
+                    CONFIG_GROUP_DUPLICATES, 6, Width.SHORT, "Duplicate sensor reading events ratio")
+        .define(CONFIG_DUPLICATE_ONLINEORDERS,
+                    Type.DOUBLE,
+                    0,   // don't create duplicate events by default
+                    Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
+                    Importance.LOW,
+                    "Ratio of online order events that should be duplicated. Must be between 0 and 1.",
+                    CONFIG_GROUP_DUPLICATES, 7, Width.SHORT, "Duplicate online order events ratio")
+        .define(CONFIG_DUPLICATE_OUTOFSTOCKS,
+                    Type.DOUBLE,
+                    0,   // don't create duplicate events by default
+                    Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
+                    Importance.LOW,
+                    "Ratio of out-of-stock events that should be duplicated. Must be between 0 and 1.",
+                    CONFIG_GROUP_DUPLICATES, 8, Width.SHORT, "Duplicate out-of-stock events ratio")
         //
         // How frequently to generate messages
         //
@@ -480,20 +643,28 @@ public class DatagenSourceConfig {
                     Range.atLeast(500),
                     Importance.LOW,
                     "Delay, in milliseconds, between each badge in event that should be generated.",
-                    CONFIG_GROUP_TIMES, 4, Width.MEDIUM, "Stock movements delay")
+                    CONFIG_GROUP_TIMES, 5, Width.MEDIUM, "Badges delay")
         .define(CONFIG_TIMES_NEWCUSTOMERS,
                     Type.INT,
                     543_400, // a little over 9 minutes
                     Range.atLeast(5_000),  // 5 seconds
                     Importance.LOW,
-                    "Delay, in milliseconds, between each new customer that should be generated.")
+                    "Delay, in milliseconds, between each new customer that should be generated.",
+                    CONFIG_GROUP_TIMES, 6, Width.MEDIUM, "New customers delay")
         .define(CONFIG_TIMES_SENSORREADINGS,
                     Type.INT,
                     27_000, // 27 seconds
                     Range.atLeast(5_000),  // 5 seconds
                     Importance.LOW,
-                    "Delay, in milliseconds, between each sensor reading that should be generated.");
-
+                    "Delay, in milliseconds, between each sensor reading that should be generated.",
+                    CONFIG_GROUP_TIMES, 7, Width.MEDIUM, "Sensor readings delay")
+        .define(CONFIG_TIMES_ONLINEORDERS,
+                    Type.INT,
+                    30_000, // 30 seconds
+                    Range.atLeast(500),
+                    Importance.LOW,
+                    "Delay, in milliseconds, between each online order that should be generated.",
+                    CONFIG_GROUP_TIMES, 8, Width.MEDIUM, "Online orders delay");
 
 
 

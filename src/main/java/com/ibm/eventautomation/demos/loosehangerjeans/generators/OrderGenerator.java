@@ -28,7 +28,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
- * Generates a {@link Order} event using randomly generated data.
+ * Generates an {@link Order} event using randomly generated data.
  */
 public class OrderGenerator {
 
@@ -41,7 +41,7 @@ public class OrderGenerator {
     private final double maxPrice;
 
     /** helper class to randomly generate the name of a product */
-    private ProductGenerator productDescriptionGenerator;
+    private ProductGenerator productGenerator;
 
     /** formatter for event timestamps */
     private final DateTimeFormatter timestampFormatter;
@@ -66,7 +66,7 @@ public class OrderGenerator {
 
     public OrderGenerator(AbstractConfig config)
     {
-        this.productDescriptionGenerator = new ProductGenerator(config);
+        this.productGenerator = new ProductGenerator(config);
 
         this.regions = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_REGIONS);
         this.minPrice = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTS_MIN_PRICE);
@@ -80,7 +80,7 @@ public class OrderGenerator {
     /** generates a random order */
     public Order generate(int minItems, int maxItems) {
         double unitPrice = Generators.randomPrice(minPrice, maxPrice);
-        String description = productDescriptionGenerator.generate();
+        String description = productGenerator.generate().getDescription();
         String region = Generators.randomItem(regions);
         Customer customer = new Customer(faker);
 
@@ -100,7 +100,7 @@ public class OrderGenerator {
         int minItems = 1;
         int maxItems = 1;
         double unitPrice = Generators.randomPrice(minPrice, maxPrice);
-        String description = productDescriptionGenerator.generate();
+        String description = productGenerator.generate().getDescription();
         String region = Generators.randomItem(regions);
 
         return generate(minItems, maxItems,

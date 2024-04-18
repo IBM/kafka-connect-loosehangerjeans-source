@@ -34,6 +34,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.tasks.BadgeInTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.FalsePositivesTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NewCustomerTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NormalOrdersTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.OnlineOrdersTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SensorReadingTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.StockMovementsTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SuspiciousOrdersTask;
@@ -59,7 +60,6 @@ public class DatagenSourceTask extends SourceTask {
      *  messages, they will add messages to this queue.
      */
     private Queue<SourceRecord> queue = new ConcurrentLinkedQueue<>();
-
 
 
 
@@ -103,6 +103,11 @@ public class DatagenSourceTask extends SourceTask {
         // IoT sensor readings
         SensorReadingTask sensorReadings = new SensorReadingTask(config, queue);
         generateTimer.scheduleAtFixedRate(sensorReadings, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_SENSORREADINGS));
+
+        // online orders
+        // create online orders and out-of-stock events
+        OnlineOrdersTask onlineOrders = new OnlineOrdersTask(config, queue, generateTimer);
+        generateTimer.scheduleAtFixedRate(onlineOrders, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_ONLINEORDERS));
     }
 
 

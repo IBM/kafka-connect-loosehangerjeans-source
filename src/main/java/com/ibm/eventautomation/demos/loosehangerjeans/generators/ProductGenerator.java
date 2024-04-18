@@ -17,6 +17,7 @@ package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
 import java.util.List;
 
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import org.apache.kafka.common.config.AbstractConfig;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
@@ -31,7 +32,6 @@ public class ProductGenerator {
     private final List<String> sizes;
     private final List<String> materials;
     private final List<String> styles;
-
     private final String product;
 
 
@@ -43,10 +43,11 @@ public class ProductGenerator {
         this.product = config.getString(DatagenSourceConfig.CONFIG_PRODUCTS_NAME);
     }
 
-    public String generate() {
-        return Generators.randomItem(sizes) + " " +
-               Generators.randomItem(materials) + " " +
-               Generators.randomItem(styles) + " " +
-               product;
+    public Product generate() {
+        Product generatedProduct = new Product(Generators.randomItem(sizes),
+            Generators.randomItem(materials),
+            Generators.randomItem(styles),
+            product);
+        return generatedProduct;
     }
 }
