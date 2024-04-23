@@ -338,7 +338,7 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_CANCELLATIONS, 3, Width.SHORT, "Max cancellations delay")
         .define(CONFIG_CANCELLATIONS_REASONS,
                     Type.LIST,
-                    Arrays.asList("CHANGEDMIND", "BADFIT"),
+                    Arrays.asList("CHANGEDMIND", "BADFIT", "SHIPPINGDELAY", "DELIVERYERROR", "CHEAPERELSEWHERE"),
                     new ValidTermsList(),
                     Importance.LOW,
                     "List of reasons to use for generated cancellations. Reasons cannot contain spaces.",

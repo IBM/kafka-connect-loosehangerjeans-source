@@ -223,7 +223,7 @@ spec:
     cancellations.delay.ms.min: 300000   # 5 minutes
     cancellations.delay.ms.max: 7200000  # 2 hours
     # reason given for a cancellation
-    cancellations.reasons: CHANGEDMIND,BADFIT
+    cancellations.reasons: CHANGEDMIND,BADFIT,SHIPPINGDELAY,DELIVERYERROR,CHEAPERELSEWHERE
 
     #
     # suspicious orders
