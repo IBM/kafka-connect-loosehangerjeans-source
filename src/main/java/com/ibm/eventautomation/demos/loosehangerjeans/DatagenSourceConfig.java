@@ -43,6 +43,8 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TOPICNAME_SENSORREADINGS = "topic.name.sensorreadings";
     public static final String CONFIG_TOPICNAME_ONLINEORDERS   = "topic.name.onlineorders";
     public static final String CONFIG_TOPICNAME_OUTOFSTOCKS    = "topic.name.outofstocks";
+    public static final String CONFIG_TOPICNAME_RETURNREQUESTS = "topic.name.returnrequests";
+    public static final String CONFIG_TOPICNAME_PRODUCTREVIEWS = "topic.name.productreviews";
 
     private static final String CONFIG_GROUP_LOCATIONS = "Locations";
     public static final String CONFIG_LOCATIONS_REGIONS    = "locations.regions";
@@ -98,6 +100,25 @@ public class DatagenSourceConfig {
     public static final String CONFIG_OUTOFSTOCKS_MIN_DELAY             = "outofstocks.delay.ms.min";
     public static final String CONFIG_OUTOFSTOCKS_MAX_DELAY             = "outofstocks.delay.ms.max";
 
+    private static final String CONFIG_GROUP_RETURNREQUESTS = "Return requests";
+    public static final String CONFIG_RETURNREQUESTS_PRODUCTS_MIN           = "returnrequests.products.min";
+    public static final String CONFIG_RETURNREQUESTS_PRODUCTS_MAX           = "returnrequests.products.max";
+    public static final String CONFIG_RETURNREQUESTS_PRODUCT_QUANTITY_MIN   = "returnrequests.product.quantity.min";
+    public static final String CONFIG_RETURNREQUESTS_PRODUCT_QUANTITY_MAX   = "returnrequests.product.quantity.max";
+    public static final String CONFIG_RETURNREQUESTS_CUSTOMER_EMAILS_MIN    = "returnrequests.customer.emails.min";
+    public static final String CONFIG_RETURNREQUESTS_CUSTOMER_EMAILS_MAX    = "returnrequests.customer.emails.max";
+    public static final String CONFIG_RETURNREQUESTS_ADDRESS_PHONES_MIN     = "returnrequests.address.phones.min";
+    public static final String CONFIG_RETURNREQUESTS_ADDRESS_PHONES_MAX     = "returnrequests.address.phones.max";
+    public static final String CONFIG_RETURNREQUESTS_REUSE_ADDRESS_RATIO    = "returnrequests.reuse.address.ratio";
+    public static final String CONFIG_RETURNREQUESTS_REASONS                = "returnrequests.reasons";
+    public static final String CONFIG_RETURNREQUESTS_REVIEW_RATIO           = "returnrequests.review.ratio";
+
+    private static final String CONFIG_GROUP_PRODUCTREVIEWS = "Product reviews";
+    public static final String CONFIG_PRODUCTREVIEWS_PRODUCTS_WITH_SIZE_ISSUE_COUNT     = "productreviews.products.with.size.issue.count";
+    public static final String CONFIG_PRODUCTREVIEWS_REVIEW_WITH_SIZE_ISSUE_RATIO       = "productreviews.review.with.size.issue.ratio";
+    public static final String CONFIG_PRODUCTREVIEWS_MIN_DELAY                          = "productreviews.min.delay";
+    public static final String CONFIG_PRODUCTREVIEWS_MAX_DELAY                          = "productreviews.max.delay";
+
     private static final String CONFIG_GROUP_DELAYS = "Event delays";
     public static final String CONFIG_DELAYS_ORDERS         = "eventdelays.orders.secs.max";
     public static final String CONFIG_DELAYS_CANCELLATIONS  = "eventdelays.cancellations.secs.max";
@@ -107,6 +128,8 @@ public class DatagenSourceConfig {
     public static final String CONFIG_DELAYS_SENSORREADINGS = "eventdelays.sensorreadings.secs.max";
     public static final String CONFIG_DELAYS_ONLINEORDERS   = "eventdelays.onlineorders.secs.max";
     public static final String CONFIG_DELAYS_OUTOFSTOCKS    = "eventdelays.outofstocks.secs.max";
+    public static final String CONFIG_DELAYS_RETURNREQUESTS   = "eventdelays.returnrequests.secs.max";
+    public static final String CONFIG_DELAYS_PRODUCTREVIEWS   = "eventdelays.productreviews.secs.max";
 
     private static final String CONFIG_GROUP_DUPLICATES = "Duplicate events";
     public static final String CONFIG_DUPLICATE_ORDERS         = "duplicates.orders.ratio";
@@ -117,6 +140,8 @@ public class DatagenSourceConfig {
     public static final String CONFIG_DUPLICATE_SENSORREADINGS = "duplicates.sensorreadings.ratio";
     public static final String CONFIG_DUPLICATE_ONLINEORDERS   = "duplicates.onlineorders.ratio";
     public static final String CONFIG_DUPLICATE_OUTOFSTOCKS    = "duplicates.outofstocks.ratio";
+    public static final String CONFIG_DUPLICATE_RETURNREQUESTS = "duplicates.returnrequests.ratio";
+    public static final String CONFIG_DUPLICATE_PRODUCTREVIEWS = "duplicates.productreviews.ratio";
 
     private static final String CONFIG_GROUP_TIMES = "Timings";
     public static final String CONFIG_TIMES_ORDERS           = "timings.ms.orders";
@@ -127,7 +152,8 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TIMES_NEWCUSTOMERS     = "timings.ms.newcustomers";
     public static final String CONFIG_TIMES_SENSORREADINGS   = "timings.ms.sensorreadings";
     public static final String CONFIG_TIMES_ONLINEORDERS     = "timings.ms.onlineorders";
-
+    public static final String CONFIG_TIMES_RETURNREQUESTS   = "timings.ms.returnrequests";
+    public static final String CONFIG_TIMES_PRODUCTREVIEWS   = "timings.ms.productreviews";
 
     public static final ConfigDef CONFIG_DEF = new ConfigDef()
         //
@@ -206,6 +232,20 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Name of the topic to use for out-of-stock events",
                     CONFIG_GROUP_TOPICNAMES, 8, Width.LONG, "Out-of-stocks topic")
+        .define(CONFIG_TOPICNAME_RETURNREQUESTS,
+                    Type.STRING,
+                    "RETURN.REQUESTS",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for return request events",
+                    CONFIG_GROUP_TOPICNAMES, 9, Width.LONG, "Return requests topic")
+        .define(CONFIG_TOPICNAME_PRODUCTREVIEWS,
+                    Type.STRING,
+                    "PRODUCT.REVIEWS",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for product review events",
+                    CONFIG_GROUP_TOPICNAMES, 10, Width.LONG, "Product reviews topic")
         //
         // how to generate locations
         //
@@ -449,14 +489,14 @@ public class DatagenSourceConfig {
                     Range.between(0, 1),
                     Importance.LOW,
                     "Ratio of orders that use the same address as shipping and billing address. Must be between 0 and 1.",
-                    CONFIG_GROUP_NEWCUSTOMERS, 7, Width.SHORT, "Reuse address ratio")
+                    CONFIG_GROUP_ONLINEORDERS, 7, Width.SHORT, "Reuse address ratio")
         .define(CONFIG_ONLINEORDERS_OUTOFSTOCK_RATIO,
                     Type.DOUBLE,
                     0.22,
                     Range.between(0, 1),
                     Importance.LOW,
                     "Ratio of orders that have at least one product that runs out-of-stock after the order has been placed. Must be between 0 and 1.",
-                    CONFIG_GROUP_CANCELLATIONS, 8, Width.SHORT, "Out-of-stock product ratio")
+                    CONFIG_GROUP_ONLINEORDERS, 8, Width.SHORT, "Out-of-stock product ratio")
         //
         // Generating out-of-stock events
         //
@@ -488,6 +528,117 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Maximum delay before an out-of-stock event is generated after an order has been placed, in milliseconds. Must be at least 120000.",
                     CONFIG_GROUP_OUTOFSTOCKS, 4, Width.SHORT, "Max out-of-stock event delay")
+        //
+        // Generating return requests
+        //
+        .define(CONFIG_RETURNREQUESTS_PRODUCTS_MIN,
+                    Type.INT,
+                    1,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Minimum number of products in a return request. Must be greater than 0.",
+                    CONFIG_GROUP_RETURNREQUESTS, 1, Width.SHORT, "Min product count")
+        .define(CONFIG_RETURNREQUESTS_PRODUCTS_MAX,
+                    Type.INT,
+                    4,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Maximum number of products in a return request. Must be greater than 0.",
+                    CONFIG_GROUP_RETURNREQUESTS, 2, Width.SHORT, "Max product count")
+        .define(CONFIG_RETURNREQUESTS_PRODUCT_QUANTITY_MIN,
+                    Type.INT,
+                    1,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Minimum quantity for each product in a return request. Must be greater than 0.",
+                    CONFIG_GROUP_RETURNREQUESTS, 3, Width.SHORT, "Min quantity per product")
+        .define(CONFIG_RETURNREQUESTS_PRODUCT_QUANTITY_MAX,
+                    Type.INT,
+                    3,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Maximum quantity for each product in a return request. Must be greater than 0.",
+                    CONFIG_GROUP_RETURNREQUESTS, 4, Width.SHORT, "Max quantity per product")
+        .define(CONFIG_RETURNREQUESTS_CUSTOMER_EMAILS_MIN,
+                    Type.INT,
+                    1,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Minimum number of emails for a customer in a return request. Must be greater than 0.",
+                    CONFIG_GROUP_RETURNREQUESTS, 5, Width.SHORT, "Min customer email count")
+        .define(CONFIG_RETURNREQUESTS_CUSTOMER_EMAILS_MAX,
+                    Type.INT,
+                    2,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Maximum number of emails for a customer in a return request. Must be greater than 0.",
+                    CONFIG_GROUP_RETURNREQUESTS, 6, Width.SHORT, "Max customer email count")
+        .define(CONFIG_RETURNREQUESTS_ADDRESS_PHONES_MIN,
+                    Type.INT,
+                    0,
+                    Range.atLeast(0),
+                    Importance.LOW,
+                    "Minimum number of phones in an address for a return request. Must be at least 0.",
+                    CONFIG_GROUP_RETURNREQUESTS, 7, Width.SHORT, "Min address phone count")
+        .define(CONFIG_RETURNREQUESTS_ADDRESS_PHONES_MAX,
+                    Type.INT,
+                    2,
+                    Range.atLeast(0),
+                    Importance.LOW,
+                    "Maximum number of phones in an address for a return request. Must be at least 0.",
+                    CONFIG_GROUP_RETURNREQUESTS, 8, Width.SHORT, "Max address phone count")
+        .define(CONFIG_RETURNREQUESTS_REUSE_ADDRESS_RATIO,
+                    Type.DOUBLE,
+                    0.75,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Ratio of return requests that use the same address as shipping and billing address. Must be between 0 and 1.",
+                    CONFIG_GROUP_RETURNREQUESTS, 9, Width.SHORT, "Reuse address ratio")
+        .define(CONFIG_RETURNREQUESTS_REASONS,
+                    Type.LIST,
+                    Arrays.asList("CHANGEDMIND", "BADFIT", "SHIPPINGDELAY", "DELIVERYERROR", "CHEAPERELSEWHERE", "OTHER"),
+                    new ValidTermsList(),
+                    Importance.LOW,
+                    "List of reasons to use for return requests. Reasons cannot contain spaces.",
+                    CONFIG_GROUP_RETURNREQUESTS, 10, Width.SHORT, "Return reason codes")
+        .define(CONFIG_RETURNREQUESTS_REVIEW_RATIO,
+                    Type.DOUBLE,
+                    0.32,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Ratio of return requests that have at least one product that has a review that is posted after the return request is issued. Must be between 0 and 1.",
+                    CONFIG_GROUP_RETURNREQUESTS, 11, Width.SHORT, "Product review ratio")
+        //
+        // Generating product reviews
+        //
+        .define(CONFIG_PRODUCTREVIEWS_PRODUCTS_WITH_SIZE_ISSUE_COUNT,
+                    Type.INT,
+                    10,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Number of products that have a size issue. Must be greater than 0.",
+                    CONFIG_GROUP_PRODUCTREVIEWS, 1, Width.SHORT, "Product with size issue count")
+        .define(CONFIG_PRODUCTREVIEWS_REVIEW_WITH_SIZE_ISSUE_RATIO,
+                    Type.DOUBLE,
+                    0.75,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Ratio of product reviews with a size issue for products that are supposed to have a size issue. Must be between 0 and 1.",
+                    CONFIG_GROUP_PRODUCTREVIEWS, 2, Width.SHORT, "Product review with size issue ratio")
+        .define(CONFIG_PRODUCTREVIEWS_MIN_DELAY,
+                    Type.INT,
+                    300_000, // 5 minutes
+                    Range.atLeast(60_000), // 1 minute
+                    Importance.LOW,
+                    "Minimum delay before a product review event is generated after a return request has been issued, in milliseconds. Must be at least 60000.",
+                    CONFIG_GROUP_PRODUCTREVIEWS, 3, Width.SHORT, "Min product review event delay")
+        .define(CONFIG_PRODUCTREVIEWS_MAX_DELAY,
+                    Type.INT,
+                    3_600_000, // 1 hour
+                    Range.atLeast(120_000), // 2 minutes
+                    Importance.LOW,
+                    "Maximum delay before a product review event is generated after a return request has been issued, in milliseconds. Must be at least 120000.",
+                    CONFIG_GROUP_PRODUCTREVIEWS, 4, Width.SHORT, "Max product review event delay")
         //
         // how long to delay messages before producing them to Kafka
         //
@@ -547,6 +698,20 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Maximum delay (in *seconds*) to produce new out-of-stock events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 8, Width.SHORT, "Out-of-stock events - max produce delay")
+        .define(CONFIG_DELAYS_RETURNREQUESTS,
+                    Type.INT,
+                    0, // payload time matching event time by default
+                    Range.between(0, 900),  // up to 15 mins max
+                    Importance.LOW,
+                    "Maximum delay (in *seconds*) to produce new return request events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    CONFIG_GROUP_DELAYS, 9, Width.SHORT, "Return request events - max produce delay")
+        .define(CONFIG_DELAYS_PRODUCTREVIEWS,
+                    Type.INT,
+                    0, // payload time matching event time by default
+                    Range.between(0, 900),  // up to 15 mins max
+                    Importance.LOW,
+                    "Maximum delay (in *seconds*) to produce new product review events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    CONFIG_GROUP_DELAYS, 10, Width.SHORT, "Product review events - max produce delay")
         //
         // likelihood of producing duplicate messages
         //
@@ -606,6 +771,20 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Ratio of out-of-stock events that should be duplicated. Must be between 0 and 1.",
                     CONFIG_GROUP_DUPLICATES, 8, Width.SHORT, "Duplicate out-of-stock events ratio")
+        .define(CONFIG_DUPLICATE_RETURNREQUESTS,
+                    Type.DOUBLE,
+                    0,   // don't create duplicate events by default
+                    Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
+                    Importance.LOW,
+                    "Ratio of return request events that should be duplicated. Must be between 0 and 1.",
+                    CONFIG_GROUP_DUPLICATES, 9, Width.SHORT, "Duplicate return request events ratio")
+        .define(CONFIG_DUPLICATE_PRODUCTREVIEWS,
+                    Type.DOUBLE,
+                    0,   // don't create duplicate events by default
+                    Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
+                    Importance.LOW,
+                    "Ratio of product review events that should be duplicated. Must be between 0 and 1.",
+                    CONFIG_GROUP_DUPLICATES, 10, Width.SHORT, "Duplicate product review events ratio")
         //
         // How frequently to generate messages
         //
@@ -664,8 +843,21 @@ public class DatagenSourceConfig {
                     Range.atLeast(500),
                     Importance.LOW,
                     "Delay, in milliseconds, between each online order that should be generated.",
-                    CONFIG_GROUP_TIMES, 8, Width.MEDIUM, "Online orders delay");
-
+                    CONFIG_GROUP_TIMES, 8, Width.MEDIUM, "Online orders delay")
+        .define(CONFIG_TIMES_RETURNREQUESTS,
+                    Type.INT,
+                    30_000, // 30 seconds
+                    Range.atLeast(500),
+                    Importance.LOW,
+                    "Delay, in milliseconds, between each return request that should be generated.",
+                    CONFIG_GROUP_TIMES, 9, Width.MEDIUM, "Return requests delay")
+        .define(CONFIG_TIMES_PRODUCTREVIEWS,
+                    Type.INT,
+                    30_000, // 30 seconds
+                    Range.atLeast(500),
+                    Importance.LOW,
+                    "Delay, in milliseconds, between each product review that should be generated.",
+                    CONFIG_GROUP_TIMES, 10, Width.MEDIUM, "Product reviews delay");
 
 
     private static class ValidTermsList implements Validator {

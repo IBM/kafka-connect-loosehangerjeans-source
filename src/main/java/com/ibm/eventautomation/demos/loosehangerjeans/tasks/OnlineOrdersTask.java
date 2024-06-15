@@ -42,7 +42,7 @@ public class OnlineOrdersTask extends TimerTask {
 
     /**
      * Queue of messages waiting to be delivered to Kafka.
-     *  Generated OnlineOrder events will be added to this queue.
+     *  Generated OnlineOrder and OutOfStock events will be added to this queue.
      */
     private final Queue<SourceRecord> queue;
 
@@ -110,7 +110,7 @@ public class OnlineOrdersTask extends TimerTask {
         if (Generators.shouldDo(outOfStockRatio)) {
             // Retrieve a product randomly in the order.
             List<String> products = order.getProducts();
-            String productDescription = products.get(Generators.randomInt(0, products.size() - 1));
+            String productDescription = Generators.randomItem(products);
             Product product = Product.parseDescription(productDescription);
             if (product != null) {
                 generateOutOfStockEvent(product);
