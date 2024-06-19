@@ -22,8 +22,19 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
+import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductReviewGenerator;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.*;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.BadgeInTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.FalsePositivesTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NewCustomerTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NormalOrdersTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.OnlineOrdersTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.ProductReviewsTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.ReturnRequestsTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SensorReadingTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.StockMovementsTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SuspiciousOrdersTask;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
@@ -104,7 +115,9 @@ public class DatagenSourceTask extends SourceTask {
 
         // return requests
         // create return requests and product reviews
-        ProductReviewGenerator productReviewGenerator = new ProductReviewGenerator(config);
+        Map<String, Product> productsWithSizeIssue = new ProductGenerator(config).generate(config.getInt(DatagenSourceConfig.CONFIG_PRODUCTREVIEWS_PRODUCTS_WITH_SIZE_ISSUE_COUNT));
+        log.info("Products that have a size issue: {}", productsWithSizeIssue.values());
+        ProductReviewGenerator productReviewGenerator = new ProductReviewGenerator(config, productsWithSizeIssue);
         ReturnRequestsTask returnRequests = new ReturnRequestsTask(config, queue, generateTimer, productReviewGenerator);
         generateTimer.scheduleAtFixedRate(returnRequests, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_RETURNREQUESTS));
 

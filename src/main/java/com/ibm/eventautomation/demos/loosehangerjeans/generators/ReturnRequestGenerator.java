@@ -17,7 +17,13 @@ package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
 import com.github.javafaker.Faker;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.*;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Address;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Country;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.NamedAddress;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineCustomer;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.ProductReturn;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.ReturnRequest;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.common.config.AbstractConfig;
 
@@ -36,6 +42,18 @@ public class ReturnRequestGenerator {
 
     /** Helper class to randomly generate the details of a product. */
     private final ProductGenerator productGenerator;
+
+    /**
+     * Ratio of products in a return request that have a size issue.
+     * Must be between 0.0 and 1.0.
+     *
+     * Setting this to 0 will mean that no product has a size issue in a given return request.
+     * Setting this to 1 will mean that all the products have a size issue in a given return request.
+     */
+    private final double productWithSizeIssueRatio;
+
+    /** Products with a size issue will be chosen from this list. */
+    private final List<Product> productsWithSizeIssue;
 
     /** Minimum number of products to include in the return request. */
     private final int minProducts;
@@ -108,8 +126,13 @@ public class ReturnRequestGenerator {
     private final Faker faker = new Faker(DEFAULT_LOCALE);
 
     /** Creates an {@link ReturnRequestGenerator} using the provided configuration. */
-    public ReturnRequestGenerator(AbstractConfig config) {
+    public ReturnRequestGenerator(AbstractConfig config,
+                                  List<Product> productsWithSizeIssue) {
         this.productGenerator = new ProductGenerator(config);
+
+        this.productsWithSizeIssue = productsWithSizeIssue;
+
+        this.productWithSizeIssueRatio = config.getDouble(DatagenSourceConfig.CONFIG_RETURNREQUESTS_PRODUCT_WITH_SIZE_ISSUE_RATIO);
 
         this.minProducts = config.getInt(DatagenSourceConfig.CONFIG_RETURNREQUESTS_PRODUCTS_MIN);
         this.maxProducts = config.getInt(DatagenSourceConfig.CONFIG_RETURNREQUESTS_PRODUCTS_MAX);
@@ -149,6 +172,8 @@ public class ReturnRequestGenerator {
         // Add the billing address to the addresses.
         addresses.add(NamedAddress.create("Billing address", billingAddress));
 
+        // A shipping address is added to the addresses only if we should not reuse the address
+        // used as billing address.
         if (!Generators.shouldDo(reuseAddressRatio)) {
             // Generate a random shipping address that is different from the billing address.
             Address shippingAddress = Address.create(faker, country, minPhones, maxPhones);
@@ -161,7 +186,10 @@ public class ReturnRequestGenerator {
         List<ProductReturn> returns = new ArrayList<>();
         for (int i = 0; i < productCount; i++) {
             int quantity = Generators.randomInt(minQuantity, maxQuantity);
-            returns.add(new ProductReturn(productGenerator.generate(), quantity, Generators.randomItem(reasons)));
+            Product product = Generators.shouldDo(productWithSizeIssueRatio)
+                    ? Generators.randomItem(productsWithSizeIssue)
+                    : productGenerator.generate();
+            returns.add(new ProductReturn(product, quantity, Generators.randomItem(reasons)));
         }
 
         return new ReturnRequest(timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),

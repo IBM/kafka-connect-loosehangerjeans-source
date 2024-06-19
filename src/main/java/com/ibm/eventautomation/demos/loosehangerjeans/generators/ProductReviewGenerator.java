@@ -31,8 +31,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -49,21 +49,22 @@ public class ProductReviewGenerator {
     /** Subset of the reviews that have a size issue. */
     private final List<Review> reviewsWithSizeIssue;
 
+    /** Products with a size issue will be chosen from this map. */
+    private final Map<String, Product> productsWithSizeIssue;
+
+    /** Formatter for event timestamps. */
+    private final DateTimeFormatter timestampFormatter;
+
     /**
      * Ratio of product reviews with a size issue for products that are supposed to have a size issue.
      * Must be between 0.0 and 1.0.
      *
-     * Setting this to 0 will mean that no specific review event with a size issue is generated
+     * Setting this to 0 will mean that no review event with a size issue is generated
      *  for a given product that is supposed to have a size issue.
      * Setting this to 1 will mean that all the review events will be generated with a size issue
      *  for a given product that is supposed to have a size issue.
      */
     private final double reviewWithSizeIssueRatio;
-
-    /** Formatter for event timestamps. */
-    private final DateTimeFormatter timestampFormatter;
-
-    private final HashMap<String, Product> productsWithSizeIssue;
 
     /**
      * Generator can simulate a source of events that offers
@@ -92,7 +93,8 @@ public class ProductReviewGenerator {
      */
     private final int MAX_DELAY_SECS;
 
-    public ProductReviewGenerator(AbstractConfig config) {
+    public ProductReviewGenerator(AbstractConfig config,
+                                  Map<String, Product> productsWithSizeIssue) {
         this.productGenerator = new ProductGenerator(config);
 
         this.reviews = initReviews();
@@ -100,12 +102,11 @@ public class ProductReviewGenerator {
         // The size corresponds to the first characteristics in the reviews.
         this.reviewsWithSizeIssue = this.reviews.stream().filter(review -> review.getCharacteristics().get(0).hasIssue()).collect(Collectors.toList());
 
-        this.productsWithSizeIssue = generateProducts(this.productGenerator,
-                config.getInt(DatagenSourceConfig.CONFIG_PRODUCTREVIEWS_PRODUCTS_WITH_SIZE_ISSUE_COUNT));
-
-        this.reviewWithSizeIssueRatio = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTREVIEWS_REVIEW_WITH_SIZE_ISSUE_RATIO);
+        this.productsWithSizeIssue = productsWithSizeIssue;
 
         this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS_LTZ));
+
+        this.reviewWithSizeIssueRatio = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTREVIEWS_REVIEW_WITH_SIZE_ISSUE_RATIO);
 
         this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_PRODUCTREVIEWS);
 
@@ -124,6 +125,10 @@ public class ProductReviewGenerator {
         return new ProductReview(timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
                 product.getShortDescription(), product.getSize(),
                 review);
+    }
+
+    public List<Product> getProductsWithSizeIssue() {
+        return new ArrayList<>(productsWithSizeIssue.values());
     }
 
     public boolean shouldDuplicate() {
@@ -147,15 +152,6 @@ public class ProductReviewGenerator {
         } else {
             throw new RuntimeException("Error while reading sample reviews");
         }
-    }
-
-    private HashMap<String, Product> generateProducts(final ProductGenerator productGenerator, final int count) {
-        HashMap<String, Product> products = new HashMap<>();
-        for (int i = 0; i < count; i++) {
-            Product product = productGenerator.generate();
-            products.put(product.getShortDescription(), product);
-        }
-        return products;
     }
 
     private Review getReviewFromRecord(final CSVRecord record) {

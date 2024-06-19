@@ -16,7 +16,9 @@
 package com.ibm.eventautomation.demos.loosehangerjeans.tasks;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.*;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.ProductReview;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.ReturnRequest;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductReviewGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ReturnRequestGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
@@ -81,7 +83,7 @@ public class ReturnRequestsTask extends TimerTask {
                               Queue<SourceRecord> queue,
                               Timer generateTimer,
                               ProductReviewGenerator productReviewGenerator) {
-        this.returnRequestGenerator = new ReturnRequestGenerator(config);
+        this.returnRequestGenerator = new ReturnRequestGenerator(config, productReviewGenerator.getProductsWithSizeIssue());
         this.queue = queue;
         this.timer = generateTimer;
         this.productReviewGenerator = productReviewGenerator;

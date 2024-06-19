@@ -16,7 +16,9 @@
 package com.ibm.eventautomation.demos.loosehangerjeans.tasks;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.*;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OutOfStock;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OnlineOrderGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OutOfStockGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;

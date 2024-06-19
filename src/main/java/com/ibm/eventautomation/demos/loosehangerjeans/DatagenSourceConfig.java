@@ -101,23 +101,24 @@ public class DatagenSourceConfig {
     public static final String CONFIG_OUTOFSTOCKS_MAX_DELAY             = "outofstocks.delay.ms.max";
 
     private static final String CONFIG_GROUP_RETURNREQUESTS = "Return requests";
-    public static final String CONFIG_RETURNREQUESTS_PRODUCTS_MIN           = "returnrequests.products.min";
-    public static final String CONFIG_RETURNREQUESTS_PRODUCTS_MAX           = "returnrequests.products.max";
-    public static final String CONFIG_RETURNREQUESTS_PRODUCT_QUANTITY_MIN   = "returnrequests.product.quantity.min";
-    public static final String CONFIG_RETURNREQUESTS_PRODUCT_QUANTITY_MAX   = "returnrequests.product.quantity.max";
-    public static final String CONFIG_RETURNREQUESTS_CUSTOMER_EMAILS_MIN    = "returnrequests.customer.emails.min";
-    public static final String CONFIG_RETURNREQUESTS_CUSTOMER_EMAILS_MAX    = "returnrequests.customer.emails.max";
-    public static final String CONFIG_RETURNREQUESTS_ADDRESS_PHONES_MIN     = "returnrequests.address.phones.min";
-    public static final String CONFIG_RETURNREQUESTS_ADDRESS_PHONES_MAX     = "returnrequests.address.phones.max";
-    public static final String CONFIG_RETURNREQUESTS_REUSE_ADDRESS_RATIO    = "returnrequests.reuse.address.ratio";
-    public static final String CONFIG_RETURNREQUESTS_REASONS                = "returnrequests.reasons";
-    public static final String CONFIG_RETURNREQUESTS_REVIEW_RATIO           = "returnrequests.review.ratio";
+    public static final String CONFIG_RETURNREQUESTS_PRODUCTS_MIN                   = "returnrequests.products.min";
+    public static final String CONFIG_RETURNREQUESTS_PRODUCTS_MAX                   = "returnrequests.products.max";
+    public static final String CONFIG_RETURNREQUESTS_PRODUCT_QUANTITY_MIN           = "returnrequests.product.quantity.min";
+    public static final String CONFIG_RETURNREQUESTS_PRODUCT_QUANTITY_MAX           = "returnrequests.product.quantity.max";
+    public static final String CONFIG_RETURNREQUESTS_CUSTOMER_EMAILS_MIN            = "returnrequests.customer.emails.min";
+    public static final String CONFIG_RETURNREQUESTS_CUSTOMER_EMAILS_MAX            = "returnrequests.customer.emails.max";
+    public static final String CONFIG_RETURNREQUESTS_ADDRESS_PHONES_MIN             = "returnrequests.address.phones.min";
+    public static final String CONFIG_RETURNREQUESTS_ADDRESS_PHONES_MAX             = "returnrequests.address.phones.max";
+    public static final String CONFIG_RETURNREQUESTS_REUSE_ADDRESS_RATIO            = "returnrequests.reuse.address.ratio";
+    public static final String CONFIG_RETURNREQUESTS_REASONS                        = "returnrequests.reasons";
+    public static final String CONFIG_RETURNREQUESTS_REVIEW_RATIO                   = "returnrequests.review.ratio";
+    public static final String CONFIG_RETURNREQUESTS_PRODUCT_WITH_SIZE_ISSUE_RATIO  = "returnrequests.product.with.size.issue.ratio";
 
     private static final String CONFIG_GROUP_PRODUCTREVIEWS = "Product reviews";
     public static final String CONFIG_PRODUCTREVIEWS_PRODUCTS_WITH_SIZE_ISSUE_COUNT     = "productreviews.products.with.size.issue.count";
     public static final String CONFIG_PRODUCTREVIEWS_REVIEW_WITH_SIZE_ISSUE_RATIO       = "productreviews.review.with.size.issue.ratio";
-    public static final String CONFIG_PRODUCTREVIEWS_MIN_DELAY                          = "productreviews.min.delay";
-    public static final String CONFIG_PRODUCTREVIEWS_MAX_DELAY                          = "productreviews.max.delay";
+    public static final String CONFIG_PRODUCTREVIEWS_MIN_DELAY                          = "productreviews.delay.ms.min";
+    public static final String CONFIG_PRODUCTREVIEWS_MAX_DELAY                          = "productreviews.delay.ms.max";
 
     private static final String CONFIG_GROUP_DELAYS = "Event delays";
     public static final String CONFIG_DELAYS_ORDERS         = "eventdelays.orders.secs.max";
@@ -234,7 +235,7 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_TOPICNAMES, 8, Width.LONG, "Out-of-stocks topic")
         .define(CONFIG_TOPICNAME_RETURNREQUESTS,
                     Type.STRING,
-                    "RETURN.REQUESTS",
+                    "PRODUCT.RETURNS",
                     new NonEmptyString(),
                     Importance.LOW,
                     "Name of the topic to use for return request events",
@@ -608,6 +609,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Ratio of return requests that have at least one product that has a review that is posted after the return request is issued. Must be between 0 and 1.",
                     CONFIG_GROUP_RETURNREQUESTS, 11, Width.SHORT, "Product review ratio")
+        .define(CONFIG_RETURNREQUESTS_PRODUCT_WITH_SIZE_ISSUE_RATIO,
+                    Type.DOUBLE,
+                    0.22,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Ratio of products in return requests that have a size issue. Must be between 0 and 1.",
+                    CONFIG_GROUP_RETURNREQUESTS, 12, Width.SHORT, "Product with size issue ratio")
         //
         // Generating product reviews
         //
