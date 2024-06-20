@@ -29,6 +29,7 @@
       "doc": "Review for the product",
       "type": {
         "type": "record",
+        "name": "Review",
         "fields": [
           {
             "name": "rating",
@@ -50,6 +51,7 @@
               "type": "array",
               "items": {
                 "type": "record",
+                "name": "Characteristic",
                 "fields": [
                   {
                     "name": "id",

@@ -16,7 +16,7 @@
       "doc": "Customer who made the online order",
       "type": {
         "type": "record",
-        "name": "customer",
+        "name": "Customer",
         "fields": [
           {
             "name": "id",
@@ -55,14 +55,14 @@
       "doc": "Address information used for the online order",
       "type": {
         "type": "record",
-        "name": "address",
+        "name": "OnlineAddress",
         "fields": [
           {
             "name": "shippingaddress",
             "doc": "Shipping address used for the online order",
             "type": {
               "type": "record",
-              "name": "shippingaddress",
+              "name": "ShippingAddress",
               "fields": [
                 {
                   "name": "number",
@@ -70,7 +70,7 @@
                     "null",
                     "int"
                   ],
-                  "doc": "Number for the shipping address"
+                  "doc": "House number for the shipping address"
                 },
                 {
                   "name": "street",
@@ -95,6 +95,7 @@
                   "doc": "Country for the shipping address",
                   "type": {
                     "type": "record",
+                    "name": "ShippingCountry",
                     "fields": [
                       {
                         "name": "code",
@@ -128,7 +129,7 @@
             "doc": "Billing address used for the online order",
             "type": {
               "type": "record",
-              "name": "billingaddress",
+              "name": "BillingAddress",
               "fields": [
                 {
                   "name": "number",
@@ -136,7 +137,7 @@
                     "null",
                     "int"
                   ],
-                  "doc": "Number for the billing address"
+                  "doc": "House number for the billing address"
                 },
                 {
                   "name": "street",
@@ -161,6 +162,7 @@
                   "doc": "Country for the billing address",
                   "type": {
                     "type": "record",
+                    "name": "BillingCountry",
                     "fields": [
                       {
                         "name": "code",

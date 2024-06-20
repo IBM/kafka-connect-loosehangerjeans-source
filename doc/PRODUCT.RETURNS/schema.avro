@@ -16,6 +16,7 @@
       "doc": "Customer who issued the return request",
       "type": {
         "type": "record",
+        "name": "Customer",
         "fields": [
           {
             "name": "id",
@@ -48,6 +49,7 @@
         "type": "array",
         "items": {
           "type": "record",
+          "name": "NamedAddress",
           "fields": [
             {
               "name": "name",
@@ -60,7 +62,7 @@
                 "null",
                 "int"
               ],
-              "doc": "Number for the address"
+              "doc": "House number for the address"
             },
             {
               "name": "street",
@@ -85,6 +87,7 @@
               "doc": "Country for the address",
               "type": {
                 "type": "record",
+                "name": "Country",
                 "fields": [
                   {
                     "name": "code",
@@ -121,12 +124,14 @@
         "type": "array",
         "items": {
           "type": "record",
+          "name": "Return",
           "fields": [
             {
               "name": "product",
               "doc": "Product that is returned",
               "type": {
                 "type": "record",
+                "name": "Product",
                 "fields": [
                   {
                     "name": "id",
