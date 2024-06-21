@@ -861,8 +861,8 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_TIMES, 9, Width.MEDIUM, "Return requests delay")
         .define(CONFIG_TIMES_PRODUCTREVIEWS,
                     Type.INT,
-                    30_000, // 30 seconds
-                    Range.atLeast(500),
+                    60_000, // 1 minute
+                    Range.atLeast(30_000), // 30 seconds
                     Importance.LOW,
                     "Delay, in milliseconds, between each product review that should be generated.",
                     CONFIG_GROUP_TIMES, 10, Width.MEDIUM, "Product reviews delay");
