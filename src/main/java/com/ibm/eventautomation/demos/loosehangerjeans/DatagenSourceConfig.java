@@ -854,8 +854,8 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_TIMES, 8, Width.MEDIUM, "Online orders delay")
         .define(CONFIG_TIMES_RETURNREQUESTS,
                     Type.INT,
-                    30_000, // 30 seconds
-                    Range.atLeast(500),
+                    300_000, // 5 minutes
+                    Range.atLeast(60_000), // 1 minute
                     Importance.LOW,
                     "Delay, in milliseconds, between each return request that should be generated.",
                     CONFIG_GROUP_TIMES, 9, Width.MEDIUM, "Return requests delay")
