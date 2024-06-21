@@ -15,10 +15,14 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
+import com.github.javafaker.Faker;
+import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -52,6 +56,30 @@ public class OnlineCustomer extends Customer {
      */
     public OnlineCustomer(String name, List<String> emails) {
         this(UUID.randomUUID().toString(), name, emails);
+    }
+
+    /**
+     * Uses the provided faker object and min, max email count to create a customer.
+     */
+    public static OnlineCustomer create(Faker faker, int minEmails, int maxEmails) {
+        // Generate a username randomly for the customer.
+        String username = faker.name().username();
+        String[] nameParts = username.split("\\.");
+        // Compute the corresponding full name.
+        String fullName = StringUtils.capitalize(nameParts[0]) + " " + StringUtils.capitalize(nameParts[1]);
+
+        // Generate some emails randomly for this customer.
+        int emailCount = Generators.randomInt(minEmails, maxEmails);
+        List<String> emails = new ArrayList<>();
+        // Use the customer username for the first email.
+        emails.add(faker.internet().safeEmailAddress(username));
+        for (int i = 1; i < emailCount; i++) {
+            // Generate other emails.
+            emails.add(faker.internet().safeEmailAddress());
+        }
+
+        // Generate the customer.
+        return new OnlineCustomer(fullName, emails);
     }
 
     public List<String> getEmails() {

@@ -22,6 +22,19 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
+import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductGenerator;
+import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductReviewGenerator;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.BadgeInTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.FalsePositivesTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NewCustomerTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NormalOrdersTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.OnlineOrdersTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.ProductReviewsTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.ReturnRequestsTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SensorReadingTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.StockMovementsTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SuspiciousOrdersTask;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
@@ -30,25 +43,16 @@ import org.slf4j.LoggerFactory;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.CancellationGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OrderGenerator;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.BadgeInTask;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.FalsePositivesTask;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NewCustomerTask;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NormalOrdersTask;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.OnlineOrdersTask;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SensorReadingTask;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.StockMovementsTask;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SuspiciousOrdersTask;
-
 
 public class DatagenSourceTask extends SourceTask {
 
-    private static Logger log = LoggerFactory.getLogger(DatagenSourceTask.class);
+    private static final Logger log = LoggerFactory.getLogger(DatagenSourceTask.class);
 
     private OrderGenerator orderGenerator;
     private CancellationGenerator cancellationGenerator;
 
     /** Schedules the random event generators */
-    private Timer generateTimer = new Timer();
+    private final Timer generateTimer = new Timer();
 
     /**
      * Queue of messages waiting to be delivered to Kafka.
@@ -59,7 +63,7 @@ public class DatagenSourceTask extends SourceTask {
      *  When the scheduled timers fire to generate randomly created
      *  messages, they will add messages to this queue.
      */
-    private Queue<SourceRecord> queue = new ConcurrentLinkedQueue<>();
+    private final Queue<SourceRecord> queue = new ConcurrentLinkedQueue<>();
 
 
 
@@ -108,6 +112,18 @@ public class DatagenSourceTask extends SourceTask {
         // create online orders and out-of-stock events
         OnlineOrdersTask onlineOrders = new OnlineOrdersTask(config, queue, generateTimer);
         generateTimer.scheduleAtFixedRate(onlineOrders, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_ONLINEORDERS));
+
+        // return requests
+        // create return requests and product reviews
+        Map<String, Product> productsWithSizeIssue = new ProductGenerator(config).generate(config.getInt(DatagenSourceConfig.CONFIG_PRODUCTREVIEWS_PRODUCTS_WITH_SIZE_ISSUE_COUNT));
+        log.info("Products that have a size issue: {}", productsWithSizeIssue.values());
+        ProductReviewGenerator productReviewGenerator = new ProductReviewGenerator(config, productsWithSizeIssue);
+        ReturnRequestsTask returnRequests = new ReturnRequestsTask(config, queue, generateTimer, productReviewGenerator);
+        generateTimer.scheduleAtFixedRate(returnRequests, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_RETURNREQUESTS));
+
+        // product reviews
+        ProductReviewsTask productReviews = new ProductReviewsTask(config, queue, productReviewGenerator);
+        generateTimer.scheduleAtFixedRate(productReviews, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_PRODUCTREVIEWS));
     }
 
 
@@ -121,7 +137,7 @@ public class DatagenSourceTask extends SourceTask {
 
 
     @Override
-    public List<SourceRecord> poll() throws InterruptedException {
+    public List<SourceRecord> poll() {
         List<SourceRecord> currentRecords = new ArrayList<>();
 
         SourceRecord nextItem = queue.poll();

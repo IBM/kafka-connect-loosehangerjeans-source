@@ -23,7 +23,6 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineAddress;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineCustomer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.config.AbstractConfig;
 
 import java.time.format.DateTimeFormatter;
@@ -134,30 +133,19 @@ public class OnlineOrderGenerator {
             products.add(productGenerator.generate().getDescription());
         }
 
-        // Generate a username randomly for the customer.
-        String username = faker.name().username();
-        String[] nameParts = username.split("\\.");
-        // Compute the corresponding full name.
-        String fullName = StringUtils.capitalize(nameParts[0]) + " " + StringUtils.capitalize(nameParts[1]);
+        // Generate a random customer.
+        OnlineCustomer customer = OnlineCustomer.create(faker, minEmails, maxEmails);
 
-        // Generate some emails randomly for this customer.
-        int emailCount = Generators.randomInt(minEmails, maxEmails);
-        List<String> emails = new ArrayList<>();
-        // Use the customer username for the first email.
-        emails.add(faker.internet().safeEmailAddress(username));
-        for (int i = 1; i < emailCount; i++) {
-            // Generate other emails.
-            emails.add(faker.internet().safeEmailAddress());
-        }
-
-        // Generate the customer.
-        OnlineCustomer customer = new OnlineCustomer(fullName, emails);
+        // Generate the country for the addresses.
+        Country country = new Country(DEFAULT_LOCALE.getCountry(), DEFAULT_LOCALE.getDisplayCountry(DEFAULT_LOCALE));
 
         // Generate a random shipping address.
-        Address shippingAddress = generateAddress();
+        Address shippingAddress = Address.create(faker, country, minPhones, maxPhones);
 
         // Possibly reuse the shipping address as billing address.
-        Address billingAddress = Generators.shouldDo(reuseAddressRatio) ? shippingAddress : generateAddress();
+        Address billingAddress = Generators.shouldDo(reuseAddressRatio)
+                ? shippingAddress
+                : Address.create(faker, country, minPhones, maxPhones);
 
         return new OnlineOrder(timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
                 customer,
@@ -167,26 +155,5 @@ public class OnlineOrderGenerator {
 
     public boolean shouldDuplicate() {
         return Generators.shouldDo(duplicatesRatio);
-    }
-
-    private Address generateAddress() {
-        // Generate some phone numbers randomly.
-        int phoneCount = Generators.randomInt(minPhones, maxPhones);
-        List<String> phones = null;
-        if (phoneCount > 0 ) {
-            phones = new ArrayList<>();
-            for (int i = 0; i < phoneCount; i++) {
-                phones.add(faker.phoneNumber().cellPhone());
-            }
-        }
-        // Generate the address.
-        com.github.javafaker.Address fakerAddress = faker.address();
-        // Generate a random address.
-        return new Address(Integer.parseInt(fakerAddress.streetAddressNumber()),
-                fakerAddress.streetName(),
-                fakerAddress.cityName(),
-                fakerAddress.zipCode(),
-                new Country(DEFAULT_LOCALE.getCountry(), DEFAULT_LOCALE.getDisplayCountry()),
-                phones);
     }
 }

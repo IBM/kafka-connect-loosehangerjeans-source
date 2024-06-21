@@ -15,10 +15,13 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
+import com.github.javafaker.Faker;
+import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +31,7 @@ import java.util.List;
 public class Address {
 
     /** The number of the address. */
-    private final int number;
+    private final Integer number;
 
     /** The street of the address. */
     private final String street;
@@ -58,7 +61,7 @@ public class Address {
             .build();
 
     /** Creates an address using the provided details. */
-    public Address(int number, String street, String city, String zipcode, Country country, List<String> phones) {
+    public Address(Integer number, String street, String city, String zipcode, Country country, List<String> phones) {
         this.number = number;
         this.street = street;
         this.city = city;
@@ -67,7 +70,31 @@ public class Address {
         this.phones = phones;
     }
 
-    public int getNumber() {
+    /**
+     * Uses the provided faker object, locale and min, max phone count to create an address.
+     */
+    public static Address create(Faker faker, Country country, int minPhones, int maxPhones) {
+        // Generate some phone numbers randomly.
+        int phoneCount = Generators.randomInt(minPhones, maxPhones);
+        List<String> phones = null;
+        if (phoneCount > 0 ) {
+            phones = new ArrayList<>();
+            for (int i = 0; i < phoneCount; i++) {
+                phones.add(faker.phoneNumber().cellPhone());
+            }
+        }
+
+        // Generate the address.
+        com.github.javafaker.Address fakerAddress = faker.address();
+        return new Address(Integer.valueOf(fakerAddress.streetAddressNumber()),
+                fakerAddress.streetName(),
+                fakerAddress.cityName(),
+                fakerAddress.zipCode(),
+                country,
+                phones);
+    }
+
+    public Integer getNumber() {
         return number;
     }
 

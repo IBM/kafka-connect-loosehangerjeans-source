@@ -15,7 +15,9 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import org.apache.kafka.common.config.AbstractConfig;
@@ -44,10 +46,18 @@ public class ProductGenerator {
     }
 
     public Product generate() {
-        Product generatedProduct = new Product(Generators.randomItem(sizes),
+        return new Product(Generators.randomItem(sizes),
             Generators.randomItem(materials),
             Generators.randomItem(styles),
             product);
-        return generatedProduct;
+    }
+
+    public Map<String, Product> generate(final int count) {
+        HashMap<String, Product> products = new HashMap<>();
+        for (int i = 0; i < count; i++) {
+            Product product = generate();
+            products.put(product.getShortDescription(), product);
+        }
+        return products;
     }
 }

@@ -4,16 +4,18 @@ Kafka Connect source connector used for generating simulated events for demos an
 
 It produces messages simulating the following events:
 
-| **Topic name**      | **Description**                                       |
-|---------------------|-------------------------------------------------------|
-| `DOOR.BADGEIN`      | An employee using their id badge to go through a door |
-| `CANCELLATIONS`     | An order being cancelled                              |
-| `CUSTOMERS.NEW`     | A new customer has registered on the website          |
-| `ORDERS.NEW`        | An order has been placed                              |
-| `SENSOR.READINGS`   | A sensor reading captured from an IoT sensor          |
-| `STOCK.MOVEMENT`    | Stock shipment received by a warehouse                |
-| `ORDERS.ONLINE`     | An online order has been placed                       |
-| `STOCK.NOSTOCK`     | A product has run out-of-stock                        |   
+| **Topic name**    | **Description**                                       |
+|-------------------|-------------------------------------------------------|
+| `DOOR.BADGEIN`    | An employee using their id badge to go through a door |
+| `CANCELLATIONS`   | An order being cancelled                              |
+| `CUSTOMERS.NEW`   | A new customer has registered on the website          |
+| `ORDERS.NEW`      | An order has been placed                              |
+| `SENSOR.READINGS` | A sensor reading captured from an IoT sensor          |
+| `STOCK.MOVEMENT`  | Stock shipment received by a warehouse                |
+| `ORDERS.ONLINE`   | An online order has been placed                       |
+| `STOCK.NOSTOCK`   | A product has run out-of-stock                        |
+| `PRODUCT.RETURNS` | A return request has been issued                      |
+| `PRODUCT.REVIEWS` | A product review has been posted                      |
 
 
 Avro schemas and sample messages for each of these topics can be found in the `./doc` folder.
@@ -78,7 +80,8 @@ spec:
     topic.name.sensorreadings: SENSOR.READINGS
     topic.name.onlineorders: ORDERS.ONLINE
     topic.name.outofstocks: STOCK.NOSTOCK
-    
+    topic.name.returnrequests: PRODUCT.RETURNS
+    topic.name.productreviews: PRODUCT.REVIEWS
 
     #
     # format of timestamps to produce
@@ -99,7 +102,7 @@ spec:
     # how often events should be created
     #
     # 'normal' random orders
-    timings.ms.orders: 30000              # every 30 seconds
+    timings.ms.orders: 30000              # every 30 seconds
     # cancellations of a large order followed by a small order of the same item
     timings.ms.falsepositives: 600000     # every 10 minutes
     # repeated cancellations of a large order followed by a small order of the same item
@@ -113,7 +116,11 @@ spec:
     # sensor reading events
     timings.ms.sensorreadings: 27000      # every 27 seconds
     # online orders
-    timings.ms.onlineorders: 30000        # every 30 seconds
+    timings.ms.onlineorders: 30000        # every 30 seconds
+    # return requests
+    timings.ms.returnrequests: 30000      # every 30 seconds
+    # product reviews
+    timings.ms.productreviews: 30000      # every 30 seconds
 
     #
     # how much of a delay to introduce when producing events
@@ -125,7 +132,7 @@ spec:
     #    time after the timestamp contained in the message payload
     #
     #    the result is that the timestamp in the message metadata
-    #    will be later then the message in the message payload
+    #    will be later than the message in the message payload
     #
     #    because the delay will be random (up to the specified max)
     #    the impact of this is that messages on the topic will be
@@ -133,21 +140,25 @@ spec:
     #    the message payload)
     #
     # orders
-    eventdelays.orders.secs.max: 0             # payload time matches event time by default
+    eventdelays.orders.secs.max: 0              # payload time matches event time by default
     # cancellations
-    eventdelays.cancellations.secs.max: 0      # payload time matches event time by default
+    eventdelays.cancellations.secs.max: 0       # payload time matches event time by default
     # stock movements
-    eventdelays.stockmovements.secs.max: 0     # payload time matches event time by default
+    eventdelays.stockmovements.secs.max: 0      # payload time matches event time by default
     # door badge events
-    eventdelays.badgeins.secs.max: 180         # payload time can be up to 3 minutes (180 secs) behind event time
+    eventdelays.badgeins.secs.max: 180          # payload time can be up to 3 minutes (180 secs) behind event time
     # new customer events
-    eventdelays.newcustomers.secs.max: 0       # payload time matches event time by default
+    eventdelays.newcustomers.secs.max: 0        # payload time matches event time by default
     # sensor readings events
-    eventdelays.sensorreadings.secs.max: 300   # payload time can be up to 5 minutes (300 secs) behind event time
+    eventdelays.sensorreadings.secs.max: 300    # payload time can be up to 5 minutes (300 secs) behind event time
     # online orders
-    eventdelays.onlineorders.secs.max: 0       # payload time matches event time by default
+    eventdelays.onlineorders.secs.max: 0        # payload time matches event time by default
     # out-of-stock events
-    eventdelays.outofstocks.secs.max: 0        # payload time matches event time by default
+    eventdelays.outofstocks.secs.max: 0         # payload time matches event time by default
+    # return requests
+    eventdelays.returnrequests.secs.max: 0      # payload time matches event time by default
+    # product reviews
+    eventdelays.productreviews.secs.max: 0      # payload time matches event time by default
 
     #
     # how many events should be duplicated
@@ -162,22 +173,26 @@ spec:
     #                         1.0 means all events will be duplicated
     #
     # orders
-    duplicates.orders.ratio: 0             # events not duplicated
+    duplicates.orders.ratio: 0              # events not duplicated
     # cancellations
-    duplicates.cancellations.ratio: 0      # events not duplicated
+    duplicates.cancellations.ratio: 0       # events not duplicated
     # stock movements
-    duplicates.stockmovements.ratio: 0.1   # duplicate roughly 10% of the events
+    duplicates.stockmovements.ratio: 0.1    # duplicate roughly 10% of the events
     # door badge events
-    duplicates.badgeins.ratio: 0           # events not duplicated
+    duplicates.badgeins.ratio: 0            # events not duplicated
     # new customer events
-    duplicates.newcustomers.ratio: 0       # events not duplicated
+    duplicates.newcustomers.ratio: 0        # events not duplicated
     # sensor reading events
-    duplicates.sensorreadings.ratio: 0     # events not duplicated
+    duplicates.sensorreadings.ratio: 0      # events not duplicated
     # online orders
-    duplicates.onlineorders.ratio: 0       # events not duplicated
+    duplicates.onlineorders.ratio: 0        # events not duplicated
     # out-of-stock events
-    duplicates.outofstocks.ratio: 0        # events not duplicated
-
+    duplicates.outofstocks.ratio: 0         # events not duplicated
+    # return requests
+    duplicates.returnrequests.ratio: 0      # events not duplicated
+    # product reviews
+    duplicates.productreviews.ratio: 0      # events not duplicated
+    
     #
     # product names to use in events
     #
@@ -293,12 +308,61 @@ spec:
     # how long after an online order should the out-of-stock happen (in milliseconds)
     outofstocks.delay.ms.min: 300000   # 5 minutes
     outofstocks.delay.ms.max: 7200000  # 2 hours
+
+    #
+    # return requests
+    #
+    #  these events are intended to represent return requests for several products, 
+    #   illustrating the use of complex objects and complex arrays
+    #
+    # number of products to include in a return request: between 1 and 4 (inclusive)
+    returnrequests.products.min: 1
+    returnrequests.products.max: 4
+    # quantity for each product to include in a return request: between 1 and 3 (inclusive)
+    returnrequests.product.quantity.min: 1
+    returnrequests.product.quantity.max: 3
+    # number of emails for the customer who issued a return request: between 1 and 2 (inclusive)
+    returnrequests.customer.emails.min: 1
+    returnrequests.customer.emails.max: 2
+    # number of phones in an address for a return request: between 0 and 2 (inclusive)
+    #    NOTE: in case of 0 phone number, `null` is generated in the events as value for the `phones` property
+    returnrequests.address.phones.min: 0
+    returnrequests.address.phones.max: 2
+    # how many return requests use the same address as shipping and billing address
+    #  between 0.0 and 1.0 : 0.0 means no return request will use the same address as shipping and billing address
+    #                        1.0 means all return requests will use the same address as shipping and billing address
+    returnrequests.reuse.address.ratio: 0.75
+    # reason given for a product return
+    returnrequests.reasons: CHANGEDMIND,BADFIT,SHIPPINGDELAY,DELIVERYERROR,CHEAPERELSEWHERE,OTHER
+    # how many return requests have at least one product that has a review that is posted after the return request has been issued
+    #  between 0.0 and 1.0 : 0.0 means no return request has some product that has a review that is posted
+    #                        1.0 means all return requests have products that have a review that is posted
+    returnrequests.review.ratio: 0.32
+    # how many products have a size issue in a return request
+    #  between 0.0 and 1.0 : 0.0 means no product has a size issue in a given return request
+    #                        1.0 means all products have a size issue in a given return request    
+    returnrequests.product.with.size.issue.ratio: 0.22
+
+    #
+    # product reviews
+    #
+    #  these events are intended to represent reviews for products returned in return requests.
+    #
+    # number of products that have a size issue for product reviews
+    productreviews.products.with.size.issue.count: 10
+    # how many product reviews have a size issue for products that are supposed to have a size issue
+    #  between 0.0 and 1.0 : 0.0 means no review with a size issue is generated for products that are supposed to have a size issue
+    #                        1.0 means all generated reviews have a size issue for products that are supposed to have a size issue
+    productreviews.review.with.size.issue.ratio: 0.75
+    # how long after a return request should the product review happen (in milliseconds)
+    productreviews.delay.ms.min: 300000   # 5 minutes
+    productreviews.delay.ms.max: 3600000  # 1 hour
   
     #
     # locations that are referred to in generated events
     #
     locations.regions: NA,SA,EMEA,APAC,ANZ
-    locations.warehouses: North,South,West,East,Central
+    locations.warehouses: North,South,West,East,Central  
 ```
 
 For example, if you want to theme the demo to be based on products in a different industry, you could adjust product sizes/materials/styles/name to match your demo (the options don't need to actually be "sizes", "materials" or "styles" - they just need to be lists that will make sense when combined into a single string).
