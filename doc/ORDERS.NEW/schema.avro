@@ -41,6 +41,11 @@
             "doc": "which region the order was made in - will be one of NA, SA, EMEA, APAC, ANZ"
         },
         {
+            "name": "city",
+            "type": "string",
+            "doc": "which city the order was made in - will be selected per region"
+        },
+        {
             "name": "ordertime",
             "type": "string",
             "doc": "time that the order was made"

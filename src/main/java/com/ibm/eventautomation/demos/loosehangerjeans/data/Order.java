@@ -53,6 +53,9 @@ public class Order {
     /** location of the customer */
     private String region;
 
+    /** city **/
+    private String city;
+
     /** schema for the events - all fields are required */
     private static final Schema SCHEMA = SchemaBuilder.struct()
         .name("order")
@@ -64,10 +67,11 @@ public class Order {
             .field("price",       Schema.FLOAT64_SCHEMA)
             .field("quantity",    Schema.INT32_SCHEMA)
             .field("region",      Schema.STRING_SCHEMA)
+            .field("city",        Schema.STRING_SCHEMA)
             .field("ordertime",   Schema.STRING_SCHEMA)
         .build();
 
-    public Order(String id, String timestamp, Customer customer, String description, double unitPrice, int quantity, String region) {
+    public Order(String id, String timestamp, Customer customer, String description, double unitPrice, int quantity, String region, String city) {
         this.id = id;
         this.timestamp = timestamp;
         this.customer = customer;
@@ -75,6 +79,7 @@ public class Order {
         this.unitPrice = unitPrice;
         this.quantity = quantity;
         this.region = region;
+        this.city = city;
     }
 
     public SourceRecord createSourceRecord(String topicname, String origin) {
@@ -86,6 +91,7 @@ public class Order {
         struct.put(SCHEMA.field("price"),       unitPrice);
         struct.put(SCHEMA.field("quantity"),    quantity);
         struct.put(SCHEMA.field("region"),      region);
+        struct.put(SCHEMA.field("city"),        city);
         struct.put(SCHEMA.field("ordertime"),   timestamp);
 
         return new SourceRecord(createSourcePartition(origin),
@@ -116,6 +122,9 @@ public class Order {
     public String getRegion() {
         return region;
     }
+    public String getCity() {
+        return city;
+    }
     public Customer getCustomer() {
         return customer;
     }
@@ -123,6 +132,6 @@ public class Order {
     @Override
     public String toString() {
         return "Order [id=" + id + ", timestamp=" + timestamp + ", customer=" + customer + ", description="
-                + description + ", unitPrice=" + unitPrice + ", quantity=" + quantity + ", region=" + region + "]";
+                + description + ", unitPrice=" + unitPrice + ", quantity=" + quantity + ", region=" + region + ", city=" + city + "]";
     }
 }

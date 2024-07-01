@@ -50,6 +50,12 @@ public class DatagenSourceConfig {
     public static final String CONFIG_LOCATIONS_REGIONS    = "locations.regions";
     public static final String CONFIG_LOCATIONS_WAREHOUSES = "locations.warehouses";
 
+    public static final String CONFIG_LOCATIONS_CITIES_NA   = "locations.cities.na";
+    public static final String CONFIG_LOCATIONS_CITIES_SA   = "locations.cities.sa";
+    public static final String CONFIG_LOCATIONS_CITIES_EMEA = "locations.cities.emea";
+    public static final String CONFIG_LOCATIONS_CITIES_APAC = "locations.cities.apac";
+    public static final String CONFIG_LOCATIONS_CITIES_ANZ  = "locations.cities.anz";
+
     private static final String CONFIG_GROUP_PRODUCTS = "Products";
     public static final String CONFIG_PRODUCTS_SIZES     = "products.sizes";
     public static final String CONFIG_PRODUCTS_MATERIALS = "products.materials";
@@ -264,6 +270,41 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "List of warehouses to use for generated locations. Warehouse names cannot contain spaces.",
                     CONFIG_GROUP_LOCATIONS, 2, Width.MEDIUM, "Warehouses")
+        .define(CONFIG_LOCATIONS_CITIES_NA,
+                    Type.LIST,
+                    Arrays.asList("Mexico-City", "New-York-City", "Los-Angeles", "Chicago", "Toronto", "Houston", "Phoenix"),
+                    new ValidTermsList(),
+                    Importance.LOW,
+                    "List of cities for NA region.",
+                    CONFIG_GROUP_LOCATIONS, 3, Width.MEDIUM, "Cities NA")
+        .define(CONFIG_LOCATIONS_CITIES_SA,
+                    Type.LIST,
+                    Arrays.asList("Brasilia", "Buenos-Aires", "Lima", "Bogota", "Santiago", "Caracas", "Quito", "Montevideo"),
+                    new ValidTermsList(),
+                    Importance.LOW,
+                    "List of cities for SA region.",
+                    CONFIG_GROUP_LOCATIONS, 4, Width.MEDIUM, "Cities SA")
+        .define(CONFIG_LOCATIONS_CITIES_EMEA,
+                    Type.LIST,
+                    Arrays.asList("London", "Berlin", "Madrid", "Rome", "Cairo", "Lagos", "Nairobi", "Ankara", "Riyadh", "Baghdad"),
+                    new ValidTermsList(),
+                    Importance.LOW,
+                    "List of cities for EMEA region.",
+                    CONFIG_GROUP_LOCATIONS, 5, Width.MEDIUM, "Cities EMEA")
+        .define(CONFIG_LOCATIONS_CITIES_APAC,
+                    Type.LIST,
+                    Arrays.asList("Tokyo", "Beijing", "New-Delhi", "Jakarta", "Seoul", "Manila", "Bangkok", "Hanoi"),
+                    new ValidTermsList(),
+                    Importance.LOW,
+                    "List of cities for APAC region.",
+                    CONFIG_GROUP_LOCATIONS, 6, Width.MEDIUM, "Cities APAC")
+        .define(CONFIG_LOCATIONS_CITIES_ANZ,
+                    Type.LIST,
+                    Arrays.asList("Sydney", "Melbourne", "Brisbane", "Perth", "Auckland", "Wellington", "Christchurch"),
+                    new ValidTermsList(),
+                    Importance.LOW,
+                    "List of cities for ANZ region.",
+                    CONFIG_GROUP_LOCATIONS, 7, Width.MEDIUM, "Cities ANZ")
         //
         // How to generate product names
         //

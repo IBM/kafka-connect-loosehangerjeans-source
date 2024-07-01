@@ -35,6 +35,13 @@ public class OrderGenerator {
     /** order regions (e.g. NA, EMEA) will be chosen at random from this list */
     private final List<String> regions;
 
+    /** cities will be chosen at random from the list related to the region */
+    private final List<String> citiesNA;
+    private final List<String> citiesSA;
+    private final List<String> citiesEMEA;
+    private final List<String> citiesAPAC;
+    private final List<String> citiesANZ;
+        
     /** minimum price for randomly selected unit price for generated orders */
     private final double minPrice;
     /** maximum price for randomly selected unit price for generated orders */
@@ -69,6 +76,13 @@ public class OrderGenerator {
         this.productGenerator = new ProductGenerator(config);
 
         this.regions = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_REGIONS);
+
+        this.citiesNA   = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_CITIES_NA);
+        this.citiesSA   = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_CITIES_SA);
+        this.citiesEMEA = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_CITIES_EMEA);
+        this.citiesAPAC = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_CITIES_APAC);
+        this.citiesANZ  = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_CITIES_ANZ);
+
         this.minPrice = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTS_MIN_PRICE);
         this.maxPrice = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTS_MAX_PRICE);
 
@@ -82,11 +96,26 @@ public class OrderGenerator {
         double unitPrice = Generators.randomPrice(minPrice, maxPrice);
         String description = productGenerator.generate().getDescription();
         String region = Generators.randomItem(regions);
+  
+        String city = null;
+        if(region.equals("NA")) {
+            city = Generators.randomItem(citiesNA);
+        } else if(region.equals("SA")) {
+            city = Generators.randomItem(citiesSA);
+        } else if(region.equals("EMEA")) {
+            city = Generators.randomItem(citiesEMEA);
+        } else if(region.equals("APAC")) {
+            city = Generators.randomItem(citiesAPAC);
+        } else if(region.equals("ANZ")) {
+            city = Generators.randomItem(citiesANZ);
+        }
+
         Customer customer = new Customer(faker);
 
         return generate(minItems, maxItems,
                         unitPrice,
                         region,
+                        city,
                         description,
                         customer);
     }
@@ -103,9 +132,23 @@ public class OrderGenerator {
         String description = productGenerator.generate().getDescription();
         String region = Generators.randomItem(regions);
 
+        String city = null;
+        if(region.equals("NA")) {
+            city = Generators.randomItem(citiesNA);
+        } else if(region.equals("SA")) {
+            city = Generators.randomItem(citiesSA);
+        } else if(region.equals("EMEA")) {
+            city = Generators.randomItem(citiesEMEA);
+        } else if(region.equals("APAC")) {
+            city = Generators.randomItem(citiesAPAC);
+        } else if(region.equals("ANZ")) {
+            city = Generators.randomItem(citiesANZ);
+        }
+
         return generate(minItems, maxItems,
                         unitPrice,
                         region,
+                        city,
                         description,
                         customer);
     }
@@ -114,6 +157,7 @@ public class OrderGenerator {
     public Order generate(int minItems, int maxItems,
             double unitPrice,
             String region,
+            String city,
             String description,
             Customer customer)
     {
@@ -127,6 +171,7 @@ public class OrderGenerator {
                          customer,
                          description,
                          unitPrice, quantity,
-                         region);
+                         region,
+                         city);
     }
 }

@@ -133,6 +133,7 @@ public abstract class DatagenTimerTask extends TimerTask {
             int minNumItems, int maxNumItems,
             double unitPrice,
             String region,
+            String city,
             String productDescription)
     {
         final Integer cancelDelayMin = null;
@@ -143,6 +144,7 @@ public abstract class DatagenTimerTask extends TimerTask {
                       minNumItems, maxNumItems,
                       unitPrice,
                       region,
+                      city,
                       productDescription,
                       cancelDelayMin, cancelDelayMax);
     }
@@ -152,6 +154,7 @@ public abstract class DatagenTimerTask extends TimerTask {
         int minNumItems, int maxNumItems,
         double unitPrice,
         String region,
+        String city,
         String productDescription,
         Integer cancelDelayMin, Integer cancelDelayMax)
     {
@@ -161,6 +164,7 @@ public abstract class DatagenTimerTask extends TimerTask {
                 Order order = orderGenerator.generate(minNumItems, maxNumItems,
                                                       unitPrice,
                                                       region,
+                                                      city,
                                                       productDescription,
                                                       customer);
                 queue.add(order.createSourceRecord(ordersTopicName, origin));

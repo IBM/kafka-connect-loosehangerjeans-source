@@ -121,6 +121,7 @@ public class FalsePositivesTask extends DatagenTimerTask {
             Generators.randomPrice(initialOrder.getUnitPrice() - maxPriceVariation,
                                    initialOrder.getUnitPrice() - 0.01),
             initialOrder.getRegion(),
+            initialOrder.getCity(),
             initialOrder.getDescription());
     }
 }
