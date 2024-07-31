@@ -15,9 +15,14 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Map;
 
+import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -58,7 +63,7 @@ public class BadgeIn {
         this.employee = employee;
     }
 
-    public SourceRecord createSourceRecord(String topicname) {
+    public SourceRecord createSourceRecord(String topicName) {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("recordid"),  recordId);
         struct.put(SCHEMA.field("door"),      doorLocation);
@@ -67,10 +72,38 @@ public class BadgeIn {
 
         return new SourceRecord(createSourcePartition(),
                                 createSourceOffset(),
-                                topicname,
-                                Schema.STRING_SCHEMA, recordId,
+                                topicName,
+                                Schema.STRING_SCHEMA,
+                                recordId,
                                 SCHEMA,
                                 struct);
+    }
+
+    public SourceRecord createSourceRecordWithTimestamp(String topicName, DateTimeFormatter dateTimeFormatter, int maxOffset) {
+        Struct struct = new Struct(SCHEMA);
+        struct.put(SCHEMA.field("recordid"),  recordId);
+        struct.put(SCHEMA.field("door"),      doorLocation);
+        struct.put(SCHEMA.field("employee"),  employee);
+        struct.put(SCHEMA.field("badgetime"), timestamp);
+
+        // Retrieve the date time used in the message payload.
+        LocalDateTime localDateTime = LocalDateTime.parse(timestamp, dateTimeFormatter);
+        // Compute the date time to be used to produce the Kafka message.
+        // A delay is added so that the timestamp used to produce the message in Kafka is later than
+        // the timestamp in the message payload.
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(Generators.addMaxOffset(localDateTime, maxOffset), ZoneId.systemDefault());
+        // Get the corresponding timestamp in milliseconds.
+        Long timestampMillis = zonedDateTime.toInstant().toEpochMilli();
+
+        return new SourceRecord(createSourcePartition(),
+                createSourceOffset(),
+                topicName,
+                0, // partition
+                Schema.STRING_SCHEMA,
+                recordId,
+                SCHEMA,
+                struct,
+                timestampMillis);
     }
 
     private Map<String, Object> createSourcePartition() {

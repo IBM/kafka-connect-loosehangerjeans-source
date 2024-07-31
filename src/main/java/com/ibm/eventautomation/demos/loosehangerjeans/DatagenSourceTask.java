@@ -23,6 +23,8 @@ import java.util.Timer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
+import com.ibm.eventautomation.demos.loosehangerjeans.generators.CancellationGenerator;
+import com.ibm.eventautomation.demos.loosehangerjeans.generators.OrderGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductReviewGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.BadgeInTask;
@@ -41,8 +43,6 @@ import org.apache.kafka.connect.source.SourceTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ibm.eventautomation.demos.loosehangerjeans.generators.CancellationGenerator;
-import com.ibm.eventautomation.demos.loosehangerjeans.generators.OrderGenerator;
 
 public class DatagenSourceTask extends SourceTask {
 
@@ -102,6 +102,11 @@ public class DatagenSourceTask extends SourceTask {
 
         // door-badge events
         BadgeInTask badgeIns = new BadgeInTask(config, queue);
+        // Generate some events for the previous week.
+        // This allows to ensure that there are always some events that occurred during
+        // the weekend.
+        badgeIns.generateEventsForPreviousWeek();
+        // Then schedule the creation of events at fixed rate.
         generateTimer.scheduleAtFixedRate(badgeIns, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_BADGEINS));
 
         // IoT sensor readings

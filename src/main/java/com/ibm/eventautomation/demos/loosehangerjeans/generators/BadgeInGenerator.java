@@ -15,7 +15,10 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.kafka.common.config.AbstractConfig;
@@ -58,6 +61,14 @@ public class BadgeInGenerator {
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_BADGEINS);
     }
 
+    public DateTimeFormatter getTimestampFormatter() {
+        return this.timestampFormatter;
+    }
+
+    public int getMaxDelayInSeconds() {
+        return this.MAX_DELAY_SECS;
+    }
+
     private String generateDoorId() {
         int floor = Generators.randomInt(0, 3);
         int door  = Generators.randomInt(10, 60);
@@ -71,5 +82,17 @@ public class BadgeInGenerator {
                            timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
                            generateDoorId(),
                            faker.name().username());
+    }
+
+    // Generate one BadgeIn event on every day during the previous week.
+    public List<BadgeIn> generateForPreviousWeek() {
+        List<BadgeIn> badgeIns = new ArrayList<>();
+        for (int i = 7; i >=1; i--) {
+            badgeIns.add(new BadgeIn(UUID.randomUUID().toString(),
+                    timestampFormatter.format(ZonedDateTime.now().minusDays(i)),
+                    generateDoorId(),
+                    faker.name().username()));
+        }
+        return badgeIns;
     }
 }

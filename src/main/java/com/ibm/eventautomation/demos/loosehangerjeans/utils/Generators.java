@@ -15,6 +15,7 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.utils;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Random;
@@ -73,4 +74,15 @@ public class Generators {
             return now.minusSeconds(randomInt(0, maxOffset));
         }
     }
+
+    /**
+     * Adds a random offset in seconds to a given local date time.
+     * @param localDateTime - the local date time to which we want to add an offset
+     * @param maxOffset - the maximum offset in seconds that is added to the local date time
+     * @return the local date time plus the maximum offset in seconds
+     */
+    public static LocalDateTime addMaxOffset(LocalDateTime localDateTime, int maxOffset) {
+        return localDateTime.plusSeconds(randomInt(0, maxOffset));
+    }
+
 }

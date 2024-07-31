@@ -33,13 +33,13 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 public class BadgeInTask extends TimerTask {
 
     /** Helper class for generating BadgeIn events. */
-    private BadgeInGenerator generator;
+    private final BadgeInGenerator generator;
 
     /**
      * Queue of messages waiting to be delivered to Kafka.
      *  Generated BadgeIn events will be added to this queue.
      */
-    private Queue<SourceRecord> queue;
+    private final Queue<SourceRecord> queue;
 
     /**
      * Generator can simulate a source of events that offers
@@ -52,27 +52,35 @@ public class BadgeInTask extends TimerTask {
      * Setting this to 0 will mean no events are duplicated.
      * Setting this to 1 will mean every message is produced twice.
      */
-    private double duplicatesRatio;
-    
-    /** Name of the topic to produce door badge-in events to. */
-    private String topicname;
+    private final double duplicatesRatio;
 
+    /** Name of the topic to produce door badge-in events to. */
+    private final String topicName;
 
     public BadgeInTask(AbstractConfig config, Queue<SourceRecord> queue) {
         this.generator = new BadgeInGenerator(config);
         this.queue = queue;
         this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_BADGEINS);
-        this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_BADGEINS);
+        this.topicName = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_BADGEINS);
     }
 
 
     @Override
     public void run() {
-        SourceRecord rec = generator.generate().createSourceRecord(topicname);
+        SourceRecord rec = generator.generate().createSourceRecord(topicName);
         queue.add(rec);
 
         if (Generators.shouldDo(duplicatesRatio)) {
             queue.add(rec);
         }
+    }
+
+    // Generate some events for the previous week.
+    public void generateEventsForPreviousWeek() {
+        generator.generateForPreviousWeek().forEach(badgeIn -> {
+            SourceRecord rec = badgeIn.createSourceRecordWithTimestamp(topicName, generator.getTimestampFormatter(), generator.getMaxDelayInSeconds());
+            queue.add(rec);
+        });
+
     }
 }
