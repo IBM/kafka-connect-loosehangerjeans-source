@@ -93,6 +93,7 @@ public class DatagenSourceConfig {
     public static final String CONFIG_ONLINEORDERS_ADDRESS_PHONES_MAX   = "onlineorders.address.phones.max";
     public static final String CONFIG_ONLINEORDERS_REUSE_ADDRESS_RATIO  = "onlineorders.reuse.address.ratio";
     public static final String CONFIG_ONLINEORDERS_OUTOFSTOCK_RATIO     = "onlineorders.outofstock.ratio";
+    public static final String CONFIG_ONLINEORDERS_CITIES               = "onlineorders.cities";
 
     private static final String CONFIG_GROUP_OUTOFSTOCKS = "Out-of-stocks";
     public static final String CONFIG_OUTOFSTOCKS_RESTOCKING_MIN_DELAY  = "outofstocks.restocking.delay.days.min";
@@ -498,6 +499,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Ratio of orders that have at least one product that runs out-of-stock after the order has been placed. Must be between 0 and 1.",
                     CONFIG_GROUP_ONLINEORDERS, 8, Width.SHORT, "Out-of-stock product ratio")
+        .define(CONFIG_ONLINEORDERS_CITIES,
+                    Type.LIST,
+                    new ArrayList<String>(),
+                    new NonNullValidator(),
+                    Importance.LOW,
+                    "List of cities used for generated online orders",
+                    CONFIG_GROUP_ONLINEORDERS, 9, Width.LONG, "Cities for online orders")
         //
         // Generating out-of-stock events
         //

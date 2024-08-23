@@ -72,6 +72,9 @@ public class OnlineOrderGenerator {
     /** Formatter for event timestamps. */
     private final DateTimeFormatter timestampFormatter;
 
+    //** Custom list of cities to be used instead of faker generated */
+    private final List<String> cities;
+
     /**
      * Generator can simulate a source of events that offers
      *  at-least-once delivery semantics by occasionally
@@ -141,6 +144,13 @@ public class OnlineOrderGenerator {
 
         // Generate a random shipping address.
         Address shippingAddress = Address.create(faker, country, minPhones, maxPhones);
+
+        // If the city list is not empty, we will randomly select a city 
+        // and replace one created by the faker
+        if(cities.size() > 0) {
+            String city = Generators.randomItem(cities);
+            shippingAddress.setCity(city);
+        }
 
         // Possibly reuse the shipping address as billing address.
         Address billingAddress = Generators.shouldDo(reuseAddressRatio)
