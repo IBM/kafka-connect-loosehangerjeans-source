@@ -125,6 +125,8 @@ public class OnlineOrderGenerator {
         this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_ONLINEORDERS);
 
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_ONLINEORDERS);
+
+        this.cities = config.getList(DatagenSourceConfig.CONFIG_ONLINEORDERS_CITIES);
     }
 
     /** Generates a random online order. */
