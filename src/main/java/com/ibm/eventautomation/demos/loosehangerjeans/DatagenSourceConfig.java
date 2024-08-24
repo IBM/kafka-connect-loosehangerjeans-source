@@ -15,6 +15,7 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
