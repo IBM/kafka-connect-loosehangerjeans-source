@@ -15,13 +15,16 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.kafka.common.config.AbstractConfig;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.BadgeIn;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.StockMovement;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
@@ -52,6 +55,7 @@ public class StockMovementGenerator {
      *  produced with the current time).
      */
     private final int MAX_DELAY_SECS;
+    private final int INTERVAL;
 
 
     public StockMovementGenerator(AbstractConfig config)
@@ -62,6 +66,7 @@ public class StockMovementGenerator {
 
         this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_STOCKMOVEMENTS);
+        this.INTERVAL = config.getInt(DatagenSourceConfig.CONFIG_TIMES_STOCKMOVEMENTS);
     }
 
 
@@ -75,5 +80,34 @@ public class StockMovementGenerator {
                                  // stock movement quantities are always
                                  //  multiples of ten
                                  quantity - (quantity % 10));
+    }
+
+     /**
+     * Generates one week's worth of events to create a fake history.
+     *  This is intended to be used on the first run of the connector
+     *  to create an instant history of events that can be used for
+     *  historical aggregations.
+     */
+    public List<StockMovement> generateHistory() {
+        final List<StockMovement> histList = new ArrayList<StockMovement>();
+
+        final ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime pastEvent = ZonedDateTime.now().minusDays(7);
+
+        while (pastEvent.isBefore(now)) {
+            int quantity = Generators.randomInt(20, 500);
+            StockMovement event = new StockMovement(UUID.randomUUID().toString(),
+                                                    timestampFormatter.format(pastEvent),
+                                                    Generators.randomItem(warehouses),
+                                                    productGenerator.generate().getDescription(),
+                                                    // stock movement quantities are always
+                                                    //  multiples of ten
+                                                    quantity - (quantity % 10));
+
+            histList.add(event);
+            pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
+        }
+        
+        return histList;
     }
 }

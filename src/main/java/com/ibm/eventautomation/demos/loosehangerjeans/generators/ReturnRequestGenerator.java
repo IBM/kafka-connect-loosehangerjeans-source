@@ -21,12 +21,14 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.Address;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Country;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.NamedAddress;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineCustomer;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.ProductReturn;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.ReturnRequest;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.common.config.AbstractConfig;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,6 +123,7 @@ public class ReturnRequestGenerator {
      *  produced with the current time).
      */
     private final int MAX_DELAY_SECS;
+    private final int INTERVAL;
 
     /** Helper class used to generate data such as names, emails, phone numbers, addresses etc. */
     private final Faker faker = new Faker(DEFAULT_LOCALE);
@@ -155,10 +158,15 @@ public class ReturnRequestGenerator {
         this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_RETURNREQUESTS);
 
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_RETURNREQUESTS);
+        this.INTERVAL = config.getInt(DatagenSourceConfig.CONFIG_TIMES_RETURNREQUESTS);
     }
 
     /** Generates a random return request. */
     public ReturnRequest generate() {
+       return generateReturnrequest(Generators.nowWithRandomOffset(MAX_DELAY_SECS));
+    }
+
+    private ReturnRequest generateReturnrequest(ZonedDateTime time) {
         // Generate a random customer.
         OnlineCustomer customer = OnlineCustomer.create(faker, minEmails, maxEmails);
 
@@ -192,7 +200,7 @@ public class ReturnRequestGenerator {
             returns.add(new ProductReturn(product, quantity, Generators.randomItem(reasons)));
         }
 
-        return new ReturnRequest(timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
+        return new ReturnRequest(timestampFormatter.format(time),
                 customer,
                 addresses,
                 returns);
@@ -200,5 +208,26 @@ public class ReturnRequestGenerator {
 
     public boolean shouldDuplicate() {
         return Generators.shouldDo(duplicatesRatio);
+    }
+
+
+     /**
+     * Generates one week's worth of events to create a fake history.
+     *  This is intended to be used on the first run of the connector
+     *  to create an instant history of events that can be used for
+     *  historical aggregations.
+     */
+    public List<ReturnRequest> generateHistory() {
+        final List<ReturnRequest> histList = new ArrayList<ReturnRequest>();
+
+        final ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime pastEvent = ZonedDateTime.now().minusDays(7);
+
+        while (pastEvent.isBefore(now)) {
+                       
+            histList.add(generateReturnrequest(pastEvent));
+            pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
+        }
+        return histList;
     }
 }

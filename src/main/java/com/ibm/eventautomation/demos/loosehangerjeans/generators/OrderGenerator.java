@@ -15,7 +15,9 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +27,9 @@ import com.github.javafaker.Faker;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Customer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OrdersAndCancellations;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.SensorReading;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
@@ -62,6 +67,13 @@ public class OrderGenerator {
 
     /** customer name generator */
     private final Faker faker = new Faker();
+    /** minimum number of items to order */
+    private int minOrders;
+    /** maximum number of items to order */
+    private int maxOrders;
+    private double orderCancellationRatio;
+    private final List<String> cancelReasons;
+    private final int INTERVAL;
 
 
     public OrderGenerator(AbstractConfig config)
@@ -74,6 +86,12 @@ public class OrderGenerator {
 
         this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_ORDERS);
+        this.minOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_SMALL_MIN);
+        this.maxOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_LARGE_MAX);
+        this.orderCancellationRatio = config.getDouble(DatagenSourceConfig.CONFIG_CANCELLATIONS_RATIO);
+        this.cancelReasons = config.getList(DatagenSourceConfig.CONFIG_CANCELLATIONS_REASONS);
+        this.INTERVAL = config.getInt(DatagenSourceConfig.CONFIG_TIMES_ORDERS);
+
     }
 
 
@@ -128,5 +146,52 @@ public class OrderGenerator {
                          description,
                          unitPrice, quantity,
                          region);
+    }
+
+    /**
+     * Generates one week's worth of events to create a fake history.
+     *  This is intended to be used on the first run of the connector
+     *  to create an instant history of events that can be used for
+     *  historical aggregations.
+     */
+
+    public OrdersAndCancellations generateHistory()  {
+
+        List<Order> orderList = new ArrayList<> ();
+        List<Cancellation> cancelList = new ArrayList<> ();
+
+        final ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime pastEvent = ZonedDateTime.now().minusDays(7);
+
+        while (pastEvent.isBefore(now)) {
+
+            double unitPrice = Generators.randomPrice(minPrice, maxPrice);
+            String description = productGenerator.generate().getDescription();
+            String region = Generators.randomItem(regions);
+            Customer customer = new Customer(faker);
+            
+            int quantity = Generators.randomInt(minOrders, maxOrders);
+
+            Order orderEvent = new Order(UUID.randomUUID().toString(),
+                                            timestampFormatter.format(pastEvent),
+                                            customer,
+                                            description,
+                                            unitPrice, quantity,
+                                            region);
+            orderList.add(orderEvent);
+
+            if (Generators.shouldDo(orderCancellationRatio)) {
+                Cancellation cancelEvent = new Cancellation(orderEvent,
+                                Generators.randomItem(cancelReasons),
+                                timestampFormatter.format(pastEvent));
+                cancelList.add(cancelEvent);                
+
+            }
+
+            pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
+        
+        }
+
+        return new OrdersAndCancellations(orderList, cancelList);
     }
 }
