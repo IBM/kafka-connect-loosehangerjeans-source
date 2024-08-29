@@ -29,7 +29,6 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.Customer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OrdersAndCancellations;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.SensorReading;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
@@ -169,7 +168,7 @@ public class OrderGenerator {
             String description = productGenerator.generate().getDescription();
             String region = Generators.randomItem(regions);
             Customer customer = new Customer(faker);
-            
+
             int quantity = Generators.randomInt(minOrders, maxOrders);
 
             Order orderEvent = new Order(UUID.randomUUID().toString(),
@@ -184,12 +183,12 @@ public class OrderGenerator {
                 Cancellation cancelEvent = new Cancellation(orderEvent,
                                 Generators.randomItem(cancelReasons),
                                 timestampFormatter.format(pastEvent));
-                cancelList.add(cancelEvent);                
+                cancelList.add(cancelEvent);
 
             }
 
             pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
-        
+
         }
 
         return new OrdersAndCancellations(orderList, cancelList);

@@ -21,7 +21,6 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.Address;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Country;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.NamedAddress;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineCustomer;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.ProductReturn;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.ReturnRequest;
@@ -224,7 +223,7 @@ public class ReturnRequestGenerator {
         ZonedDateTime pastEvent = ZonedDateTime.now().minusDays(7);
 
         while (pastEvent.isBefore(now)) {
-                       
+
             histList.add(generateReturnrequest(pastEvent));
             pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
         }

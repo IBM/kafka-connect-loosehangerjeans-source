@@ -24,7 +24,6 @@ import java.util.UUID;
 import org.apache.kafka.common.config.AbstractConfig;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.BadgeIn;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.StockMovement;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
@@ -107,7 +106,7 @@ public class StockMovementGenerator {
             histList.add(event);
             pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
         }
-        
+
         return histList;
     }
 }
