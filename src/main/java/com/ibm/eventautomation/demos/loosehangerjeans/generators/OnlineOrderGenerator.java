@@ -139,30 +139,30 @@ public class OnlineOrderGenerator extends Generator<OnlineOrder> {
 
     @Override
     protected OnlineOrder generateEvent(ZonedDateTime timestamp) {
-         // Generate some products randomly.
-         int productCount = Generators.randomInt(minProducts, maxProducts);
-         List<String> products = new ArrayList<>();
-         for (int i = 0; i < productCount; i++) {
-             products.add(productGenerator.generate().getDescription());
-         }
+        // Generate some products randomly.
+        int productCount = Generators.randomInt(minProducts, maxProducts);
+        List<String> products = new ArrayList<>();
+        for (int i = 0; i < productCount; i++) {
+            products.add(productGenerator.generate().getDescription());
+        }
 
-         // Generate a random customer.
-         OnlineCustomer customer = OnlineCustomer.create(faker, minEmails, maxEmails);
+        // Generate a random customer.
+        OnlineCustomer customer = OnlineCustomer.create(faker, minEmails, maxEmails);
 
-         // Generate the country for the addresses.
-         Country country = new Country(DEFAULT_LOCALE.getCountry(), DEFAULT_LOCALE.getDisplayCountry(DEFAULT_LOCALE));
+        // Generate the country for the addresses.
+        Country country = new Country(DEFAULT_LOCALE.getCountry(), DEFAULT_LOCALE.getDisplayCountry(DEFAULT_LOCALE));
 
-         // Generate a random shipping address.
-         Address shippingAddress = Address.create(faker, country, minPhones, maxPhones);
+        // Generate a random shipping address.
+        Address shippingAddress = Address.create(faker, country, minPhones, maxPhones);
 
-         // Possibly reuse the shipping address as billing address.
-         Address billingAddress = Generators.shouldDo(reuseAddressRatio)
-                 ? shippingAddress
-                 : Address.create(faker, country, minPhones, maxPhones);
+        // Possibly reuse the shipping address as billing address.
+        Address billingAddress = Generators.shouldDo(reuseAddressRatio)
+                ? shippingAddress
+                : Address.create(faker, country, minPhones, maxPhones);
 
-         return new OnlineOrder(timestampFormatter.format(timestamp),
-                 customer,
-                 products,
-                 new OnlineAddress(shippingAddress, billingAddress));
-         }
+        return new OnlineOrder(timestampFormatter.format(timestamp),
+                customer,
+                products,
+                new OnlineAddress(shippingAddress, billingAddress));
+    }
 }
