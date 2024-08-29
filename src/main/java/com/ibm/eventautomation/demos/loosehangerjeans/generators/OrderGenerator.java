@@ -16,14 +16,11 @@
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.kafka.common.config.AbstractConfig;
 
-import com.github.javafaker.Faker;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Customer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
@@ -47,25 +44,6 @@ public class OrderGenerator extends Generator<OrderAndCancellation> {
     /** helper class to randomly generate the name of a product */
     private ProductGenerator productGenerator;
 
-    /** formatter for event timestamps */
-    private final DateTimeFormatter timestampFormatter;
-
-    /**
-     * Generator can simulate a delay in events being produced
-     *  to Kafka by putting a timestamp in the message payload
-     *  that is earlier than the current time.
-     *
-     * The amount of the delay will be randomized to simulate
-     *  a delay due to network or infrastructure reasons.
-     *
-     * This value is the maximum delay (in seconds) that it will
-     *  use. (Setting this to 0 will mean all events are
-     *  produced with the current time).
-     */
-    private final int MAX_DELAY_SECS;
-
-    /** customer name generator */
-    private final Faker faker = new Faker();
     /** minimum number of items to order */
     private int minOrders;
     /** maximum number of items to order */
@@ -76,7 +54,10 @@ public class OrderGenerator extends Generator<OrderAndCancellation> {
 
     public OrderGenerator(AbstractConfig config)
     {
-        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_ORDERS));
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_ORDERS),
+              config.getInt(DatagenSourceConfig.CONFIG_DELAYS_ORDERS),
+              config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_ORDERS),
+              config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
 
         this.productGenerator = new ProductGenerator(config);
 
@@ -84,8 +65,6 @@ public class OrderGenerator extends Generator<OrderAndCancellation> {
         this.minPrice = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTS_MIN_PRICE);
         this.maxPrice = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTS_MAX_PRICE);
 
-        this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
-        this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_ORDERS);
         this.minOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_SMALL_MIN);
         this.maxOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_LARGE_MAX);
         this.orderCancellationRatio = config.getDouble(DatagenSourceConfig.CONFIG_CANCELLATIONS_RATIO);
@@ -139,7 +118,7 @@ public class OrderGenerator extends Generator<OrderAndCancellation> {
         }
 
         return new Order(UUID.randomUUID().toString(),
-                         timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
+                         formatTimestamp(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
                          customer,
                          description,
                          unitPrice, quantity,
@@ -157,17 +136,17 @@ public class OrderGenerator extends Generator<OrderAndCancellation> {
         int quantity = Generators.randomInt(minOrders, maxOrders);
 
         Order orderEvent = new Order(UUID.randomUUID().toString(),
-                                        timestampFormatter.format(timestamp),
-                                        customer,
-                                        description,
-                                        unitPrice, quantity,
-                                        region);
+                                     formatTimestamp(timestamp),
+                                     customer,
+                                     description,
+                                     unitPrice, quantity,
+                                     region);
 
         if (Generators.shouldDo(orderCancellationRatio)) {
             Cancellation cancelEvent = new Cancellation(orderEvent,
                                                         Generators.randomItem(cancelReasons),
                                                         // TODO delay required
-                                                        timestampFormatter.format(timestamp));
+                                                        formatTimestamp(timestamp));
             return new OrderAndCancellation(orderEvent, cancelEvent);
         }
 

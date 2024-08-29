@@ -41,19 +41,6 @@ public class StockMovementsTask extends TimerTask {
      */
     private Queue<SourceRecord> queue;
 
-    /**
-     * Generator can simulate a source of events that offers
-     *  at-least-once delivery semantics by occasionally
-     *  producing duplicate messages.
-     *
-     * This value is the proportion of events that will be
-     *  duplicated, between 0.0 and 1.0.
-     *
-     * Setting this to 0 will mean no events are duplicated.
-     * Setting this to 1 will mean every message is produced twice.
-     */
-    private double duplicatesRatio;
-    
     /** Name of the topic to produce stock movement events to. */
     private String topicname;
 
@@ -61,7 +48,6 @@ public class StockMovementsTask extends TimerTask {
     public StockMovementsTask(AbstractConfig config, Queue<SourceRecord> queue) {
         this.generator = new StockMovementGenerator(config);
         this.queue = queue;
-        this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_STOCKMOVEMENTS);
         this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_STOCKMOVEMENTS);
     }
 
@@ -71,7 +57,7 @@ public class StockMovementsTask extends TimerTask {
         SourceRecord rec = generator.generate().createSourceRecord(topicname);
         queue.add(rec);
 
-        if (Generators.shouldDo(duplicatesRatio)) {
+        if (generator.shouldDuplicate()) {
             queue.add(rec);
         }
     }

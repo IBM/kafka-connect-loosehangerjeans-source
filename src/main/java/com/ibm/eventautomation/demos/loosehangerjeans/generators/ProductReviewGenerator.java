@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 /**
  * Generates a {@link ProductReview} event for a given product using randomly generated data.
  */
-public class ProductReviewGenerator {
+public class ProductReviewGenerator extends Generator<ProductReview> {
 
     /** Helper class to randomly generate the details of a product. */
     private final ProductGenerator productGenerator;
@@ -52,9 +52,6 @@ public class ProductReviewGenerator {
     /** Products with a size issue will be chosen from this map. */
     private final Map<String, Product> productsWithSizeIssue;
 
-    /** Formatter for event timestamps. */
-    private final DateTimeFormatter timestampFormatter;
-
     /**
      * Ratio of product reviews with a size issue for products that are supposed to have a size issue.
      * Must be between 0.0 and 1.0.
@@ -66,35 +63,15 @@ public class ProductReviewGenerator {
      */
     private final double reviewWithSizeIssueRatio;
 
-    /**
-     * Generator can simulate a source of events that offers
-     *  at-least-once delivery semantics by occasionally
-     *  producing duplicate messages.
-     *
-     * This value is the proportion of events that will be
-     *  duplicated, between 0.0 and 1.0.
-     *
-     * Setting this to 0 will mean no events are duplicated.
-     * Setting this to 1 will mean every message is produced twice.
-     */
-    private final double duplicatesRatio;
-
-    /**
-     * Generator can simulate a delay in events being produced
-     *  to Kafka by putting a timestamp in the message payload
-     *  that is earlier than the current time.
-     *
-     * The amount of the delay will be randomized to simulate
-     *  a delay due to network or infrastructure reasons.
-     *
-     * This value is the maximum delay (in seconds) that it will
-     *  use. (Setting this to 0 will mean all events are
-     *  produced with the current time).
-     */
-    private final int MAX_DELAY_SECS;
 
     public ProductReviewGenerator(AbstractConfig config,
-                                  Map<String, Product> productsWithSizeIssue) {
+                                  Map<String, Product> productsWithSizeIssue)
+    {
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_PRODUCTREVIEWS),
+              config.getInt(DatagenSourceConfig.CONFIG_DELAYS_PRODUCTREVIEWS),
+              config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_PRODUCTREVIEWS),
+              config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS_LTZ));
+
         this.productGenerator = new ProductGenerator(config);
 
         this.reviews = initReviews();
@@ -104,35 +81,26 @@ public class ProductReviewGenerator {
 
         this.productsWithSizeIssue = productsWithSizeIssue;
 
-        this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS_LTZ));
-
         this.reviewWithSizeIssueRatio = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTREVIEWS_REVIEW_WITH_SIZE_ISSUE_RATIO);
-
-        this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_PRODUCTREVIEWS);
-
-        this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_PRODUCTREVIEWS);
     }
 
-    public ProductReview generate() {
+    @Override
+    protected ProductReview generateEvent(ZonedDateTime timestamp) {
         Product product = productGenerator.generate();
-        return generate(product);
+        return generate(product, timestamp);
     }
 
-    public ProductReview generate(final Product product) {
+    public ProductReview generate(final Product product, final ZonedDateTime timestamp) {
         Review review = productsWithSizeIssue.containsKey(product.getShortDescription()) && Generators.shouldDo(reviewWithSizeIssueRatio)
                 ? Generators.randomItem(reviewsWithSizeIssue)
                 : Generators.randomItem(reviews);
-        return new ProductReview(timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
-                product.getShortDescription(), product.getSize(),
-                review);
+        return new ProductReview(formatTimestamp(timestamp),
+                                 product.getShortDescription(), product.getSize(),
+                                 review);
     }
 
     public List<Product> getProductsWithSizeIssue() {
         return new ArrayList<>(productsWithSizeIssue.values());
-    }
-
-    public boolean shouldDuplicate() {
-        return Generators.shouldDo(duplicatesRatio);
     }
 
     private List<Review> initReviews() {

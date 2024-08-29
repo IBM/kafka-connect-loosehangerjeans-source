@@ -25,6 +25,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 
+import java.time.ZonedDateTime;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -123,7 +124,7 @@ public class ReturnRequestsTask extends TimerTask {
             @Override
             public void run() {
                 SourceRecord rec = productReviewGenerator
-                        .generate(product)
+                        .generate(product, ZonedDateTime.now())
                         .createSourceRecord(productReviewTopicName);
                 queue.add(rec);
 
