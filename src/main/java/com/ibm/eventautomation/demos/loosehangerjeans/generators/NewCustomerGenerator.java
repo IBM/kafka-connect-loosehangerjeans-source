@@ -31,7 +31,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 /**
  * Generates a {@link NewCustomer} event using randomly generated data.
  */
-public class NewCustomerGenerator {
+public class NewCustomerGenerator extends Generator<NewCustomer> {
 
     /** formatter for event timestamps */
     private final DateTimeFormatter timestampFormatter;
@@ -49,42 +49,25 @@ public class NewCustomerGenerator {
      *  produced with the current time).
      */
     private final int MAX_DELAY_SECS;
-    private final int INTERVAL;
 
     /** customer name generator */
     private final Faker faker = new Faker();
 
 
     public NewCustomerGenerator(AbstractConfig config) {
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_NEWCUSTOMERS));
+
         this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_NEWCUSTOMERS);
-        this.INTERVAL = config.getInt(DatagenSourceConfig.CONFIG_TIMES_NEWCUSTOMERS);
     }
 
     public NewCustomer generate() {
-        return new NewCustomer(timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
-                               new Customer(faker));
+        return generateEvent(Generators.nowWithRandomOffset(MAX_DELAY_SECS));
     }
 
-     /**
-     * Generates one week's worth of events to create a fake history.
-     *  This is intended to be used on the first run of the connector
-     *  to create an instant history of events that can be used for
-     *  historical aggregations.
-     */
-    public List<NewCustomer> generateHistory() {
-        final List<NewCustomer> histList = new ArrayList<NewCustomer>();
-
-        final ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime pastEvent = ZonedDateTime.now().minusDays(7);
-
-        while (pastEvent.isBefore(now)) {
-            NewCustomer event = new NewCustomer(timestampFormatter.format(pastEvent),
-                                                    new Customer(faker));            
-            histList.add(event);
-            pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
-        }
-        
-        return histList;
+    @Override
+    protected NewCustomer generateEvent(ZonedDateTime timestamp) {
+        return new NewCustomer(timestampFormatter.format(timestamp),
+                               new Customer(faker));
     }
 }

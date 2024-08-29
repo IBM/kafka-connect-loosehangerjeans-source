@@ -17,8 +17,6 @@ package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-import java.util.ArrayList;
-import java.util.List;
 import java.time.ZonedDateTime;
 
 import org.apache.kafka.common.config.AbstractConfig;
@@ -32,7 +30,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 /**
  * Generates a {@link BadgeIn} event using randomly generated data.
  */
-public class BadgeInGenerator {
+public class BadgeInGenerator extends Generator<BadgeIn> {
 
     /** username generator */
     private final Faker faker = new Faker();
@@ -53,14 +51,13 @@ public class BadgeInGenerator {
      *  produced with the current time).
      */
     private final int MAX_DELAY_SECS;
-    private final int INTERVAL;
-
 
     public BadgeInGenerator(AbstractConfig config)
     {
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_BADGEINS));
+
         this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_BADGEINS);
-        this.INTERVAL = config.getInt(DatagenSourceConfig.CONFIG_TIMES_BADGEINS);
     }
 
     private String generateDoorId() {
@@ -72,35 +69,14 @@ public class BadgeInGenerator {
     }
 
     public BadgeIn generate() {
-        return new BadgeIn(UUID.randomUUID().toString(),
-                           timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
-                           generateDoorId(),
-                           faker.name().username());
+        return generateEvent(Generators.nowWithRandomOffset(MAX_DELAY_SECS));
     }
 
-
-    /**
-     * Generates one week's worth of events to create a fake history.
-     *  This is intended to be used on the first run of the connector
-     *  to create an instant history of events that can be used for
-     *  historical aggregations.
-     */
-    public List<BadgeIn> generateHistory() {
-        final List<BadgeIn> histList = new ArrayList<BadgeIn>();
-
-        final ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime pastEvent = ZonedDateTime.now().minusDays(7);
-
-        while (pastEvent.isBefore(now)) {
-            BadgeIn event = new BadgeIn(UUID.randomUUID().toString(), 
-                                        timestampFormatter.format(pastEvent), 
-                                        generateDoorId(), 
-                                        faker.name().username());
-
-            histList.add(event);
-            pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
-        }
-        
-        return histList;
+    @Override
+    protected BadgeIn generateEvent(ZonedDateTime timestamp) {
+        return new BadgeIn(UUID.randomUUID().toString(),
+                           timestampFormatter.format(timestamp),
+                           generateDoorId(),
+                           faker.name().username());
     }
 }

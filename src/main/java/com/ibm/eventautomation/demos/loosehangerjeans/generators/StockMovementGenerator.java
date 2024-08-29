@@ -30,7 +30,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 /**
  * Generates a {@link StockMovement} event using randomly generated data.
  */
-public class StockMovementGenerator {
+public class StockMovementGenerator extends Generator<StockMovement> {
 
     /** warehouse codes will be randomly selected from this list */
     private final List<String> warehouses;
@@ -54,26 +54,26 @@ public class StockMovementGenerator {
      *  produced with the current time).
      */
     private final int MAX_DELAY_SECS;
-    private final int INTERVAL;
 
 
     public StockMovementGenerator(AbstractConfig config)
     {
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_STOCKMOVEMENTS));
+
         this.productGenerator = new ProductGenerator(config);
 
         this.warehouses = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_WAREHOUSES);
 
         this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_STOCKMOVEMENTS);
-        this.INTERVAL = config.getInt(DatagenSourceConfig.CONFIG_TIMES_STOCKMOVEMENTS);
     }
 
-
-    public StockMovement generate() {
+    @Override
+    protected StockMovement generateEvent(ZonedDateTime timestamp) {
         int quantity = Generators.randomInt(20, 500);
 
         return new StockMovement(UUID.randomUUID().toString(),
-                                 timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
+                                 timestampFormatter.format(timestamp),
                                  Generators.randomItem(warehouses),
                                  productGenerator.generate().getDescription(),
                                  // stock movement quantities are always
@@ -81,32 +81,7 @@ public class StockMovementGenerator {
                                  quantity - (quantity % 10));
     }
 
-     /**
-     * Generates one week's worth of events to create a fake history.
-     *  This is intended to be used on the first run of the connector
-     *  to create an instant history of events that can be used for
-     *  historical aggregations.
-     */
-    public List<StockMovement> generateHistory() {
-        final List<StockMovement> histList = new ArrayList<StockMovement>();
-
-        final ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime pastEvent = ZonedDateTime.now().minusDays(7);
-
-        while (pastEvent.isBefore(now)) {
-            int quantity = Generators.randomInt(20, 500);
-            StockMovement event = new StockMovement(UUID.randomUUID().toString(),
-                                                    timestampFormatter.format(pastEvent),
-                                                    Generators.randomItem(warehouses),
-                                                    productGenerator.generate().getDescription(),
-                                                    // stock movement quantities are always
-                                                    //  multiples of ten
-                                                    quantity - (quantity % 10));
-
-            histList.add(event);
-            pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
-        }
-
-        return histList;
+    public StockMovement generate() {
+        return generateEvent(Generators.nowWithRandomOffset(MAX_DELAY_SECS));
     }
 }

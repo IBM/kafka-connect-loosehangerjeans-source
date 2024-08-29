@@ -28,13 +28,13 @@ import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Customer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.OrdersAndCancellations;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OrderAndCancellation;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
  * Generates an {@link Order} event using randomly generated data.
  */
-public class OrderGenerator {
+public class OrderGenerator extends Generator<OrderAndCancellation> {
 
     /** order regions (e.g. NA, EMEA) will be chosen at random from this list */
     private final List<String> regions;
@@ -72,11 +72,12 @@ public class OrderGenerator {
     private int maxOrders;
     private double orderCancellationRatio;
     private final List<String> cancelReasons;
-    private final int INTERVAL;
 
 
     public OrderGenerator(AbstractConfig config)
     {
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_ORDERS));
+
         this.productGenerator = new ProductGenerator(config);
 
         this.regions = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_REGIONS);
@@ -89,8 +90,6 @@ public class OrderGenerator {
         this.maxOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_LARGE_MAX);
         this.orderCancellationRatio = config.getDouble(DatagenSourceConfig.CONFIG_CANCELLATIONS_RATIO);
         this.cancelReasons = config.getList(DatagenSourceConfig.CONFIG_CANCELLATIONS_REASONS);
-        this.INTERVAL = config.getInt(DatagenSourceConfig.CONFIG_TIMES_ORDERS);
-
     }
 
 
@@ -147,50 +146,31 @@ public class OrderGenerator {
                          region);
     }
 
-    /**
-     * Generates one week's worth of events to create a fake history.
-     *  This is intended to be used on the first run of the connector
-     *  to create an instant history of events that can be used for
-     *  historical aggregations.
-     */
 
-    public OrdersAndCancellations generateHistory()  {
+    @Override
+    protected OrderAndCancellation generateEvent(ZonedDateTime timestamp) {
+        double unitPrice = Generators.randomPrice(minPrice, maxPrice);
+        String description = productGenerator.generate().getDescription();
+        String region = Generators.randomItem(regions);
+        Customer customer = new Customer(faker);
 
-        List<Order> orderList = new ArrayList<> ();
-        List<Cancellation> cancelList = new ArrayList<> ();
+        int quantity = Generators.randomInt(minOrders, maxOrders);
 
-        final ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime pastEvent = ZonedDateTime.now().minusDays(7);
+        Order orderEvent = new Order(UUID.randomUUID().toString(),
+                                        timestampFormatter.format(timestamp),
+                                        customer,
+                                        description,
+                                        unitPrice, quantity,
+                                        region);
 
-        while (pastEvent.isBefore(now)) {
-
-            double unitPrice = Generators.randomPrice(minPrice, maxPrice);
-            String description = productGenerator.generate().getDescription();
-            String region = Generators.randomItem(regions);
-            Customer customer = new Customer(faker);
-
-            int quantity = Generators.randomInt(minOrders, maxOrders);
-
-            Order orderEvent = new Order(UUID.randomUUID().toString(),
-                                            timestampFormatter.format(pastEvent),
-                                            customer,
-                                            description,
-                                            unitPrice, quantity,
-                                            region);
-            orderList.add(orderEvent);
-
-            if (Generators.shouldDo(orderCancellationRatio)) {
-                Cancellation cancelEvent = new Cancellation(orderEvent,
-                                Generators.randomItem(cancelReasons),
-                                timestampFormatter.format(pastEvent));
-                cancelList.add(cancelEvent);
-
-            }
-
-            pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
-
+        if (Generators.shouldDo(orderCancellationRatio)) {
+            Cancellation cancelEvent = new Cancellation(orderEvent,
+                                                        Generators.randomItem(cancelReasons),
+                                                        // TODO delay required
+                                                        timestampFormatter.format(timestamp));
+            return new OrderAndCancellation(orderEvent, cancelEvent);
         }
 
-        return new OrdersAndCancellations(orderList, cancelList);
+        return new OrderAndCancellation(orderEvent);
     }
 }

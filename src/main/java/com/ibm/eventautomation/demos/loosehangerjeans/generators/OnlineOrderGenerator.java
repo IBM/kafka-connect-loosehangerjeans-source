@@ -34,7 +34,7 @@ import java.util.Locale;
 /**
  * Generates an {@link OnlineOrder} event using randomly generated data.
  */
-public class OnlineOrderGenerator {
+public class OnlineOrderGenerator extends Generator<OnlineOrder> {
 
     /** Locale used for the data generation. */
     private static final Locale DEFAULT_LOCALE = Locale.US;
@@ -99,13 +99,14 @@ public class OnlineOrderGenerator {
      *  produced with the current time).
      */
     private final int MAX_DELAY_SECS;
-    private final int INTERVAL;
 
     /** Helper class used to generate data such as names, emails, phone numbers, addresses etc. */
     private final Faker faker = new Faker(DEFAULT_LOCALE);
 
     /** Creates an {@link OnlineOrderGenerator} using the provided configuration. */
     public OnlineOrderGenerator(AbstractConfig config) {
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_ONLINEORDERS));
+
         this.productGenerator = new ProductGenerator(config);
 
         this.minProducts = config.getInt(DatagenSourceConfig.CONFIG_ONLINEORDERS_PRODUCTS_MIN);
@@ -124,62 +125,41 @@ public class OnlineOrderGenerator {
         this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_ONLINEORDERS);
 
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_ONLINEORDERS);
-        this.INTERVAL = config.getInt(DatagenSourceConfig.CONFIG_TIMES_ONLINEORDERS);
     }
 
     /** Generates a random online order. */
     public OnlineOrder generate() {
-       return generateOnlineOrder(Generators.nowWithRandomOffset(MAX_DELAY_SECS));
-    }
-
-
-     /**
-     * Generates one week's worth of events to create a fake history.
-     *  This is intended to be used on the first run of the connector
-     *  to create an instant history of events that can be used for
-     *  historical aggregations.
-     */
-    public List<OnlineOrder> generateHistory() {
-        final List<OnlineOrder> histList = new ArrayList<OnlineOrder>();
-
-        final ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime pastEvent = ZonedDateTime.now().minusDays(7);
-
-        while (pastEvent.isBefore(now)) {
-                       
-            histList.add(generateOnlineOrder(pastEvent));
-            pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
-        }
-        return histList;
+       return generateEvent(Generators.nowWithRandomOffset(MAX_DELAY_SECS));
     }
 
     public boolean shouldDuplicate() {
         return Generators.shouldDo(duplicatesRatio);
     }
 
-    private OnlineOrder generateOnlineOrder(ZonedDateTime timestamp) {
 
+    @Override
+    protected OnlineOrder generateEvent(ZonedDateTime timestamp) {
          // Generate some products randomly.
          int productCount = Generators.randomInt(minProducts, maxProducts);
          List<String> products = new ArrayList<>();
          for (int i = 0; i < productCount; i++) {
              products.add(productGenerator.generate().getDescription());
          }
- 
+
          // Generate a random customer.
          OnlineCustomer customer = OnlineCustomer.create(faker, minEmails, maxEmails);
- 
+
          // Generate the country for the addresses.
          Country country = new Country(DEFAULT_LOCALE.getCountry(), DEFAULT_LOCALE.getDisplayCountry(DEFAULT_LOCALE));
- 
+
          // Generate a random shipping address.
          Address shippingAddress = Address.create(faker, country, minPhones, maxPhones);
- 
+
          // Possibly reuse the shipping address as billing address.
          Address billingAddress = Generators.shouldDo(reuseAddressRatio)
                  ? shippingAddress
                  : Address.create(faker, country, minPhones, maxPhones);
- 
+
          return new OnlineOrder(timestampFormatter.format(timestamp),
                  customer,
                  products,

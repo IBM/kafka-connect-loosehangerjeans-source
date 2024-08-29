@@ -15,26 +15,20 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
-import java.util.List;
+import java.util.Optional;
 
-public class OrdersAndCancellations {
+public class OrderAndCancellation {
 
-    private final List<Order> orderList;
-    private final List<Cancellation> cancellationList;
+    public final Order order;
+    public final Optional<Cancellation> cancellation;
 
-    public OrdersAndCancellations(List<Order> orderList, List<Cancellation> cancellationList) {
-        this.orderList = orderList;
-        this.cancellationList = cancellationList;
+    public OrderAndCancellation(Order order, Cancellation cancellation) {
+        this.order = order;
+        this.cancellation = Optional.of(cancellation);
     }
 
-    public List<Order> getOrderList() {
-        return orderList;
+    public OrderAndCancellation(Order order) {
+        this.order = order;
+        this.cancellation = Optional.empty();
     }
-
-    public List<Cancellation> getCancellationList() {
-        return cancellationList;
-    }
-
-
-
 }

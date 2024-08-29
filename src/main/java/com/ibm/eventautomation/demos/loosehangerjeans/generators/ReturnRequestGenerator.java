@@ -36,7 +36,7 @@ import java.util.Locale;
 /**
  * Generates a {@link ReturnRequest} event using randomly generated data.
  */
-public class ReturnRequestGenerator {
+public class ReturnRequestGenerator extends Generator<ReturnRequest> {
 
     /** Locale used for the data generation. */
     private static final Locale DEFAULT_LOCALE = Locale.US;
@@ -122,14 +122,16 @@ public class ReturnRequestGenerator {
      *  produced with the current time).
      */
     private final int MAX_DELAY_SECS;
-    private final int INTERVAL;
 
     /** Helper class used to generate data such as names, emails, phone numbers, addresses etc. */
     private final Faker faker = new Faker(DEFAULT_LOCALE);
 
     /** Creates an {@link ReturnRequestGenerator} using the provided configuration. */
     public ReturnRequestGenerator(AbstractConfig config,
-                                  List<Product> productsWithSizeIssue) {
+                                  List<Product> productsWithSizeIssue)
+    {
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_RETURNREQUESTS));
+
         this.productGenerator = new ProductGenerator(config);
 
         this.productsWithSizeIssue = productsWithSizeIssue;
@@ -157,15 +159,15 @@ public class ReturnRequestGenerator {
         this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_RETURNREQUESTS);
 
         this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_RETURNREQUESTS);
-        this.INTERVAL = config.getInt(DatagenSourceConfig.CONFIG_TIMES_RETURNREQUESTS);
     }
 
     /** Generates a random return request. */
     public ReturnRequest generate() {
-       return generateReturnrequest(Generators.nowWithRandomOffset(MAX_DELAY_SECS));
+       return generateEvent(Generators.nowWithRandomOffset(MAX_DELAY_SECS));
     }
 
-    private ReturnRequest generateReturnrequest(ZonedDateTime time) {
+    @Override
+    protected ReturnRequest generateEvent(ZonedDateTime timestamp) {
         // Generate a random customer.
         OnlineCustomer customer = OnlineCustomer.create(faker, minEmails, maxEmails);
 
@@ -199,7 +201,7 @@ public class ReturnRequestGenerator {
             returns.add(new ProductReturn(product, quantity, Generators.randomItem(reasons)));
         }
 
-        return new ReturnRequest(timestampFormatter.format(time),
+        return new ReturnRequest(timestampFormatter.format(timestamp),
                 customer,
                 addresses,
                 returns);
@@ -207,26 +209,5 @@ public class ReturnRequestGenerator {
 
     public boolean shouldDuplicate() {
         return Generators.shouldDo(duplicatesRatio);
-    }
-
-
-     /**
-     * Generates one week's worth of events to create a fake history.
-     *  This is intended to be used on the first run of the connector
-     *  to create an instant history of events that can be used for
-     *  historical aggregations.
-     */
-    public List<ReturnRequest> generateHistory() {
-        final List<ReturnRequest> histList = new ArrayList<ReturnRequest>();
-
-        final ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime pastEvent = ZonedDateTime.now().minusDays(7);
-
-        while (pastEvent.isBefore(now)) {
-
-            histList.add(generateReturnrequest(pastEvent));
-            pastEvent = pastEvent.plusNanos(INTERVAL * 1_000_000);
-        }
-        return histList;
     }
 }
