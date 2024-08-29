@@ -24,14 +24,12 @@ import org.apache.kafka.common.config.AbstractConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Customer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.OrderAndCancellation;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
  * Generates an {@link Order} event using randomly generated data.
  */
-public class OrderGenerator extends Generator<OrderAndCancellation> {
+public class OrderGenerator extends Generator<Order> {
 
     /** order regions (e.g. NA, EMEA) will be chosen at random from this list */
     private final List<String> regions;
@@ -48,8 +46,6 @@ public class OrderGenerator extends Generator<OrderAndCancellation> {
     private int minOrders;
     /** maximum number of items to order */
     private int maxOrders;
-    private double orderCancellationRatio;
-    private final List<String> cancelReasons;
 
 
     public OrderGenerator(AbstractConfig config)
@@ -67,8 +63,6 @@ public class OrderGenerator extends Generator<OrderAndCancellation> {
 
         this.minOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_SMALL_MIN);
         this.maxOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_LARGE_MAX);
-        this.orderCancellationRatio = config.getDouble(DatagenSourceConfig.CONFIG_CANCELLATIONS_RATIO);
-        this.cancelReasons = config.getList(DatagenSourceConfig.CONFIG_CANCELLATIONS_REASONS);
     }
 
 
@@ -117,17 +111,20 @@ public class OrderGenerator extends Generator<OrderAndCancellation> {
             customer = new Customer(faker);
         }
 
+        ZonedDateTime timestamp = ZonedDateTime.now();
+
         return new Order(UUID.randomUUID().toString(),
-                         formatTimestamp(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
+                         formatTimestamp(timestamp),
                          customer,
                          description,
                          unitPrice, quantity,
-                         region);
+                         region,
+                         timestamp);
     }
 
 
     @Override
-    protected OrderAndCancellation generateEvent(ZonedDateTime timestamp) {
+    protected Order generateEvent(ZonedDateTime timestamp) {
         double unitPrice = Generators.randomPrice(minPrice, maxPrice);
         String description = productGenerator.generate().getDescription();
         String region = Generators.randomItem(regions);
@@ -135,21 +132,12 @@ public class OrderGenerator extends Generator<OrderAndCancellation> {
 
         int quantity = Generators.randomInt(minOrders, maxOrders);
 
-        Order orderEvent = new Order(UUID.randomUUID().toString(),
-                                     formatTimestamp(timestamp),
-                                     customer,
-                                     description,
-                                     unitPrice, quantity,
-                                     region);
-
-        if (Generators.shouldDo(orderCancellationRatio)) {
-            Cancellation cancelEvent = new Cancellation(orderEvent,
-                                                        Generators.randomItem(cancelReasons),
-                                                        // TODO delay required
-                                                        formatTimestamp(timestamp));
-            return new OrderAndCancellation(orderEvent, cancelEvent);
-        }
-
-        return new OrderAndCancellation(orderEvent);
+        return new Order(UUID.randomUUID().toString(),
+                         formatTimestamp(timestamp),
+                         customer,
+                         description,
+                         unitPrice, quantity,
+                         region,
+                         timestamp);
     }
 }

@@ -59,6 +59,7 @@ public class StockMovementGenerator extends Generator<StockMovement> {
                                  productGenerator.generate().getDescription(),
                                  // stock movement quantities are always
                                  //  multiples of ten
-                                 quantity - (quantity % 10));
+                                 quantity - (quantity % 10),
+                                 timestamp);
     }
 }

@@ -15,8 +15,7 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
-import java.util.Collections;
-import java.util.Map;
+import java.time.ZonedDateTime;
 
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
@@ -27,7 +26,7 @@ import org.apache.kafka.connect.source.SourceRecord;
  * Represents an event capturing an employee using their id badge
  *  to go through a door.
  */
-public class BadgeIn {
+public class BadgeIn extends LoosehangerData {
 
     /** unique ID for this event */
     private String recordId;
@@ -51,34 +50,39 @@ public class BadgeIn {
             .field("badgetime", Schema.STRING_SCHEMA)
         .build();
 
-    public BadgeIn(String id, String timestamp, String door, String employee) {
+    public BadgeIn(String id, String timestamp, String door, String employee, ZonedDateTime recordTimestamp) {
+        super(recordTimestamp);
+
         this.recordId = id;
         this.timestamp = timestamp;
         this.doorLocation = door;
         this.employee = employee;
     }
 
-    public SourceRecord createSourceRecord(String topicname) {
+    public SourceRecord createSourceRecord(String topicName) {
+        return super.createSourceRecord(topicName, "badgein");
+    }
+
+    @Override
+    protected String getKey() {
+        return recordId;
+    }
+
+    @Override
+    protected Schema getValueSchema() {
+        return SCHEMA;
+    }
+
+    @Override
+    protected Struct getValue() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("recordid"),  recordId);
         struct.put(SCHEMA.field("door"),      doorLocation);
         struct.put(SCHEMA.field("employee"),  employee);
         struct.put(SCHEMA.field("badgetime"), timestamp);
-
-        return new SourceRecord(createSourcePartition(),
-                                createSourceOffset(),
-                                topicname,
-                                Schema.STRING_SCHEMA, recordId,
-                                SCHEMA,
-                                struct);
+        return struct;
     }
 
-    private Map<String, Object> createSourcePartition() {
-        return Collections.singletonMap("partition", "badgein");
-    }
-    private Map<String, Object> createSourceOffset() {
-        return Collections.singletonMap("offset", timestamp);
-    }
 
     @Override
     public String toString() {

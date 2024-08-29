@@ -16,7 +16,6 @@
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.apache.kafka.common.config.AbstractConfig;
@@ -45,9 +44,11 @@ public class CancellationGenerator extends Generator<Cancellation> {
     }
 
     public Cancellation generate(Order order) {
+        ZonedDateTime timestamp = Generators.nowWithRandomOffset(MAX_DELAY_SECS);
         return new Cancellation(order,
                                 Generators.randomItem(reasons),
-                                formatTimestamp(Generators.nowWithRandomOffset(MAX_DELAY_SECS)));
+                                formatTimestamp(timestamp),
+                                timestamp);
     }
 
     @Override

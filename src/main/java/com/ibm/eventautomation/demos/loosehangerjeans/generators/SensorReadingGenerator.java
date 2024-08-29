@@ -57,20 +57,21 @@ public class SensorReadingGenerator extends Generator<SensorReading> {
               DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT).withZone(ZoneId.systemDefault()));
     }
 
-    private String generateSensorId() {
-        int floor  = Generators.randomInt(0, 3);
-        int sensor = Generators.randomInt(10, 30);
-        return Generators.randomItem(Locations.BUILDINGS) + "-" +
-               floor + "-" +
-               sensor;
-    }
-
     @Override
     protected SensorReading generateEvent(ZonedDateTime timestamp) {
         return new SensorReading(UUID.randomUUID().toString(),
                                  formatTimestamp(timestamp),
                                  generateSensorId(),
                                  Generators.randomDouble(TEMP_MIN, TEMP_MAX),
-                                 Generators.randomInt(HUMIDITY_MIN, HUMIDITY_MAX));
+                                 Generators.randomInt(HUMIDITY_MIN, HUMIDITY_MAX),
+                                 timestamp);
+    }
+
+    private String generateSensorId() {
+        int floor  = Generators.randomInt(0, 3);
+        int sensor = Generators.randomInt(10, 30);
+        return Generators.randomItem(Locations.BUILDINGS) + "-" +
+               floor + "-" +
+               sensor;
     }
 }

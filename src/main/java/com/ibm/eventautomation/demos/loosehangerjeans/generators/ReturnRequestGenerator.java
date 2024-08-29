@@ -156,8 +156,9 @@ public class ReturnRequestGenerator extends Generator<ReturnRequest> {
         }
 
         return new ReturnRequest(formatTimestamp(timestamp),
-                customer,
-                addresses,
-                returns);
+                                 customer,
+                                 addresses,
+                                 returns,
+                                 timestamp);
     }
 }

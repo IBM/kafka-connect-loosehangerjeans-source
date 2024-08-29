@@ -15,13 +15,11 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.time.ZonedDateTime;
 
 import org.apache.kafka.common.config.AbstractConfig;
 
-import com.github.javafaker.Faker;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.BadgeIn;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Locations;
@@ -40,19 +38,21 @@ public class BadgeInGenerator extends Generator<BadgeIn> {
               config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
     }
 
+    @Override
+    protected BadgeIn generateEvent(ZonedDateTime timestamp) {
+        return new BadgeIn(UUID.randomUUID().toString(),
+                           formatTimestamp(timestamp),
+                           generateDoorId(),
+                           faker.name().username(),
+                           timestamp);
+    }
+
+
     private String generateDoorId() {
         int floor = Generators.randomInt(0, 3);
         int door  = Generators.randomInt(10, 60);
         return Generators.randomItem(Locations.BUILDINGS) + "-" +
                floor + "-" +
                door;
-    }
-
-    @Override
-    protected BadgeIn generateEvent(ZonedDateTime timestamp) {
-        return new BadgeIn(UUID.randomUUID().toString(),
-                           formatTimestamp(timestamp),
-                           generateDoorId(),
-                           faker.name().username());
     }
 }

@@ -55,7 +55,7 @@ public class OutOfStockGenerator extends Generator<OutOfStock> {
         long timestamp = dateTime.toInstant().toEpochMilli();
         int restockingDelay = Generators.randomInt(restockingMinDelay, restockingMaxDelay);
         int restockingDate = (int) dateTime.plusDays(restockingDelay).toLocalDate().toEpochDay();
-        return new OutOfStock(timestamp, product, restockingDate);
+        return new OutOfStock(timestamp, product, restockingDate, dateTime);
     }
 
     @Override

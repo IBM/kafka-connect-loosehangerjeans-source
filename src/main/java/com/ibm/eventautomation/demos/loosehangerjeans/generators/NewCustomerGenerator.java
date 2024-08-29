@@ -38,6 +38,7 @@ public class NewCustomerGenerator extends Generator<NewCustomer> {
     @Override
     protected NewCustomer generateEvent(ZonedDateTime timestamp) {
         return new NewCustomer(formatTimestamp(timestamp),
-                               new Customer(faker));
+                               new Customer(faker),
+                               timestamp);
     }
 }

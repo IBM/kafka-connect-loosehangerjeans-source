@@ -111,8 +111,9 @@ public class OnlineOrderGenerator extends Generator<OnlineOrder> {
                 : Address.create(faker, country, minPhones, maxPhones);
 
         return new OnlineOrder(formatTimestamp(timestamp),
-                customer,
-                products,
-                new OnlineAddress(shippingAddress, billingAddress));
+                               customer,
+                               products,
+                               new OnlineAddress(shippingAddress, billingAddress),
+                               timestamp);
     }
 }

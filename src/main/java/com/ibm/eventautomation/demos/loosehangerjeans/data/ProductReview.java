@@ -20,14 +20,13 @@ import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 
-import java.util.Collections;
-import java.util.Map;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 /**
  * Represents an event for a product review.
  */
-public class ProductReview {
+public class ProductReview extends LoosehangerData {
 
     /** Unique ID for this product review. */
     private final String id;
@@ -56,7 +55,9 @@ public class ProductReview {
             .build();
 
     /** Creates a {@link ProductReview} object using the provided details. */
-    public ProductReview(String id, String timestamp, String product, String size, Review review) {
+    public ProductReview(String id, String timestamp, String product, String size, Review review, ZonedDateTime recordTimestamp) {
+        super(recordTimestamp);
+
         this.id = id;
         this.timestamp = timestamp;
         this.product = product;
@@ -67,8 +68,8 @@ public class ProductReview {
     /** Creates a {@link ProductReview} using the provided details.
      * The ID is generated randomly.
      * */
-    public ProductReview(String timestamp, String product, String size, Review review) {
-        this(UUID.randomUUID().toString(), timestamp, product, size, review);
+    public ProductReview(String timestamp, String product, String size, Review review, ZonedDateTime recordTimestamp) {
+        this(UUID.randomUUID().toString(), timestamp, product, size, review, recordTimestamp);
     }
 
     public String getId() {
@@ -91,28 +92,29 @@ public class ProductReview {
         return review;
     }
 
-    public SourceRecord createSourceRecord(String topicname) {
+    public SourceRecord createSourceRecord(String topicName) {
+        return super.createSourceRecord(topicName, "productreview");
+    }
+
+    @Override
+    protected String getKey() {
+        return id;
+    }
+
+    @Override
+    protected Schema getValueSchema() {
+        return SCHEMA;
+    }
+
+    @Override
+    protected Struct getValue() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),              id);
         struct.put(SCHEMA.field("product"),         product);
         struct.put(SCHEMA.field("size"),            size);
         struct.put(SCHEMA.field("review"),          review.toStruct());
         struct.put(SCHEMA.field("reviewtime"),      timestamp);
-
-        return new SourceRecord(createSourcePartition(),
-                createSourceOffset(),
-                topicname,
-                Schema.STRING_SCHEMA, id,
-                SCHEMA,
-                struct);
-    }
-
-    private Map<String, Object> createSourcePartition() {
-        return Collections.singletonMap("partition", "productreview");
-    }
-
-    private Map<String, Object> createSourceOffset() {
-        return Collections.singletonMap("offset", timestamp);
+        return struct;
     }
 
     @Override

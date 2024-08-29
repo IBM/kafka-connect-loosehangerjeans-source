@@ -22,15 +22,14 @@ import org.apache.kafka.connect.source.SourceRecord;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Map;
 import java.util.UUID;
 
 /**
  * Represents an event for a product that runs out-of-stock.
  */
-public class OutOfStock {
+public class OutOfStock extends LoosehangerData {
 
     /** Unique ID for the out-of-stock event. */
     private final String id;
@@ -59,7 +58,9 @@ public class OutOfStock {
             .build();
 
     /** Creates an {@link OutOfStock} object using the provided details. */
-    public OutOfStock(String id, long timestamp, Product product, int restockingDate) {
+    public OutOfStock(String id, long timestamp, Product product, int restockingDate, ZonedDateTime recordTimestamp) {
+        super(recordTimestamp);
+
         this.id = id;
         this.timestamp = timestamp;
         this.product = product;
@@ -69,8 +70,8 @@ public class OutOfStock {
     /** Creates an {@link OutOfStock} object using the provided details.
      * The ID is generated randomly.
      * */
-    public OutOfStock(long timestamp, Product product, int restockingDate) {
-        this(UUID.randomUUID().toString(), timestamp, product, restockingDate);
+    public OutOfStock(long timestamp, Product product, int restockingDate, ZonedDateTime recordTimestamp) {
+        this(UUID.randomUUID().toString(), timestamp, product, restockingDate, recordTimestamp);
     }
 
     public String getId() {
@@ -89,28 +90,28 @@ public class OutOfStock {
         return restockingDate;
     }
 
-    /** Creates a source record to pass to Kafka Connect for storage in Kafka. */
-    public SourceRecord createSourceRecord(String topicname) {
+    public SourceRecord createSourceRecord(String topicName) {
+        return super.createSourceRecord(topicName, "outofstock");
+    }
+
+    @Override
+    protected String getKey() {
+        return id;
+    }
+
+    @Override
+    protected Schema getValueSchema() {
+        return SCHEMA;
+    }
+
+    @Override
+    protected Struct getValue() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),                  id);
         struct.put(SCHEMA.field("product"),             product.toStruct());
         struct.put(SCHEMA.field("restockingdate"),      restockingDate);
         struct.put(SCHEMA.field("outofstocktime"),      timestamp);
-
-        return new SourceRecord(createSourcePartition(),
-                createSourceOffset(),
-                topicname,
-                Schema.STRING_SCHEMA, id,
-                SCHEMA,
-                struct);
-    }
-
-    private Map<String, Object> createSourcePartition() {
-        return Collections.singletonMap("partition", "outofstock");
-    }
-
-    private Map<String, Object> createSourceOffset() {
-        return Collections.singletonMap("offset", timestamp);
+        return struct;
     }
 
     @Override

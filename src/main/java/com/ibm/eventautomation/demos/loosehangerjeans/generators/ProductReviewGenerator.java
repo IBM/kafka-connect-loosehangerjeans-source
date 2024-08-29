@@ -96,7 +96,8 @@ public class ProductReviewGenerator extends Generator<ProductReview> {
                 : Generators.randomItem(reviews);
         return new ProductReview(formatTimestamp(timestamp),
                                  product.getShortDescription(), product.getSize(),
-                                 review);
+                                 review,
+                                 timestamp);
     }
 
     public List<Product> getProductsWithSizeIssue() {
