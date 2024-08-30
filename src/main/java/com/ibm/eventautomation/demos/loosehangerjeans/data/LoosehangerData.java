@@ -17,7 +17,6 @@ package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.Map;
 
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Struct;
@@ -40,27 +39,28 @@ public abstract class LoosehangerData {
     protected abstract Struct getValue();
 
     /** Message timestamp */
-    private long recordTimestampEpoch;
+    private ZonedDateTime recordTimestamp;
 
     protected LoosehangerData(ZonedDateTime timestamp) {
-        this.recordTimestampEpoch = timestamp.toEpochSecond();
+        this.recordTimestamp = timestamp;
     }
 
     public SourceRecord createSourceRecord(String topicName, String origin) {
         final Integer topicPartition = null;
-        return new SourceRecord(createSourcePartition(origin),
-                                createSourceOffset(),
+        final long timestamp = recordTimestamp.toEpochSecond();
+        return new SourceRecord(Collections.singletonMap("partition", origin),
+                                Collections.singletonMap("offset", timestamp),
                                 topicName, topicPartition,
                                 Schema.STRING_SCHEMA, getKey(),
                                 getValueSchema(), getValue(),
-                                recordTimestampEpoch);
+                                timestamp);
     }
 
-    private Map<String, Object> createSourcePartition(String origin) {
-        return Collections.singletonMap("partition", origin);
-    }
-
-    private Map<String, Object> createSourceOffset() {
-        return Collections.singletonMap("offset", recordTimestampEpoch);
+    /**
+     * Timestamp that will be applied to the SourceRecord delivered
+     *  to Kafka.
+     */
+    public ZonedDateTime recordTimestamp() {
+        return recordTimestamp;
     }
 }

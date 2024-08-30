@@ -44,7 +44,10 @@ public class CancellationGenerator extends Generator<Cancellation> {
     }
 
     public Cancellation generate(Order order) {
-        ZonedDateTime timestamp = Generators.nowWithRandomOffset(MAX_DELAY_SECS);
+        return generate(Generators.nowWithRandomOffset(MAX_DELAY_SECS), order);
+    }
+
+    public Cancellation generate(ZonedDateTime timestamp, Order order) {
         return new Cancellation(order,
                                 Generators.randomItem(reasons),
                                 formatTimestamp(timestamp),

@@ -122,7 +122,7 @@ public abstract class Generator<T> {
      *  to create an instant history of events that can be used for
      *  historical aggregations.
      */
-    protected List<T> generateHistory() {
+    public List<T> generateHistory() {
         final List<T> history = new ArrayList<T>();
 
         final ZonedDateTime now = ZonedDateTime.now();

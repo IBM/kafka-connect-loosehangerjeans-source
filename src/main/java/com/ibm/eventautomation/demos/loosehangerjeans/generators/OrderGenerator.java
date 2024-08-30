@@ -68,16 +68,23 @@ public class OrderGenerator extends Generator<Order> {
 
     /** generates a random order */
     public Order generate(int minItems, int maxItems) {
+        return generate(minItems, maxItems, ZonedDateTime.now());
+    }
+
+    public Order generate(int minItems, int maxItems, ZonedDateTime timestamp) {
+        int quantity = Generators.randomInt(minItems, maxItems);
         double unitPrice = Generators.randomPrice(minPrice, maxPrice);
         String description = productGenerator.generate().getDescription();
         String region = Generators.randomItem(regions);
         Customer customer = new Customer(faker);
 
-        return generate(minItems, maxItems,
-                        unitPrice,
-                        region,
-                        description,
-                        customer);
+        return new Order(UUID.randomUUID().toString(),
+                         formatTimestamp(timestamp),
+                         customer,
+                         description,
+                         unitPrice, quantity,
+                         region,
+                         timestamp);
     }
 
     /**
@@ -101,17 +108,30 @@ public class OrderGenerator extends Generator<Order> {
 
     /** Creates an order with known details */
     public Order generate(int minItems, int maxItems,
-            double unitPrice,
-            String region,
-            String description,
-            Customer customer)
+                          double unitPrice,
+                          String region,
+                          String description,
+                          Customer customer)
+    {
+        return generate(minItems, maxItems,
+                        unitPrice,
+                        region,
+                        description,
+                        customer,
+                        ZonedDateTime.now());
+    }
+
+    public Order generate(int minItems, int maxItems,
+                          double unitPrice,
+                          String region,
+                          String description,
+                          Customer customer,
+                          ZonedDateTime timestamp)
     {
         int quantity = Generators.randomInt(minItems, maxItems);
         if (customer == null) {
             customer = new Customer(faker);
         }
-
-        ZonedDateTime timestamp = ZonedDateTime.now();
 
         return new Order(UUID.randomUUID().toString(),
                          formatTimestamp(timestamp),

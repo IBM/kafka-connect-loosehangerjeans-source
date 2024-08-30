@@ -21,12 +21,15 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.Country;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineAddress;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineCustomer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OutOfStock;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.common.config.AbstractConfig;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Generates an {@link OnlineOrder} event using randomly generated data.
@@ -64,6 +67,17 @@ public class OnlineOrderGenerator extends Generator<OnlineOrder> {
      */
     private final double reuseAddressRatio;
 
+    /**
+     * Ratio of orders that have at least one product that runs out-of-stock after the order has been placed.
+     * Must be between 0.0 and 1.0.
+     *
+     * Setting this to 0 will mean that no out-of-stock event is generated.
+     * Setting this to 1 will mean that one out-of-stock event will be generated for each new order.
+     */
+    private final double outOfStockRatio;
+
+
+
 
     /** Creates an {@link OnlineOrderGenerator} using the provided configuration. */
     public OnlineOrderGenerator(AbstractConfig config) {
@@ -84,6 +98,7 @@ public class OnlineOrderGenerator extends Generator<OnlineOrder> {
         this.maxPhones = config.getInt(DatagenSourceConfig.CONFIG_ONLINEORDERS_ADDRESS_PHONES_MAX);
 
         this.reuseAddressRatio = config.getDouble(DatagenSourceConfig.CONFIG_ONLINEORDERS_REUSE_ADDRESS_RATIO);
+        this.outOfStockRatio = config.getDouble(DatagenSourceConfig.CONFIG_ONLINEORDERS_OUTOFSTOCK_RATIO);
     }
 
 
@@ -115,5 +130,9 @@ public class OnlineOrderGenerator extends Generator<OnlineOrder> {
                                products,
                                new OnlineAddress(shippingAddress, billingAddress),
                                timestamp);
+    }
+
+    public boolean shouldGenerateOutOfStockEvent() {
+        return Generators.shouldDo(outOfStockRatio);
     }
 }

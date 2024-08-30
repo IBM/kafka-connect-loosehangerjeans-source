@@ -26,6 +26,7 @@ import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -50,15 +51,6 @@ public class OnlineOrdersTask extends TimerTask {
 
     /** Timer used to schedule message-generation tasks. */
     private final Timer timer;
-
-    /**
-     * Ratio of orders that have at least one product that runs out-of-stock after the order has been placed.
-     * Must be between 0.0 and 1.0.
-     *
-     * Setting this to 0 will mean that no out-of-stock event is generated.
-     * Setting this to 1 will mean that one out-of-stock event will be generated for each new order.
-     */
-    private final double outOfStockRatio;
 
     /**
      * Minimum time (in milliseconds) to wait after creating an {@link OnlineOrder} before
@@ -87,7 +79,6 @@ public class OnlineOrdersTask extends TimerTask {
         this.queue = queue;
         this.timer = generateTimer;
 
-        this.outOfStockRatio = config.getDouble(DatagenSourceConfig.CONFIG_ONLINEORDERS_OUTOFSTOCK_RATIO);
         this.outOfStockMinDelay = config.getInt(DatagenSourceConfig.CONFIG_OUTOFSTOCKS_MIN_DELAY);
         this.outOfStockMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_OUTOFSTOCKS_MAX_DELAY);
 
@@ -109,24 +100,19 @@ public class OnlineOrdersTask extends TimerTask {
         }
 
         // Sometimes generate an out-of-stock event for a given order.
-        if (Generators.shouldDo(outOfStockRatio)) {
-            // Retrieve a product randomly in the order.
-            List<String> products = order.getProducts();
-            String productDescription = Generators.randomItem(products);
-            Product product = Product.parseDescription(productDescription);
-            if (product != null) {
-                generateOutOfStockEvent(product);
+        if (orderGenerator.shouldGenerateOutOfStockEvent()) {
+            OutOfStock outOfStock = outOfStockGenerator.generate(order);
+            if (outOfStock != null) {
+                generateOutOfStockEvent(outOfStock);
             }
         }
     }
 
-    private void generateOutOfStockEvent(final Product product) {
+    private void generateOutOfStockEvent(final OutOfStock outOfStock) {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                SourceRecord rec = outOfStockGenerator
-                        .generate(product)
-                        .createSourceRecord(outOfStockTopicName);
+                SourceRecord rec = outOfStock.createSourceRecord(outOfStockTopicName);
                 queue.add(rec);
 
                 // Possibly duplicate the event.

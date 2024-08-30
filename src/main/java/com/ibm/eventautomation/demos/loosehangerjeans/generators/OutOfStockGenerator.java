@@ -16,12 +16,14 @@
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OutOfStock;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.common.config.AbstractConfig;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * Generates an {@link OutOfStock} event for a given product using randomly generated data.
@@ -49,8 +51,18 @@ public class OutOfStockGenerator extends Generator<OutOfStock> {
         this.restockingMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_OUTOFSTOCKS_RESTOCKING_MAX_DELAY);
     }
 
-    /** Generates a random out-of-stock for a given product. */
-    public OutOfStock generate(Product product) {
+    public OutOfStock generate(OnlineOrder order) {
+        // Retrieve a product description randomly in the order.
+        List<String> products = order.getProducts();
+        String productDescription = Generators.randomItem(products);
+
+        // Generate a product object from the description
+        Product product = Product.parseDescription(productDescription);
+        if (product == null) {
+            return null;
+        }
+
+        // Generate an out-of-stock event for the product
         ZonedDateTime dateTime = Generators.nowWithRandomOffset(MAX_DELAY_SECS);
         long timestamp = dateTime.toInstant().toEpochMilli();
         int restockingDelay = Generators.randomInt(restockingMinDelay, restockingMaxDelay);
