@@ -158,7 +158,6 @@ public class DatagenHistoryGenerator {
         final String CANCELLATIONS_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_CANCELLATIONS);
 
         // normal orders
-        double cancellationRatio = config.getDouble(DatagenSourceConfig.CONFIG_CANCELLATIONS_RATIO);
         int cancellationMinDelay = config.getInt(DatagenSourceConfig.CONFIG_CANCELLATIONS_MIN_DELAY);
         int cancellationMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_CANCELLATIONS_MAX_DELAY);
 
@@ -169,7 +168,7 @@ public class DatagenHistoryGenerator {
             SourceRecord orderRecord = order.createSourceRecord(ORDERS_TOPIC, NormalOrdersTask.class.getName());
             historicalRecords.add(orderRecord);
 
-            if (Generators.shouldDo(cancellationRatio)) {
+            if (orderGenerator.shouldCancel()) {
                 int delayMs = Generators.randomInt(cancellationMinDelay, cancellationMaxDelay);
                 Cancellation cancellationRecord = cancellationGenerator.generate(
                     order.recordTimestamp().plusNanos(delayMs * 1_000_000),
@@ -195,7 +194,6 @@ public class DatagenHistoryGenerator {
         String RETURN_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_RETURNREQUESTS);
         String REVIEW_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_PRODUCTREVIEWS);
 
-        double reviewRatio = config.getDouble(DatagenSourceConfig.CONFIG_RETURNREQUESTS_REVIEW_RATIO);
         int reviewMinDelay = config.getInt(DatagenSourceConfig.CONFIG_PRODUCTREVIEWS_MIN_DELAY);
         int reviewMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_PRODUCTREVIEWS_MAX_DELAY);
 
@@ -207,7 +205,7 @@ public class DatagenHistoryGenerator {
             SourceRecord returnRecord = returnRequest.createSourceRecord(RETURN_TOPIC);
             historicalRecords.add(returnRecord);
 
-            if (Generators.shouldDo(reviewRatio)) {
+            if (returnRequestGenerator.shouldReview()) {
                 Product product = Generators.randomItem(returnRequest.getReturns()).getProduct();
                 if (product != null) {
                     int delay = Generators.randomInt(reviewMinDelay, reviewMaxDelay);

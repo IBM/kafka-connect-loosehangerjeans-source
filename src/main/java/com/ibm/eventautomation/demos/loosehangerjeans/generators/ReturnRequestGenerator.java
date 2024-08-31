@@ -87,6 +87,17 @@ public class ReturnRequestGenerator extends Generator<ReturnRequest> {
      */
     private final double reuseAddressRatio;
 
+    /**
+     * Ratio of return requests that have at least one product that has a review that is
+     * posted after the return request is issued.
+     * Must be between 0.0 and 1.0.
+     *
+     * Setting this to 0 will mean that no product review event is generated.
+     * Setting this to 1 will mean that one product review event will be generated for each
+     *  new return request.
+     */
+    private final double reviewRatio;
+
 
     /** Creates an {@link ReturnRequestGenerator} using the provided configuration. */
     public ReturnRequestGenerator(AbstractConfig config,
@@ -118,6 +129,7 @@ public class ReturnRequestGenerator extends Generator<ReturnRequest> {
         this.maxPhones = config.getInt(DatagenSourceConfig.CONFIG_RETURNREQUESTS_ADDRESS_PHONES_MAX);
 
         this.reuseAddressRatio = config.getDouble(DatagenSourceConfig.CONFIG_RETURNREQUESTS_REUSE_ADDRESS_RATIO);
+        this.reviewRatio = config.getDouble(DatagenSourceConfig.CONFIG_RETURNREQUESTS_REVIEW_RATIO);
     }
 
     @Override
@@ -160,5 +172,18 @@ public class ReturnRequestGenerator extends Generator<ReturnRequest> {
                                  addresses,
                                  returns,
                                  timestamp);
+    }
+
+    /**
+     * Returns a random decision of whether an return request should be
+     *  followed by a review.
+     *
+     *  The frequency for how often this returns true is determined by
+     *  a ratio provided to the generator constructor.
+     *
+     * @return true if a review should be generated
+     */
+    public boolean shouldReview() {
+        return Generators.shouldDo(reviewRatio);
     }
 }

@@ -45,17 +45,6 @@ public class NormalOrdersTask extends DatagenTimerTask {
     private static final String ORIGIN = NormalOrdersTask.class.getName();
 
     /**
-     * Proportion of {@link Order} events that should have an associated
-     *  {@link Cancellation} event generated.
-     *
-     * Between 0.0 and 1.0
-     *
-     * Set this to 0.0 for no cancellation events.
-     * Set this to 1.0 for every order to have a corresponding cancellation.
-     */
-    private double cancellationRatio;
-
-    /**
      * minimum time to wait after creating an {@link Order} before
      *  generating the corresponding {@link Cancellation}
      */
@@ -83,7 +72,6 @@ public class NormalOrdersTask extends DatagenTimerTask {
     {
         super(orderGenerator, cancellationGenerator, queue, timer, config);
 
-        cancellationRatio = config.getDouble(DatagenSourceConfig.CONFIG_CANCELLATIONS_RATIO);
         cancellationMinDelay = config.getInt(DatagenSourceConfig.CONFIG_CANCELLATIONS_MIN_DELAY);
         cancellationMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_CANCELLATIONS_MAX_DELAY);
 
@@ -107,7 +95,7 @@ public class NormalOrdersTask extends DatagenTimerTask {
         }
 
         // sometimes cancel it
-        if (Generators.shouldDo(cancellationRatio)) {
+        if (orderGenerator.shouldCancel()) {
             cancelOrder(order, ORIGIN,
                         cancellationMinDelay,
                         cancellationMaxDelay);

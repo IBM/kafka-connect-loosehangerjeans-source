@@ -22,6 +22,7 @@ import java.util.UUID;
 import org.apache.kafka.common.config.AbstractConfig;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Customer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
@@ -47,6 +48,17 @@ public class OrderGenerator extends Generator<Order> {
     /** maximum number of items to order */
     private int maxOrders;
 
+    /**
+     * Proportion of {@link Order} events that should have an associated
+     *  {@link Cancellation} event generated.
+     *
+     * Between 0.0 and 1.0
+     *
+     * Set this to 0.0 for no cancellation events.
+     * Set this to 1.0 for every order to have a corresponding cancellation.
+     */
+    private double cancellationRatio;
+
 
     public OrderGenerator(AbstractConfig config)
     {
@@ -63,6 +75,8 @@ public class OrderGenerator extends Generator<Order> {
 
         this.minOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_SMALL_MIN);
         this.maxOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_LARGE_MAX);
+
+        this.cancellationRatio = config.getDouble(DatagenSourceConfig.CONFIG_CANCELLATIONS_RATIO);
     }
 
 
@@ -159,5 +173,16 @@ public class OrderGenerator extends Generator<Order> {
                          unitPrice, quantity,
                          region,
                          timestamp);
+    }
+
+    /**
+     * Returns a random decision of whether an order should be cancelled.
+     *  The frequency for how often this returns true is determined by
+     *  a ratio provided to the generator constructor.
+     *
+     * @return true if the order should be cancelled
+     */
+    public boolean shouldCancel() {
+        return Generators.shouldDo(cancellationRatio);
     }
 }
