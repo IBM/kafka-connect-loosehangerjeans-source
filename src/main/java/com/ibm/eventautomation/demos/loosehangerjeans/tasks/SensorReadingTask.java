@@ -22,9 +22,7 @@ import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.SensorReading;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.SensorReadingGenerator;
-import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
  * Timer task intended for repeated execution. Creates new

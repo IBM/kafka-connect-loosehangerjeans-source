@@ -21,15 +21,12 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.Country;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineAddress;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineCustomer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.OutOfStock;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.common.config.AbstractConfig;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Generates an {@link OnlineOrder} event using randomly generated data.

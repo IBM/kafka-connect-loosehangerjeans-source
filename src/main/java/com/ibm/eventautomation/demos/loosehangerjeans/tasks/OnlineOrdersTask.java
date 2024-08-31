@@ -18,15 +18,12 @@ package com.ibm.eventautomation.demos.loosehangerjeans.tasks;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OutOfStock;
-import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OnlineOrderGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OutOfStockGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;

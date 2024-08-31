@@ -26,7 +26,6 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.CancellationGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OrderGenerator;
-import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
  * Timer task intended for repeated execution. Creates new

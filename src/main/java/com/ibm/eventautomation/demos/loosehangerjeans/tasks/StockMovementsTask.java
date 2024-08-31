@@ -24,7 +24,6 @@ import org.apache.kafka.connect.source.SourceRecord;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.StockMovement;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.StockMovementGenerator;
-import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
  * Timer task intended for repeated execution. Creates new
