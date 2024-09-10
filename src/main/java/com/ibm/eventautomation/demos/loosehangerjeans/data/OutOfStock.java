@@ -31,6 +31,8 @@ import java.util.UUID;
  */
 public class OutOfStock extends LoosehangerData {
 
+    public static final String PARTITION = "outofstock";
+
     /** Unique ID for the out-of-stock event. */
     private final String id;
 
@@ -91,7 +93,7 @@ public class OutOfStock extends LoosehangerData {
     }
 
     public SourceRecord createSourceRecord(String topicName) {
-        return super.createSourceRecord(topicName, "outofstock");
+        return super.createSourceRecord(topicName, PARTITION);
     }
 
     @Override

@@ -23,6 +23,10 @@ import java.util.Map;
 
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
+import org.apache.kafka.connect.source.SourceTaskContext;
+import org.apache.kafka.connect.storage.OffsetStorageReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ibm.eventautomation.demos.loosehangerjeans.data.BadgeIn;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
@@ -30,6 +34,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.LoosehangerData;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.NewCustomer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OutOfStock;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.ProductReview;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.ReturnRequest;
@@ -47,6 +52,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.generators.ReturnRequestGe
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.SensorReadingGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.StockMovementGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.SuspiciousOrderGenerator;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.FalsePositivesTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NewCustomerTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NormalOrdersTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SuspiciousOrdersTask;
@@ -71,11 +77,15 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
  */
 public class DatagenHistoryGenerator {
 
+    private static final Logger log = LoggerFactory.getLogger(DatagenHistoryGenerator.class);
+
     /**
      * Create a list containing seven days' worth of Loosehanger events.
      */
-    public static List<SourceRecord> generateHistory(AbstractConfig config)
+    public List<SourceRecord> generateHistory(AbstractConfig config)
     {
+        log.info("Generating historical events to warm up the topics");
+
         List<SourceRecord> historicalRecords = new ArrayList<>();
 
         addNewCustomerRecords(historicalRecords, config);
@@ -95,7 +105,8 @@ public class DatagenHistoryGenerator {
 
 
 
-    private static void addBadgeInRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+    private void addBadgeInRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+        log.debug("generating historical badgein records");
         final String TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_BADGEINS);
 
         for (BadgeIn badgein : new BadgeInGenerator(config).generateHistory()) {
@@ -104,7 +115,8 @@ public class DatagenHistoryGenerator {
         }
     }
 
-    private static void addNewCustomerRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+    private void addNewCustomerRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+        log.debug("generating historical customer records");
         final String TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_CUSTOMERS);
 
         for (NewCustomer customer : new NewCustomerGenerator(config).generateHistory()) {
@@ -113,7 +125,8 @@ public class DatagenHistoryGenerator {
         }
     }
 
-    private static void addSensorReadingRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+    private void addSensorReadingRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+        log.debug("generating historical sensor records");
         final String TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_SENSORREADINGS);
 
         for (SensorReading reading : new SensorReadingGenerator(config).generateHistory()) {
@@ -122,7 +135,8 @@ public class DatagenHistoryGenerator {
         }
     }
 
-    private static void addStockMovementRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+    private void addStockMovementRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+        log.debug("generating historical stock movement records");
         final String TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_STOCKMOVEMENTS);
 
         for (StockMovement movement : new StockMovementGenerator(config).generateHistory()) {
@@ -131,7 +145,8 @@ public class DatagenHistoryGenerator {
         }
     }
 
-    private static void addOnlineOrderRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+    private void addOnlineOrderRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+        log.debug("generating historical online order records");
         final String ONLINEORDERS_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ONLINEORDERS);
         final String OUTOFSTOCK_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_OUTOFSTOCKS);
 
@@ -153,7 +168,8 @@ public class DatagenHistoryGenerator {
         }
     }
 
-    private static void addOrderAndCancellationRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+    private void addOrderAndCancellationRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+        log.debug("generating historical order records");
         final String ORDERS_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ORDERS);
         final String CANCELLATIONS_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_CANCELLATIONS);
 
@@ -171,7 +187,7 @@ public class DatagenHistoryGenerator {
             if (orderGenerator.shouldCancel()) {
                 int delayMs = Generators.randomInt(cancellationMinDelay, cancellationMaxDelay);
                 Cancellation cancellationRecord = cancellationGenerator.generate(
-                    order.recordTimestamp().plusNanos(delayMs * 1_000_000),
+                    order.recordTimestamp().plusNanos(delayMs * 1_000_000L),
                     order);
                 historicalRecords.add(cancellationRecord.createSourceRecord(CANCELLATIONS_TOPIC, NormalOrdersTask.class.getName()));
             }
@@ -190,7 +206,8 @@ public class DatagenHistoryGenerator {
         }
     }
 
-    private static void addReturnsRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+    private void addReturnsRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+        log.debug("generating historical returns records");
         String RETURN_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_RETURNREQUESTS);
         String REVIEW_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_PRODUCTREVIEWS);
 
@@ -209,7 +226,7 @@ public class DatagenHistoryGenerator {
                 Product product = Generators.randomItem(returnRequest.getReturns()).getProduct();
                 if (product != null) {
                     int delay = Generators.randomInt(reviewMinDelay, reviewMaxDelay);
-                    ZonedDateTime timestamp = returnRequest.recordTimestamp().plusNanos(delay * 1_000_000);
+                    ZonedDateTime timestamp = returnRequest.recordTimestamp().plusNanos(delay * 1_000_000L);
 
                     ProductReview review = productReviewGenerator.generate(product, timestamp);
                     SourceRecord reviewRecord = review.createSourceRecord(REVIEW_TOPIC);
@@ -226,5 +243,68 @@ public class DatagenHistoryGenerator {
             SourceRecord reviewRecord = review.createSourceRecord(REVIEW_TOPIC);
             historicalRecords.add(reviewRecord);
         }
+    }
+
+
+    private List<Map<String, Object>> getExpectedPartitions() {
+        return List.of(
+            LoosehangerData.partition(NormalOrdersTask.class.getName()),
+            LoosehangerData.partition(NewCustomerTask.class.getName()),
+            LoosehangerData.partition(SuspiciousOrdersTask.class.getName()),
+            LoosehangerData.partition(FalsePositivesTask.class.getName()),
+            LoosehangerData.partition(BadgeIn.PARTITION),
+            LoosehangerData.partition(OnlineOrder.PARTITION),
+            LoosehangerData.partition(OutOfStock.PARTITION),
+            LoosehangerData.partition(ProductReview.PARTITION),
+            LoosehangerData.partition(ReturnRequest.PARTITION),
+            LoosehangerData.partition(SensorReading.PARTITION),
+            LoosehangerData.partition(StockMovement.PARTITION)
+        );
+    }
+
+    /**
+     * Optionally, the Connector can generate a week's worth of historical
+     *  events when it starts for the first time, so that events are
+     *  immediately available for demos, without needing to wait for events
+     *  to be generated over time.
+     *
+     * This should only be done the first time that the Connector starts,
+     *  and not be repeated on every restart, reconfiguration, or rebalance.
+     *
+     * This method is used to look for indications that the Connector has
+     *  run before. Note that this depends on looking for offsets, so
+     *  restarting the connector with a different name or administratively
+     *  deleting it's offset will appear as if the connector is starting
+     *  for the first time.
+     */
+    public boolean startingForFirstTime(SourceTaskContext context) {
+        if (context == null) {
+            log.debug("No context");
+            return true;
+        }
+        if (context.offsetStorageReader() == null) {
+            log.debug("No offset reader");
+            return true;
+        }
+
+        OffsetStorageReader offsetReader = context.offsetStorageReader();
+
+        final List<Map<String, Object>> EXPECTED_PARTITIONS = getExpectedPartitions();
+        Map<Map<String, Object>, Map<String, Object>> allOffsets = offsetReader.offsets(EXPECTED_PARTITIONS);
+        if (allOffsets.isEmpty()) {
+            log.debug("No offsets found");
+            return true;
+        }
+
+        for (Map<String, Object> partition : EXPECTED_PARTITIONS) {
+            if (allOffsets.get(partition) != null) {
+                log.debug("Offset found for {}", partition);
+                return false;
+            }
+        }
+
+        // no evidence of previous runs found
+        log.debug("No offsets found for any partition");
+        return true;
     }
 }

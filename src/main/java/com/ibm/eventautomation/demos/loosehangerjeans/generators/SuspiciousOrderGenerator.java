@@ -78,7 +78,7 @@ public class SuspiciousOrderGenerator {
                 // cancel the order after a short delay
                 int minDelay = Generators.randomInt(1000, cancellationMinDelay);
                 int delayMs = Generators.randomInt(minDelay, cancellationMaxDelay);
-                nextTimestamp = nextTimestamp.plusNanos(delayMs * 1_000_000);
+                nextTimestamp = nextTimestamp.plusNanos(delayMs * 1_000_000L);
 
                 Cancellation largeOrderCancellation = cancellationGenerator.generate(nextTimestamp, largeOrder);
                 history.add(largeOrderCancellation);

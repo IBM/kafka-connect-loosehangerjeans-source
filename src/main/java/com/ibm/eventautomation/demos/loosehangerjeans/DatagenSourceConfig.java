@@ -156,6 +156,9 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TIMES_RETURNREQUESTS   = "timings.ms.returnrequests";
     public static final String CONFIG_TIMES_PRODUCTREVIEWS   = "timings.ms.productreviews";
 
+    private static final String CONFIG_GROUP_BEHAVIOR = "Behavior";
+    public static final String CONFIG_BEHAVIOR_STARTUPHISTORY = "startup.history.enabled";
+
     public static final ConfigDef CONFIG_DEF = new ConfigDef()
         //
         // format to use
@@ -865,7 +868,16 @@ public class DatagenSourceConfig {
                     Range.atLeast(30_000), // 30 seconds
                     Importance.LOW,
                     "Delay, in milliseconds, between each product review that should be generated.",
-                    CONFIG_GROUP_TIMES, 10, Width.MEDIUM, "Product reviews delay");
+                    CONFIG_GROUP_TIMES, 10, Width.MEDIUM, "Product reviews delay")
+        //
+        // How frequently to generate messages
+        //
+        .define(CONFIG_BEHAVIOR_STARTUPHISTORY,
+                    Type.BOOLEAN,
+                    false, // disabled by default
+                    Importance.LOW,
+                    "If enabled, the connector will generate a week of historical events on startup for the first time.",
+                    CONFIG_GROUP_BEHAVIOR, 1, Width.SHORT, "Generate history on first start");
 
 
     private static class ValidTermsList implements Validator {

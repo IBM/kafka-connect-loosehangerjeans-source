@@ -137,7 +137,7 @@ public abstract class Generator<T> {
                 history.add(event);
             }
 
-            timestamp = timestamp.plusNanos(INTERVAL_MS * 1_000_000);
+            timestamp = timestamp.plusNanos(INTERVAL_MS * 1_000_000L);
         }
 
         return history;

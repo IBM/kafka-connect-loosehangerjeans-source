@@ -28,6 +28,8 @@ import java.util.UUID;
  */
 public class ProductReview extends LoosehangerData {
 
+    public static final String PARTITION = "productreview";
+
     /** Unique ID for this product review. */
     private final String id;
 
@@ -93,7 +95,7 @@ public class ProductReview extends LoosehangerData {
     }
 
     public SourceRecord createSourceRecord(String topicName) {
-        return super.createSourceRecord(topicName, "productreview");
+        return super.createSourceRecord(topicName, PARTITION);
     }
 
     @Override

@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
  */
 public class ReturnRequest extends LoosehangerData {
 
+    public static final String PARTITION = "returnrequest";
+
     /** Unique ID for this return request. */
     private final String id;
 
@@ -101,7 +103,7 @@ public class ReturnRequest extends LoosehangerData {
     }
 
     public SourceRecord createSourceRecord(String topicName) {
-        return super.createSourceRecord(topicName, "returnrequest");
+        return super.createSourceRecord(topicName, PARTITION);
     }
 
     @Override

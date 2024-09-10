@@ -28,6 +28,8 @@ import org.apache.kafka.connect.source.SourceRecord;
  */
 public class StockMovement extends LoosehangerData {
 
+    public static final String PARTITION = "stock";
+
     /** unique ID for this event */
     private String movementid;
 
@@ -65,7 +67,7 @@ public class StockMovement extends LoosehangerData {
     }
 
     public SourceRecord createSourceRecord(String topicName) {
-        return super.createSourceRecord(topicName, "stock");
+        return super.createSourceRecord(topicName, PARTITION);
     }
 
     @Override

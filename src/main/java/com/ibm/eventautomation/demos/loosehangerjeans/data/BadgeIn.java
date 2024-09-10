@@ -28,6 +28,8 @@ import org.apache.kafka.connect.source.SourceRecord;
  */
 public class BadgeIn extends LoosehangerData {
 
+    public static final String PARTITION = "badgein";
+
     /** unique ID for this event */
     private String recordId;
 
@@ -60,7 +62,7 @@ public class BadgeIn extends LoosehangerData {
     }
 
     public SourceRecord createSourceRecord(String topicName) {
-        return super.createSourceRecord(topicName, "badgein");
+        return super.createSourceRecord(topicName, PARTITION);
     }
 
     @Override

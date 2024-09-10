@@ -71,12 +71,22 @@ public class DatagenSourceTask extends SourceTask {
     public void start(Map<String, String> props) {
         log.info("Starting task {}", props);
 
+        // optionally, the connector can generate a week of historical events
+        //  when starting for the first time
         AbstractConfig config = new AbstractConfig(DatagenSourceConfig.CONFIG_DEF, props);
-        orderGenerator = new OrderGenerator(config);
-        cancellationGenerator = new CancellationGenerator(config);
+        if (config.getBoolean(DatagenSourceConfig.CONFIG_BEHAVIOR_STARTUPHISTORY)) {
+            DatagenHistoryGenerator historyGenerator = new DatagenHistoryGenerator();
+            if (historyGenerator.startingForFirstTime(context)) {
+                queue.addAll(historyGenerator.generateHistory(config));
+                log.info("Historical events generated");
+            }
+        }
 
         // schedule the timer tasks that will periodically generate
         //  new messages and add them to the queue
+
+        orderGenerator = new OrderGenerator(config);
+        cancellationGenerator = new CancellationGenerator(config);
 
         // new customer registrations
         NewCustomerTask newCustomers = new NewCustomerTask(config, orderGenerator, queue, generateTimer);

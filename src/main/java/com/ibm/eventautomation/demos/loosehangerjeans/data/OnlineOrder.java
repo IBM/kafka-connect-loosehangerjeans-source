@@ -33,6 +33,8 @@ import java.util.UUID;
  */
 public class OnlineOrder extends LoosehangerData {
 
+    public static final String PARTITION = "onlineorder";
+
     /** Unique ID for this order. */
     private final String id;
 
@@ -98,7 +100,7 @@ public class OnlineOrder extends LoosehangerData {
     }
 
     public SourceRecord createSourceRecord(String topicName) {
-        return super.createSourceRecord(topicName, "onlineorder");
+        return super.createSourceRecord(topicName, PARTITION);
     }
 
     @Override

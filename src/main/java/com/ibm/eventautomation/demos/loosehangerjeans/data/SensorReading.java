@@ -27,6 +27,8 @@ import org.apache.kafka.connect.source.SourceRecord;
  */
 public class SensorReading extends LoosehangerData {
 
+    public static final String PARTITION = "sensor";
+
     /** unique id for the sensor that captured the reading */
     private String sensorid;
 
@@ -60,7 +62,7 @@ public class SensorReading extends LoosehangerData {
     }
 
     public SourceRecord createSourceRecord(String topicName) {
-        return super.createSourceRecord(topicName, "sensor");
+        return super.createSourceRecord(topicName, PARTITION);
     }
 
     @Override
