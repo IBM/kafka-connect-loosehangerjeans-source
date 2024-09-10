@@ -63,7 +63,7 @@ public class OutOfStockGenerator extends Generator<OutOfStock> {
         }
 
         // Generate an out-of-stock event for the product
-        ZonedDateTime dateTime = Generators.nowWithRandomOffset(MAX_DELAY_SECS);
+        ZonedDateTime dateTime = order.recordTimestamp();
         long timestamp = dateTime.toInstant().toEpochMilli();
         int restockingDelay = Generators.randomInt(restockingMinDelay, restockingMaxDelay);
         int restockingDate = (int) dateTime.plusDays(restockingDelay).toLocalDate().toEpochDay();

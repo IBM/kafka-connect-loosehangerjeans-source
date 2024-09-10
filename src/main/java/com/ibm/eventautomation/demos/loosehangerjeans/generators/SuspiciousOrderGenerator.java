@@ -55,7 +55,7 @@ public class SuspiciousOrderGenerator {
         while (timestamp.isBefore(now)) {
 
             // random start for the suspicious activity
-            ZonedDateTime nextTimestamp = now.plusMinutes(Generators.randomInt(1, 120));
+            ZonedDateTime nextTimestamp = timestamp.plusMinutes(Generators.randomInt(1, 120));
 
             // generate a product that this activity will be based on
             Order initialOrder = orderGenerator.generate(largeOrderMinItems, largeOrderMaxItems, nextTimestamp);
@@ -65,6 +65,10 @@ public class SuspiciousOrderGenerator {
             {
                 // random offset
                 nextTimestamp = nextTimestamp.plusSeconds(Generators.randomInt(60, 300));
+                if (nextTimestamp.isAfter(now)) {
+                    // stop creating events once we no longer have a historical timestamp
+                    break;
+                }
 
                 // make a large order (that will reduce the price)
                 Order largeOrder = orderGenerator.generate(largeOrderMinItems, largeOrderMaxItems,
@@ -79,6 +83,10 @@ public class SuspiciousOrderGenerator {
                 int minDelay = Generators.randomInt(1000, cancellationMinDelay);
                 int delayMs = Generators.randomInt(minDelay, cancellationMaxDelay);
                 nextTimestamp = nextTimestamp.plusNanos(delayMs * 1_000_000L);
+                if (nextTimestamp.isAfter(now)) {
+                    // stop creating events once we no longer have a historical timestamp
+                    break;
+                }
 
                 Cancellation largeOrderCancellation = cancellationGenerator.generate(nextTimestamp, largeOrder);
                 history.add(largeOrderCancellation);
@@ -86,16 +94,17 @@ public class SuspiciousOrderGenerator {
 
             // make a small order at the reduced price
             nextTimestamp = nextTimestamp.plusSeconds(Generators.randomInt(60, 300));
-            Order smallOrder = orderGenerator.generate(
-                        smallOrderMinItems, smallOrderMaxItems,
-                        Generators.randomPrice(initialOrder.getUnitPrice() - maxPriceVariation,
-                                            initialOrder.getUnitPrice() - 0.01),
-                        initialOrder.getRegion(),
-                        initialOrder.getDescription(),
-                        Generators.randomItem(customers),
-                        nextTimestamp);
-            history.add(smallOrder);
-
+            if (nextTimestamp.isBefore(now)) {
+                Order smallOrder = orderGenerator.generate(
+                            smallOrderMinItems, smallOrderMaxItems,
+                            Generators.randomPrice(initialOrder.getUnitPrice() - maxPriceVariation,
+                                                initialOrder.getUnitPrice() - 0.01),
+                            initialOrder.getRegion(),
+                            initialOrder.getDescription(),
+                            Generators.randomItem(customers),
+                            nextTimestamp);
+                history.add(smallOrder);
+            }
 
             // generate one suspicious order a day
             timestamp = timestamp.plusDays(1);
