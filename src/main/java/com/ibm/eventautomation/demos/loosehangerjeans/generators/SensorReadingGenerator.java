@@ -16,6 +16,7 @@
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
@@ -29,26 +30,13 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 /**
  * Generates a {@link SensorReading} event using randomly generated data.
  */
-public class SensorReadingGenerator {
-
-    private static final String TIMESTAMP_FORMAT = "EEE MMM dd HH:mm:ss zzz yyyy";
-
-    /** formatter for event timestamps */
-    private final DateTimeFormatter timestampFormatter;
+public class SensorReadingGenerator extends Generator<SensorReading> {
 
     /**
-     * Generator can simulate a delay in events being produced
-     *  to Kafka by putting a timestamp in the message payload
-     *  that is earlier than the current time.
-     *
-     * The amount of the delay will be randomized to simulate
-     *  a delay due to network or infrastructure reasons.
-     *
-     * This value is the maximum delay (in seconds) that it will
-     *  use. (Setting this to 0 will mean all events are
-     *  produced with the current time).
+     * timestamp format used for sensor readings, ignoring config for the
+     *  timestamps for other events
      */
-    private final int MAX_DELAY_SECS;
+    private static final String TIMESTAMP_FORMAT = "EEE MMM dd HH:mm:ss zzz yyyy";
 
     /** minimum temperature for randomly selected temperature reading */
     private final static double TEMP_MIN = 19.5;
@@ -63,8 +51,20 @@ public class SensorReadingGenerator {
 
     public SensorReadingGenerator(AbstractConfig config)
     {
-        this.timestampFormatter = DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT).withZone(ZoneId.systemDefault());
-        this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_SENSORREADINGS);
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_SENSORREADINGS),
+              config.getInt(DatagenSourceConfig.CONFIG_DELAYS_SENSORREADINGS),
+              config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_SENSORREADINGS),
+              DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT).withZone(ZoneId.systemDefault()));
+    }
+
+    @Override
+    protected SensorReading generateEvent(ZonedDateTime timestamp) {
+        return new SensorReading(UUID.randomUUID().toString(),
+                                 formatTimestamp(timestamp),
+                                 generateSensorId(),
+                                 Generators.randomDouble(TEMP_MIN, TEMP_MAX),
+                                 Generators.randomInt(HUMIDITY_MIN, HUMIDITY_MAX),
+                                 timestamp);
     }
 
     private String generateSensorId() {
@@ -73,13 +73,5 @@ public class SensorReadingGenerator {
         return Generators.randomItem(Locations.BUILDINGS) + "-" +
                floor + "-" +
                sensor;
-    }
-
-    public SensorReading generate() {
-        return new SensorReading(UUID.randomUUID().toString(),
-                                 timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
-                                 generateSensorId(),
-                                 Generators.randomDouble(TEMP_MIN, TEMP_MAX),
-                                 Generators.randomInt(HUMIDITY_MIN, HUMIDITY_MAX));
     }
 }

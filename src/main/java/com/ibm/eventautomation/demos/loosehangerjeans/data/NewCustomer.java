@@ -15,19 +15,17 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
-import java.util.Collections;
-import java.util.Map;
+import java.time.ZonedDateTime;
 
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
-import org.apache.kafka.connect.source.SourceRecord;
 
 /**
  * Represents an event capturing a new customer registering with
  *  the company website.
  */
-public class NewCustomer {
+public class NewCustomer extends LoosehangerData {
 
     /** time that the event was recorded */
     private String timestamp;
@@ -44,30 +42,30 @@ public class NewCustomer {
             .field("registered",   Schema.STRING_SCHEMA)
         .build();
 
-    public NewCustomer(String timestamp, Customer customer) {
+    public NewCustomer(String timestamp, Customer customer, ZonedDateTime recordTimestamp) {
+        super(recordTimestamp);
+
         this.timestamp = timestamp;
         this.customer = customer;
     }
 
-    public SourceRecord createSourceRecord(String topicname, String origin) {
+    @Override
+    protected String getKey() {
+        return customer.getId();
+    }
+
+    @Override
+    protected Schema getValueSchema() {
+        return SCHEMA;
+    }
+
+    @Override
+    protected Struct getValue() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("customerid"),   customer.getId());
         struct.put(SCHEMA.field("customername"), customer.getName());
         struct.put(SCHEMA.field("registered"),   timestamp);
-
-        return new SourceRecord(createSourcePartition(origin),
-                                createSourceOffset(),
-                                topicname,
-                                Schema.STRING_SCHEMA, customer.getId(),
-                                SCHEMA,
-                                struct);
-    }
-
-    private Map<String, Object> createSourcePartition(String origin) {
-        return Collections.singletonMap("partition", origin);
-    }
-    private Map<String, Object> createSourceOffset() {
-        return Collections.singletonMap("offset", timestamp);
+        return struct;
     }
 
     public Customer getCustomer() {

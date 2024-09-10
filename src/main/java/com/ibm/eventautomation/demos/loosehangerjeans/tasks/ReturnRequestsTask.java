@@ -25,6 +25,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 
+import java.time.ZonedDateTime;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -49,17 +50,6 @@ public class ReturnRequestsTask extends TimerTask {
 
     /** Timer used to schedule message-generation tasks. */
     private final Timer timer;
-
-    /**
-     * Ratio of return requests that have at least one product that has a review that is
-     * posted after the return request is issued.
-     * Must be between 0.0 and 1.0.
-     *
-     * Setting this to 0 will mean that no product review event is generated.
-     * Setting this to 1 will mean that one product review event will be generated for each
-     *  new return request.
-     */
-    private final double reviewRatio;
 
     /**
      * Minimum time (in milliseconds) to wait after creating a {@link ReturnRequest} before
@@ -88,7 +78,6 @@ public class ReturnRequestsTask extends TimerTask {
         this.timer = generateTimer;
         this.productReviewGenerator = productReviewGenerator;
 
-        this.reviewRatio = config.getDouble(DatagenSourceConfig.CONFIG_RETURNREQUESTS_REVIEW_RATIO);
         this.reviewMinDelay = config.getInt(DatagenSourceConfig.CONFIG_PRODUCTREVIEWS_MIN_DELAY);
         this.reviewMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_PRODUCTREVIEWS_MAX_DELAY);
 
@@ -109,7 +98,7 @@ public class ReturnRequestsTask extends TimerTask {
         }
 
         // Sometimes generate a review for a given product of a given return request.
-        if (Generators.shouldDo(reviewRatio)) {
+        if (returnRequestGenerator.shouldReview()) {
             // Retrieve a product randomly in the return request.
             Product product = Generators.randomItem(returnRequest.getReturns()).getProduct();
             if (product != null) {
@@ -123,7 +112,7 @@ public class ReturnRequestsTask extends TimerTask {
             @Override
             public void run() {
                 SourceRecord rec = productReviewGenerator
-                        .generate(product)
+                        .generate(product, ZonedDateTime.now())
                         .createSourceRecord(productReviewTopicName);
                 queue.add(rec);
 

@@ -15,8 +15,7 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
-import java.util.Collections;
-import java.util.Map;
+import java.time.ZonedDateTime;
 
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
@@ -27,7 +26,9 @@ import org.apache.kafka.connect.source.SourceRecord;
  * Represents an event recording a bulk movement of stock into
  *  a warehouse.
  */
-public class StockMovement {
+public class StockMovement extends LoosehangerData {
+
+    public static final String PARTITION = "stock";
 
     /** unique ID for this event */
     private String movementid;
@@ -55,7 +56,9 @@ public class StockMovement {
             .field("updatetime", Schema.STRING_SCHEMA)
         .build();
 
-    public StockMovement(String id, String timestamp, String warehouse, String product, int quantity) {
+    public StockMovement(String id, String timestamp, String warehouse, String product, int quantity, ZonedDateTime recordTimestamp) {
+        super(recordTimestamp);
+
         this.movementid = id;
         this.timestamp = timestamp;
         this.warehouse = warehouse;
@@ -63,27 +66,29 @@ public class StockMovement {
         this.quantity = quantity;
     }
 
-    public SourceRecord createSourceRecord(String topicname) {
+    public SourceRecord createSourceRecord(String topicName) {
+        return super.createSourceRecord(topicName, PARTITION);
+    }
+
+    @Override
+    protected String getKey() {
+        return movementid;
+    }
+
+    @Override
+    protected Schema getValueSchema() {
+        return SCHEMA;
+    }
+
+    @Override
+    protected Struct getValue() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("movementid"), movementid);
         struct.put(SCHEMA.field("warehouse"),  warehouse);
         struct.put(SCHEMA.field("product"),    productDescription);
         struct.put(SCHEMA.field("quantity"),   quantity);
         struct.put(SCHEMA.field("updatetime"), timestamp);
-
-        return new SourceRecord(createSourcePartition(),
-                                createSourceOffset(),
-                                topicname,
-                                Schema.STRING_SCHEMA, movementid,
-                                SCHEMA,
-                                struct);
-    }
-
-    private Map<String, Object> createSourcePartition() {
-        return Collections.singletonMap("partition", "stock");
-    }
-    private Map<String, Object> createSourceOffset() {
-        return Collections.singletonMap("offset", timestamp);
+        return struct;
     }
 
     @Override

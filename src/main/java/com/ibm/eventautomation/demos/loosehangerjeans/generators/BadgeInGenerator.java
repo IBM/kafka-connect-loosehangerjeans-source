@@ -15,12 +15,11 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import java.time.ZonedDateTime;
 
 import org.apache.kafka.common.config.AbstractConfig;
 
-import com.github.javafaker.Faker;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.BadgeIn;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Locations;
@@ -29,34 +28,25 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 /**
  * Generates a {@link BadgeIn} event using randomly generated data.
  */
-public class BadgeInGenerator {
-
-    /** username generator */
-    private final Faker faker = new Faker();
-
-    /** formatter for event timestamps */
-    private final DateTimeFormatter timestampFormatter;
-
-    /**
-     * Generator can simulate a delay in events being produced
-     *  to Kafka by putting a timestamp in the message payload
-     *  that is earlier than the current time.
-     *
-     * The amount of the delay will be randomized to simulate
-     *  a delay due to network or infrastructure reasons.
-     *
-     * This value is the maximum delay (in seconds) that it will
-     *  use. (Setting this to 0 will mean all events are
-     *  produced with the current time).
-     */
-    private final int MAX_DELAY_SECS;
-
+public class BadgeInGenerator extends Generator<BadgeIn> {
 
     public BadgeInGenerator(AbstractConfig config)
     {
-        this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
-        this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_BADGEINS);
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_BADGEINS),
+              config.getInt(DatagenSourceConfig.CONFIG_DELAYS_BADGEINS),
+              config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_BADGEINS),
+              config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
     }
+
+    @Override
+    protected BadgeIn generateEvent(ZonedDateTime timestamp) {
+        return new BadgeIn(UUID.randomUUID().toString(),
+                           formatTimestamp(timestamp),
+                           generateDoorId(),
+                           faker.name().username(),
+                           timestamp);
+    }
+
 
     private String generateDoorId() {
         int floor = Generators.randomInt(0, 3);
@@ -64,12 +54,5 @@ public class BadgeInGenerator {
         return Generators.randomItem(Locations.BUILDINGS) + "-" +
                floor + "-" +
                door;
-    }
-
-    public BadgeIn generate() {
-        return new BadgeIn(UUID.randomUUID().toString(),
-                           timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
-                           generateDoorId(),
-                           faker.name().username());
     }
 }

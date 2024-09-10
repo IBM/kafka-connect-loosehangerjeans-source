@@ -15,19 +15,17 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
-import java.util.Collections;
-import java.util.Map;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
-import org.apache.kafka.connect.source.SourceRecord;
 
 /**
  * Represents an event capturing a customer cancelling an order.
  */
-public class Cancellation {
+public class Cancellation extends LoosehangerData {
 
     /** unique ID for this event */
     private String id;
@@ -51,33 +49,33 @@ public class Cancellation {
             .field("reason",     Schema.STRING_SCHEMA)
         .build();
 
-    public Cancellation(Order order, String reason, String timestamp) {
-        this.order = order;
+    public Cancellation(Order order, String reason, String timestamp, ZonedDateTime recordTimestamp) {
+        super(recordTimestamp);
+
         this.id = UUID.randomUUID().toString();
+        this.order = order;
         this.reason = reason;
         this.timestamp = timestamp;
     }
 
-    public SourceRecord createSourceRecord(String topicname, String origin) {
+    @Override
+    protected String getKey() {
+        return id;
+    }
+
+    @Override
+    protected Schema getValueSchema() {
+        return SCHEMA;
+    }
+
+    @Override
+    protected Struct getValue() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),         id);
         struct.put(SCHEMA.field("orderid"),    order.getId());
         struct.put(SCHEMA.field("canceltime"), timestamp);
         struct.put(SCHEMA.field("reason"),     reason);
-
-        return new SourceRecord(createSourcePartition(origin),
-                                createSourceOffset(timestamp),
-                                topicname,
-                                Schema.STRING_SCHEMA, id,
-                                SCHEMA,
-                                struct);
-    }
-
-    private Map<String, Object> createSourcePartition(String origin) {
-        return Collections.singletonMap("partition", origin);
-    }
-    private Map<String, Object> createSourceOffset(String timestamp) {
-        return Collections.singletonMap("offset", timestamp);
+        return struct;
     }
 
     @Override

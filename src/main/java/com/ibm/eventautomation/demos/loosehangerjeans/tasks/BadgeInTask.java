@@ -24,7 +24,6 @@ import org.apache.kafka.connect.source.SourceRecord;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.BadgeIn;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.BadgeInGenerator;
-import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
  * Timer task intended for repeated execution. Creates new
@@ -41,19 +40,6 @@ public class BadgeInTask extends TimerTask {
      */
     private Queue<SourceRecord> queue;
 
-    /**
-     * Generator can simulate a source of events that offers
-     *  at-least-once delivery semantics by occasionally
-     *  producing duplicate messages.
-     *
-     * This value is the proportion of events that will be
-     *  duplicated, between 0.0 and 1.0.
-     *
-     * Setting this to 0 will mean no events are duplicated.
-     * Setting this to 1 will mean every message is produced twice.
-     */
-    private double duplicatesRatio;
-    
     /** Name of the topic to produce door badge-in events to. */
     private String topicname;
 
@@ -61,7 +47,6 @@ public class BadgeInTask extends TimerTask {
     public BadgeInTask(AbstractConfig config, Queue<SourceRecord> queue) {
         this.generator = new BadgeInGenerator(config);
         this.queue = queue;
-        this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_BADGEINS);
         this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_BADGEINS);
     }
 
@@ -71,7 +56,7 @@ public class BadgeInTask extends TimerTask {
         SourceRecord rec = generator.generate().createSourceRecord(topicname);
         queue.add(rec);
 
-        if (Generators.shouldDo(duplicatesRatio)) {
+        if (generator.shouldDuplicate()) {
             queue.add(rec);
         }
     }

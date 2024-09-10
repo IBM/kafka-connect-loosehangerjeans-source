@@ -77,7 +77,7 @@ public class Address {
         // Generate some phone numbers randomly.
         int phoneCount = Generators.randomInt(minPhones, maxPhones);
         List<String> phones = null;
-        if (phoneCount > 0 ) {
+        if (phoneCount > 0) {
             phones = new ArrayList<>();
             for (int i = 0; i < phoneCount; i++) {
                 phones.add(faker.phoneNumber().cellPhone());

@@ -15,8 +15,7 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
-import java.util.Collections;
-import java.util.Map;
+import java.time.ZonedDateTime;
 
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
@@ -26,7 +25,9 @@ import org.apache.kafka.connect.source.SourceRecord;
 /**
  * Represents an event with readings captured from an IoT sensor.
  */
-public class SensorReading {
+public class SensorReading extends LoosehangerData {
+
+    public static final String PARTITION = "sensor";
 
     /** unique id for the sensor that captured the reading */
     private String sensorid;
@@ -50,7 +51,9 @@ public class SensorReading {
             .field("humidity",    Schema.INT32_SCHEMA)
         .build();
 
-    public SensorReading(String id, String timestamp, String sensor, double temp, int humidity) {
+    public SensorReading(String id, String timestamp, String sensor, double temp, int humidity, ZonedDateTime recordTimestamp) {
+        super(recordTimestamp);
+
         this.sensorid = id;
         this.timestamp = timestamp;
         this.sensorid = sensor;
@@ -58,26 +61,28 @@ public class SensorReading {
         this.humidity = humidity;
     }
 
-    public SourceRecord createSourceRecord(String topicname) {
+    public SourceRecord createSourceRecord(String topicName) {
+        return super.createSourceRecord(topicName, PARTITION);
+    }
+
+    @Override
+    protected String getKey() {
+        return sensorid;
+    }
+
+    @Override
+    protected Schema getValueSchema() {
+        return SCHEMA;
+    }
+
+    @Override
+    protected Struct getValue() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("sensorid"),    sensorid);
         struct.put(SCHEMA.field("sensortime"),  timestamp);
         struct.put(SCHEMA.field("temperature"), temperature);
         struct.put(SCHEMA.field("humidity"),    humidity);
-
-        return new SourceRecord(createSourcePartition(),
-                                createSourceOffset(),
-                                topicname,
-                                Schema.STRING_SCHEMA, sensorid,
-                                SCHEMA,
-                                struct);
-    }
-
-    private Map<String, Object> createSourcePartition() {
-        return Collections.singletonMap("partition", "sensor");
-    }
-    private Map<String, Object> createSourceOffset() {
-        return Collections.singletonMap("offset", timestamp);
+        return struct;
     }
 
     @Override

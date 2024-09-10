@@ -15,13 +15,11 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
-import java.util.Collections;
-import java.util.Map;
+import java.time.ZonedDateTime;
 
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
-import org.apache.kafka.connect.source.SourceRecord;
 
 /**
  * Represents an event for a new order that has been placed by
@@ -30,7 +28,7 @@ import org.apache.kafka.connect.source.SourceRecord;
  * The price is included in the event, to represent a retailer
  *  with a dynamic pricing algorithm.
  */
-public class Order {
+public class Order extends LoosehangerData {
 
     /** unique ID for this order */
     private String id;
@@ -67,7 +65,9 @@ public class Order {
             .field("ordertime",   Schema.STRING_SCHEMA)
         .build();
 
-    public Order(String id, String timestamp, Customer customer, String description, double unitPrice, int quantity, String region) {
+    public Order(String id, String timestamp, Customer customer, String description, double unitPrice, int quantity, String region, ZonedDateTime recordTimestamp) {
+        super(recordTimestamp);
+
         this.id = id;
         this.timestamp = timestamp;
         this.customer = customer;
@@ -77,7 +77,18 @@ public class Order {
         this.region = region;
     }
 
-    public SourceRecord createSourceRecord(String topicname, String origin) {
+    @Override
+    protected String getKey() {
+        return id;
+    }
+
+    @Override
+    protected Schema getValueSchema() {
+        return SCHEMA;
+    }
+
+    @Override
+    protected Struct getValue() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),          id);
         struct.put(SCHEMA.field("customer"),    customer.getName());
@@ -87,20 +98,7 @@ public class Order {
         struct.put(SCHEMA.field("quantity"),    quantity);
         struct.put(SCHEMA.field("region"),      region);
         struct.put(SCHEMA.field("ordertime"),   timestamp);
-
-        return new SourceRecord(createSourcePartition(origin),
-                                createSourceOffset(),
-                                topicname,
-                                Schema.STRING_SCHEMA, id,
-                                SCHEMA,
-                                struct);
-    }
-
-    private Map<String, Object> createSourcePartition(String origin) {
-        return Collections.singletonMap("partition", origin);
-    }
-    private Map<String, Object> createSourceOffset() {
-        return Collections.singletonMap("offset", timestamp);
+        return struct;
     }
 
 
