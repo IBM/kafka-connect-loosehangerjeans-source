@@ -48,7 +48,7 @@ public abstract class LoosehangerData {
 
     public SourceRecord createSourceRecord(String topicName, String origin) {
         final Integer topicPartition = null;
-        final long timestamp = recordTimestamp.toEpochSecond();
+        final long timestamp = recordTimestamp.toEpochSecond() * 1000L;
         return new SourceRecord(partition(origin),
                                 Collections.singletonMap("offset", timestamp),
                                 topicName, topicPartition,
