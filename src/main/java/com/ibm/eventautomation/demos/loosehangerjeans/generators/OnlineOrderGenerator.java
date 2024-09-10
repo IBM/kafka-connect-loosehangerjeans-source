@@ -73,6 +73,9 @@ public class OnlineOrderGenerator extends Generator<OnlineOrder> {
      */
     private final double outOfStockRatio;
 
+    /** Custom list of cities to be used instead of faker generated */
+    private final List<String> cities;
+
 
 
 
@@ -96,6 +99,8 @@ public class OnlineOrderGenerator extends Generator<OnlineOrder> {
 
         this.reuseAddressRatio = config.getDouble(DatagenSourceConfig.CONFIG_ONLINEORDERS_REUSE_ADDRESS_RATIO);
         this.outOfStockRatio = config.getDouble(DatagenSourceConfig.CONFIG_ONLINEORDERS_OUTOFSTOCK_RATIO);
+
+        this.cities = config.getList(DatagenSourceConfig.CONFIG_ONLINEORDERS_CITIES);
     }
 
 
@@ -116,6 +121,13 @@ public class OnlineOrderGenerator extends Generator<OnlineOrder> {
 
         // Generate a random shipping address.
         Address shippingAddress = Address.create(faker, country, minPhones, maxPhones);
+
+        // If the city list is not empty, we will randomly select a city 
+        // and replace one created by the faker
+        if (cities.size() > 0) {
+            String city = Generators.randomItem(cities);
+            shippingAddress.setCity(city);
+        }
 
         // Possibly reuse the shipping address as billing address.
         Address billingAddress = Generators.shouldDo(reuseAddressRatio)

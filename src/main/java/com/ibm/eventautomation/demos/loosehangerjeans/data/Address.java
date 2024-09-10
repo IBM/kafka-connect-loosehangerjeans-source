@@ -37,7 +37,7 @@ public class Address {
     private final String street;
 
     /** The city of the address. */
-    private final String city;
+    private String city;
 
     /** The zipcode of the address. */
     private final String zipcode;
@@ -104,6 +104,10 @@ public class Address {
 
     public String getCity() {
         return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public String getZipcode() {
