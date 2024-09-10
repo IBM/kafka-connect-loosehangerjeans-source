@@ -15,7 +15,7 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
-import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +28,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 /**
  * Generates a {@link StockMovement} event using randomly generated data.
  */
-public class StockMovementGenerator {
+public class StockMovementGenerator extends Generator<StockMovement> {
 
     /** warehouse codes will be randomly selected from this list */
     private final List<String> warehouses;
@@ -36,44 +36,30 @@ public class StockMovementGenerator {
     /** helper class to randomly generate the name of a product */
     private ProductGenerator productGenerator;
 
-    /** formatter for event timestamps */
-    private final DateTimeFormatter timestampFormatter;
-
-    /**
-     * Generator can simulate a delay in events being produced
-     *  to Kafka by putting a timestamp in the message payload
-     *  that is earlier than the current time.
-     *
-     * The amount of the delay will be randomized to simulate
-     *  a delay due to network or infrastructure reasons.
-     *
-     * This value is the maximum delay (in seconds) that it will
-     *  use. (Setting this to 0 will mean all events are
-     *  produced with the current time).
-     */
-    private final int MAX_DELAY_SECS;
-
 
     public StockMovementGenerator(AbstractConfig config)
     {
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_STOCKMOVEMENTS),
+              config.getInt(DatagenSourceConfig.CONFIG_DELAYS_STOCKMOVEMENTS),
+              config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_STOCKMOVEMENTS),
+              config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
+
         this.productGenerator = new ProductGenerator(config);
 
         this.warehouses = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_WAREHOUSES);
-
-        this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
-        this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_STOCKMOVEMENTS);
     }
 
-
-    public StockMovement generate() {
+    @Override
+    protected StockMovement generateEvent(ZonedDateTime timestamp) {
         int quantity = Generators.randomInt(20, 500);
 
         return new StockMovement(UUID.randomUUID().toString(),
-                                 timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
+                                 formatTimestamp(timestamp),
                                  Generators.randomItem(warehouses),
                                  productGenerator.generate().getDescription(),
                                  // stock movement quantities are always
                                  //  multiples of ten
-                                 quantity - (quantity % 10));
+                                 quantity - (quantity % 10),
+                                 timestamp);
     }
 }

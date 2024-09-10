@@ -61,19 +61,6 @@ public class NewCustomerTask extends DatagenTimerTask {
     /** Helper class for generating NewCustomer events. */
     private NewCustomerGenerator generator;
 
-    /**
-     * Generator can simulate a source of events that offers
-     *  at-least-once delivery semantics by occasionally
-     *  producing duplicate messages.
-     *
-     * This value is the proportion of events that will be
-     *  duplicated, between 0.0 and 1.0.
-     *
-     * Setting this to 0 will mean no events are duplicated.
-     * Setting this to 1 will mean every message is produced twice.
-     */
-    private double duplicatesRatio;
-
     /** Name of the topic to produce customer registration events to. */
     private String topicname;
 
@@ -91,8 +78,6 @@ public class NewCustomerTask extends DatagenTimerTask {
         firstOrderMinDelay = config.getInt(DatagenSourceConfig.CONFIG_NEWCUSTOMERS_ORDER_MIN_DELAY);
         firstOrderMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_NEWCUSTOMERS_ORDER_MAX_DELAY);
 
-        this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_NEWCUSTOMERS);
-        
         this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_CUSTOMERS);
     }
 
@@ -105,7 +90,7 @@ public class NewCustomerTask extends DatagenTimerTask {
         queue.add(rec);
 
         // optionally, duplicate the new customer event
-        if (Generators.shouldDo(duplicatesRatio)) {
+        if (generator.shouldDuplicate()) {
             queue.add(rec);
         }
 

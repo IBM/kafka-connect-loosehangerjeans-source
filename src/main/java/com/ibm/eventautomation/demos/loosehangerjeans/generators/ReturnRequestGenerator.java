@@ -15,7 +15,6 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
-import com.github.javafaker.Faker;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Address;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Country;
@@ -27,18 +26,14 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.ReturnRequest;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.common.config.AbstractConfig;
 
-import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Generates a {@link ReturnRequest} event using randomly generated data.
  */
-public class ReturnRequestGenerator {
-
-    /** Locale used for the data generation. */
-    private static final Locale DEFAULT_LOCALE = Locale.US;
+public class ReturnRequestGenerator extends Generator<ReturnRequest> {
 
     /** Helper class to randomly generate the details of a product. */
     private final ProductGenerator productGenerator;
@@ -92,42 +87,27 @@ public class ReturnRequestGenerator {
      */
     private final double reuseAddressRatio;
 
-    /** Formatter for event timestamps. */
-    private final DateTimeFormatter timestampFormatter;
-
     /**
-     * Generator can simulate a source of events that offers
-     *  at-least-once delivery semantics by occasionally
-     *  producing duplicate messages.
+     * Ratio of return requests that have at least one product that has a review that is
+     * posted after the return request is issued.
+     * Must be between 0.0 and 1.0.
      *
-     * This value is the proportion of events that will be
-     *  duplicated, between 0.0 and 1.0.
-     *
-     * Setting this to 0 will mean no events are duplicated.
-     * Setting this to 1 will mean every message is produced twice.
+     * Setting this to 0 will mean that no product review event is generated.
+     * Setting this to 1 will mean that one product review event will be generated for each
+     *  new return request.
      */
-    private final double duplicatesRatio;
+    private final double reviewRatio;
 
-    /**
-     * Generator can simulate a delay in events being produced
-     *  to Kafka by putting a timestamp in the message payload
-     *  that is earlier than the current time.
-     *
-     * The amount of the delay will be randomized to simulate
-     *  a delay due to network or infrastructure reasons.
-     *
-     * This value is the maximum delay (in seconds) that it will
-     *  use. (Setting this to 0 will mean all events are
-     *  produced with the current time).
-     */
-    private final int MAX_DELAY_SECS;
-
-    /** Helper class used to generate data such as names, emails, phone numbers, addresses etc. */
-    private final Faker faker = new Faker(DEFAULT_LOCALE);
 
     /** Creates an {@link ReturnRequestGenerator} using the provided configuration. */
     public ReturnRequestGenerator(AbstractConfig config,
-                                  List<Product> productsWithSizeIssue) {
+                                  List<Product> productsWithSizeIssue)
+    {
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_RETURNREQUESTS),
+              config.getInt(DatagenSourceConfig.CONFIG_DELAYS_RETURNREQUESTS),
+              config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_RETURNREQUESTS),
+              config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS_LTZ));
+
         this.productGenerator = new ProductGenerator(config);
 
         this.productsWithSizeIssue = productsWithSizeIssue;
@@ -149,16 +129,11 @@ public class ReturnRequestGenerator {
         this.maxPhones = config.getInt(DatagenSourceConfig.CONFIG_RETURNREQUESTS_ADDRESS_PHONES_MAX);
 
         this.reuseAddressRatio = config.getDouble(DatagenSourceConfig.CONFIG_RETURNREQUESTS_REUSE_ADDRESS_RATIO);
-
-        this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS_LTZ));
-
-        this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_RETURNREQUESTS);
-
-        this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_RETURNREQUESTS);
+        this.reviewRatio = config.getDouble(DatagenSourceConfig.CONFIG_RETURNREQUESTS_REVIEW_RATIO);
     }
 
-    /** Generates a random return request. */
-    public ReturnRequest generate() {
+    @Override
+    protected ReturnRequest generateEvent(ZonedDateTime timestamp) {
         // Generate a random customer.
         OnlineCustomer customer = OnlineCustomer.create(faker, minEmails, maxEmails);
 
@@ -192,13 +167,23 @@ public class ReturnRequestGenerator {
             returns.add(new ProductReturn(product, quantity, Generators.randomItem(reasons)));
         }
 
-        return new ReturnRequest(timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
-                customer,
-                addresses,
-                returns);
+        return new ReturnRequest(formatTimestamp(timestamp),
+                                 customer,
+                                 addresses,
+                                 returns,
+                                 timestamp);
     }
 
-    public boolean shouldDuplicate() {
-        return Generators.shouldDo(duplicatesRatio);
+    /**
+     * Returns a random decision of whether an return request should be
+     *  followed by a review.
+     *
+     *  The frequency for how often this returns true is determined by
+     *  a ratio provided to the generator constructor.
+     *
+     * @return true if a review should be generated
+     */
+    public boolean shouldReview() {
+        return Generators.shouldDo(reviewRatio);
     }
 }

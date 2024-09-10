@@ -84,6 +84,13 @@ spec:
     topic.name.productreviews: PRODUCT.REVIEWS
 
     #
+    # startup behavior
+    #
+    # if true, the connector will generate one week of historical
+    #  events when starting for the first time
+    startup.history.enabled: false
+
+    #
     # format of timestamps to produce
     #
     #    default is chosen to be suitable for use with Event Processing,
@@ -95,7 +102,7 @@ spec:
     #
     formats.timestamps: yyyy-MM-dd HH:mm:ss.SSS
     # format of timestamps with local time zone (UTC time in ISO 8601 format)
-    #    NOTE: this format is used by default for online orders 
+    #    NOTE: this format is used by default for online orders
     formats.timestamps.ltz: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
 
     #
@@ -192,7 +199,7 @@ spec:
     duplicates.returnrequests.ratio: 0      # events not duplicated
     # product reviews
     duplicates.productreviews.ratio: 0      # events not duplicated
-    
+
     #
     # product names to use in events
     #
@@ -271,11 +278,11 @@ spec:
     #  should they wait before making their order
     newcustomers.order.delay.ms.min: 180000     # wait at least 3 minutes
     newcustomers.order.delay.ms.max: 1380000    # order within 23 minutes
-    
+
     #
     # online orders
     #
-    #  these events are intended to represent orders for several products, 
+    #  these events are intended to represent orders for several products,
     #   illustrating the use of complex objects and primitive arrays
     #
     # number of products to include in an online order: between 1 and 5 (inclusive)
@@ -295,8 +302,8 @@ spec:
     # how many online orders have at least one product that runs out-of-stock after the order has been placed
     #  between 0.0 and 1.0 : 0.0 means no online order has some product that runs out-of-stock
     #                        1.0 means all online orders have products that run out-of-stock
-    onlineorders.outofstock.ratio: 0.22 
-    
+    onlineorders.outofstock.ratio: 0.22
+
     #
     # out-of-stocks
     #
@@ -312,7 +319,7 @@ spec:
     #
     # return requests
     #
-    #  these events are intended to represent return requests for several products, 
+    #  these events are intended to represent return requests for several products,
     #   illustrating the use of complex objects and complex arrays
     #
     # number of products to include in a return request: between 1 and 4 (inclusive)
@@ -340,7 +347,7 @@ spec:
     returnrequests.review.ratio: 0.32
     # how many products have a size issue in a return request
     #  between 0.0 and 1.0 : 0.0 means no product has a size issue in a given return request
-    #                        1.0 means all products have a size issue in a given return request    
+    #                        1.0 means all products have a size issue in a given return request
     returnrequests.product.with.size.issue.ratio: 0.22
 
     #
@@ -357,12 +364,12 @@ spec:
     # how long after a return request should the product review happen (in milliseconds)
     productreviews.delay.ms.min: 300000   # 5 minutes
     productreviews.delay.ms.max: 3600000  # 1 hour
-  
+
     #
     # locations that are referred to in generated events
     #
     locations.regions: NA,SA,EMEA,APAC,ANZ
-    locations.warehouses: North,South,West,East,Central  
+    locations.warehouses: North,South,West,East,Central
 ```
 
 For example, if you want to theme the demo to be based on products in a different industry, you could adjust product sizes/materials/styles/name to match your demo (the options don't need to actually be "sizes", "materials" or "styles" - they just need to be lists that will make sense when combined into a single string).

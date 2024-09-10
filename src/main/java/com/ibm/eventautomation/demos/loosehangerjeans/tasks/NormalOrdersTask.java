@@ -26,7 +26,6 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.CancellationGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OrderGenerator;
-import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
  * Timer task intended for repeated execution. Creates new
@@ -45,17 +44,6 @@ public class NormalOrdersTask extends DatagenTimerTask {
     private static final String ORIGIN = NormalOrdersTask.class.getName();
 
     /**
-     * Proportion of {@link Order} events that should have an associated
-     *  {@link Cancellation} event generated.
-     *
-     * Between 0.0 and 1.0
-     *
-     * Set this to 0.0 for no cancellation events.
-     * Set this to 1.0 for every order to have a corresponding cancellation.
-     */
-    private double cancellationRatio;
-
-    /**
      * minimum time to wait after creating an {@link Order} before
      *  generating the corresponding {@link Cancellation}
      */
@@ -71,19 +59,6 @@ public class NormalOrdersTask extends DatagenTimerTask {
     /** maximum number of items to order */
     private int maxItems;
 
-    /**
-     * Generator can simulate a source of events that offers
-     *  at-least-once delivery semantics by occasionally
-     *  producing duplicate messages.
-     *
-     * This value is the proportion of events that will be
-     *  duplicated, between 0.0 and 1.0.
-     *
-     * Setting this to 0 will mean no events are duplicated.
-     * Setting this to 1 will mean every message is produced twice.
-     */
-    private double duplicatesRatio;
-
     /** Name of the topic to produce order events to. */
     private String topicname;
 
@@ -96,15 +71,12 @@ public class NormalOrdersTask extends DatagenTimerTask {
     {
         super(orderGenerator, cancellationGenerator, queue, timer, config);
 
-        cancellationRatio = config.getDouble(DatagenSourceConfig.CONFIG_CANCELLATIONS_RATIO);
         cancellationMinDelay = config.getInt(DatagenSourceConfig.CONFIG_CANCELLATIONS_MIN_DELAY);
         cancellationMaxDelay = config.getInt(DatagenSourceConfig.CONFIG_CANCELLATIONS_MAX_DELAY);
 
         minItems = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_SMALL_MIN);
         maxItems = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_LARGE_MAX);
 
-        this.duplicatesRatio = config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_ORDERS);
-        
         this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ORDERS);
     }
 
@@ -117,12 +89,12 @@ public class NormalOrdersTask extends DatagenTimerTask {
         queue.add(rec);
 
         // possibly duplicate it
-        if (Generators.shouldDo(duplicatesRatio)) {
+        if (orderGenerator.shouldDuplicate()) {
             queue.add(rec);
         }
 
         // sometimes cancel it
-        if (Generators.shouldDo(cancellationRatio)) {
+        if (orderGenerator.shouldCancel()) {
             cancelOrder(order, ORIGIN,
                         cancellationMinDelay,
                         cancellationMaxDelay);

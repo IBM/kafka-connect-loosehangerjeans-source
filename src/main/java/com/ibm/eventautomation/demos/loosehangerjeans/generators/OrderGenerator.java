@@ -15,14 +15,14 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 
-import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.kafka.common.config.AbstractConfig;
 
-import com.github.javafaker.Faker;
 import com.ibm.eventautomation.demos.loosehangerjeans.DatagenSourceConfig;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Customer;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
@@ -30,7 +30,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 /**
  * Generates an {@link Order} event using randomly generated data.
  */
-public class OrderGenerator {
+public class OrderGenerator extends Generator<Order> {
 
     /** order regions (e.g. NA, EMEA) will be chosen at random from this list */
     private final List<String> regions;
@@ -43,52 +43,62 @@ public class OrderGenerator {
     /** helper class to randomly generate the name of a product */
     private ProductGenerator productGenerator;
 
-    /** formatter for event timestamps */
-    private final DateTimeFormatter timestampFormatter;
+    /** minimum number of items to order */
+    private int minOrders;
+    /** maximum number of items to order */
+    private int maxOrders;
 
     /**
-     * Generator can simulate a delay in events being produced
-     *  to Kafka by putting a timestamp in the message payload
-     *  that is earlier than the current time.
+     * Proportion of {@link Order} events that should have an associated
+     *  {@link Cancellation} event generated.
      *
-     * The amount of the delay will be randomized to simulate
-     *  a delay due to network or infrastructure reasons.
+     * Between 0.0 and 1.0
      *
-     * This value is the maximum delay (in seconds) that it will
-     *  use. (Setting this to 0 will mean all events are
-     *  produced with the current time).
+     * Set this to 0.0 for no cancellation events.
+     * Set this to 1.0 for every order to have a corresponding cancellation.
      */
-    private final int MAX_DELAY_SECS;
-
-    /** customer name generator */
-    private final Faker faker = new Faker();
+    private double cancellationRatio;
 
 
     public OrderGenerator(AbstractConfig config)
     {
+        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_ORDERS),
+              config.getInt(DatagenSourceConfig.CONFIG_DELAYS_ORDERS),
+              config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_ORDERS),
+              config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
+
         this.productGenerator = new ProductGenerator(config);
 
         this.regions = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_REGIONS);
         this.minPrice = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTS_MIN_PRICE);
         this.maxPrice = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTS_MAX_PRICE);
 
-        this.timestampFormatter = DateTimeFormatter.ofPattern(config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
-        this.MAX_DELAY_SECS = config.getInt(DatagenSourceConfig.CONFIG_DELAYS_ORDERS);
+        this.minOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_SMALL_MIN);
+        this.maxOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_LARGE_MAX);
+
+        this.cancellationRatio = config.getDouble(DatagenSourceConfig.CONFIG_CANCELLATIONS_RATIO);
     }
 
 
     /** generates a random order */
     public Order generate(int minItems, int maxItems) {
+        return generate(minItems, maxItems, ZonedDateTime.now());
+    }
+
+    public Order generate(int minItems, int maxItems, ZonedDateTime timestamp) {
+        int quantity = Generators.randomInt(minItems, maxItems);
         double unitPrice = Generators.randomPrice(minPrice, maxPrice);
         String description = productGenerator.generate().getDescription();
         String region = Generators.randomItem(regions);
         Customer customer = new Customer(faker);
 
-        return generate(minItems, maxItems,
-                        unitPrice,
-                        region,
-                        description,
-                        customer);
+        return new Order(UUID.randomUUID().toString(),
+                         formatTimestamp(timestamp),
+                         customer,
+                         description,
+                         unitPrice, quantity,
+                         region,
+                         timestamp);
     }
 
     /**
@@ -112,10 +122,25 @@ public class OrderGenerator {
 
     /** Creates an order with known details */
     public Order generate(int minItems, int maxItems,
-            double unitPrice,
-            String region,
-            String description,
-            Customer customer)
+                          double unitPrice,
+                          String region,
+                          String description,
+                          Customer customer)
+    {
+        return generate(minItems, maxItems,
+                        unitPrice,
+                        region,
+                        description,
+                        customer,
+                        ZonedDateTime.now());
+    }
+
+    public Order generate(int minItems, int maxItems,
+                          double unitPrice,
+                          String region,
+                          String description,
+                          Customer customer,
+                          ZonedDateTime timestamp)
     {
         int quantity = Generators.randomInt(minItems, maxItems);
         if (customer == null) {
@@ -123,10 +148,41 @@ public class OrderGenerator {
         }
 
         return new Order(UUID.randomUUID().toString(),
-                         timestampFormatter.format(Generators.nowWithRandomOffset(MAX_DELAY_SECS)),
+                         formatTimestamp(timestamp),
                          customer,
                          description,
                          unitPrice, quantity,
-                         region);
+                         region,
+                         timestamp);
+    }
+
+
+    @Override
+    protected Order generateEvent(ZonedDateTime timestamp) {
+        double unitPrice = Generators.randomPrice(minPrice, maxPrice);
+        String description = productGenerator.generate().getDescription();
+        String region = Generators.randomItem(regions);
+        Customer customer = new Customer(faker);
+
+        int quantity = Generators.randomInt(minOrders, maxOrders);
+
+        return new Order(UUID.randomUUID().toString(),
+                         formatTimestamp(timestamp),
+                         customer,
+                         description,
+                         unitPrice, quantity,
+                         region,
+                         timestamp);
+    }
+
+    /**
+     * Returns a random decision of whether an order should be cancelled.
+     *  The frequency for how often this returns true is determined by
+     *  a ratio provided to the generator constructor.
+     *
+     * @return true if the order should be cancelled
+     */
+    public boolean shouldCancel() {
+        return Generators.shouldDo(cancellationRatio);
     }
 }
