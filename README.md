@@ -125,9 +125,9 @@ spec:
     # online orders
     timings.ms.onlineorders: 30000        # every 30 seconds
     # return requests
-    timings.ms.returnrequests: 30000      # every 30 seconds
+    timings.ms.returnrequests: 300000     # every 5 minutes
     # product reviews
-    timings.ms.productreviews: 30000      # every 30 seconds
+    timings.ms.productreviews: 60000      # every 1 minute
 
     #
     # how much of a delay to introduce when producing events
