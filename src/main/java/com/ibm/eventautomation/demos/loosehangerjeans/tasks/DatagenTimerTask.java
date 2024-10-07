@@ -133,7 +133,10 @@ public abstract class DatagenTimerTask extends TimerTask {
             int minNumItems, int maxNumItems,
             double unitPrice,
             String region,
-            String productDescription)
+            String country,
+            String productDescription,
+            String priority,
+            String storeID)
     {
         final Integer cancelDelayMin = null;
         final Integer cancelDelayMax = null;
@@ -143,8 +146,11 @@ public abstract class DatagenTimerTask extends TimerTask {
                       minNumItems, maxNumItems,
                       unitPrice,
                       region,
+                      country,
                       productDescription,
-                      cancelDelayMin, cancelDelayMax);
+                      cancelDelayMin, cancelDelayMax,
+                      priority,
+                      storeID);
     }
 
     protected void scheduleOrder(final String origin, final int delay,
@@ -152,8 +158,11 @@ public abstract class DatagenTimerTask extends TimerTask {
         int minNumItems, int maxNumItems,
         double unitPrice,
         String region,
+        String country,
         String productDescription,
-        Integer cancelDelayMin, Integer cancelDelayMax)
+        Integer cancelDelayMin, Integer cancelDelayMax,
+        String priority,
+        String storeID)
     {
         timer.schedule(new TimerTask() {
             @Override
@@ -162,7 +171,10 @@ public abstract class DatagenTimerTask extends TimerTask {
                                                       unitPrice,
                                                       region,
                                                       productDescription,
-                                                      customer);
+                                                      customer,
+                                                      country,
+                                                      priority,
+                                                      storeID);
                 queue.add(order.createSourceRecord(ordersTopicName, origin));
 
                 if (cancelDelayMin != null && cancelDelayMax != null) {

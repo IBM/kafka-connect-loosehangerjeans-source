@@ -50,6 +50,8 @@ public class DatagenSourceConfig {
     private static final String CONFIG_GROUP_LOCATIONS = "Locations";
     public static final String CONFIG_LOCATIONS_REGIONS    = "locations.regions";
     public static final String CONFIG_LOCATIONS_WAREHOUSES = "locations.warehouses";
+    public static final String CONFIG_LOCATIONS_COUNTRIES = "locations.countries";
+    public static final String CONFIG_LOCATIONS_STORE_IDS = "locations.storeId";
 
     private static final String CONFIG_GROUP_PRODUCTS = "Products";
     public static final String CONFIG_PRODUCTS_SIZES     = "products.sizes";
@@ -161,6 +163,9 @@ public class DatagenSourceConfig {
     private static final String CONFIG_GROUP_BEHAVIOR = "Behavior";
     public static final String CONFIG_BEHAVIOR_STARTUPHISTORY = "startup.history.enabled";
 
+    public static final String CONFIG_GROUP_PRIORITIES = "Priorities";
+    public static final String CONFIG_PRIORITIES = "priorities.priority";
+
     public static final ConfigDef CONFIG_DEF = new ConfigDef()
         //
         // format to use
@@ -269,6 +274,30 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "List of warehouses to use for generated locations. Warehouse names cannot contain spaces.",
                     CONFIG_GROUP_LOCATIONS, 2, Width.MEDIUM, "Warehouses")
+        .define(CONFIG_LOCATIONS_COUNTRIES,
+                    Type.LIST,
+                    Arrays.asList("AQ", "FR", "AT","AO","CH","DK","DO","GS","GT","CN","IN"),
+                    new ValidTermsList(),
+                    Importance.LOW,
+                    "List of countries to use for generated locations. Country names cannot contain spaces",
+                    CONFIG_GROUP_LOCATIONS, 3, Width.MEDIUM, "Countries")
+        .define(CONFIG_LOCATIONS_STORE_IDS,
+                    Type.LIST,
+                    Arrays.asList("0168","3254","7293","2358","8764"),
+                    new ValidTermsList(),
+                    Importance.LOW,
+                    "List of store IDs to use for generated countries. Store ID cannot contain spaces",
+                    CONFIG_GROUP_LOCATIONS, 4, Width.MEDIUM, "Store IDs")
+        //
+        // How to generate priorities
+        //
+        .define(CONFIG_PRIORITIES,
+                Type.LIST,
+                Arrays.asList("normal", "high", "urgent"),
+                new ValidTermsList(),
+                Importance.LOW,
+                "List of priorities for a orders. Must be one of three",
+                CONFIG_GROUP_PRIORITIES, 1, Width.MEDIUM, "Priority")
         //
         // How to generate product names
         //

@@ -34,6 +34,14 @@ public class OrderGenerator extends Generator<Order> {
 
     /** order regions (e.g. NA, EMEA) will be chosen at random from this list */
     private final List<String> regions;
+    /** order country (e.g. India, France) */
+    private final List<String> countries;
+
+    /** priorities list for orders */
+    private final List<String> priorities;
+
+    /** list for store IDs */
+    private final List<String> storeIDs;
 
     /** minimum price for randomly selected unit price for generated orders */
     private final double minPrice;
@@ -70,8 +78,12 @@ public class OrderGenerator extends Generator<Order> {
         this.productGenerator = new ProductGenerator(config);
 
         this.regions = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_REGIONS);
+        this.countries = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_COUNTRIES);
+        this.storeIDs = config.getList(DatagenSourceConfig.CONFIG_LOCATIONS_STORE_IDS);
         this.minPrice = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTS_MIN_PRICE);
         this.maxPrice = config.getDouble(DatagenSourceConfig.CONFIG_PRODUCTS_MAX_PRICE);
+
+        this.priorities = config.getList(DatagenSourceConfig.CONFIG_PRIORITIES);
 
         this.minOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_SMALL_MIN);
         this.maxOrders = config.getInt(DatagenSourceConfig.CONFIG_ORDERS_LARGE_MAX);
@@ -90,6 +102,9 @@ public class OrderGenerator extends Generator<Order> {
         double unitPrice = Generators.randomPrice(minPrice, maxPrice);
         String description = productGenerator.generate().getDescription();
         String region = Generators.randomItem(regions);
+        String country = Generators.randomItem(countries);
+        String storeID = Generators.randomItem(storeIDs);
+        String priority = Generators.randomItem(priorities);
         Customer customer = new Customer(faker);
 
         return new Order(UUID.randomUUID().toString(),
@@ -98,7 +113,10 @@ public class OrderGenerator extends Generator<Order> {
                          description,
                          unitPrice, quantity,
                          region,
-                         timestamp);
+                         timestamp,
+                         country,
+                         priority,
+                         storeID);
     }
 
     /**
@@ -112,27 +130,39 @@ public class OrderGenerator extends Generator<Order> {
         double unitPrice = Generators.randomPrice(minPrice, maxPrice);
         String description = productGenerator.generate().getDescription();
         String region = Generators.randomItem(regions);
+        String country = Generators.randomItem(countries);
+        String priority = Generators.randomItem(priorities);
+        String storeID = Generators.randomItem(storeIDs);
 
         return generate(minItems, maxItems,
                         unitPrice,
                         region,
                         description,
-                        customer);
+                        customer,
+                        country,
+                        priority,
+                        storeID);
     }
 
     /** Creates an order with known details */
     public Order generate(int minItems, int maxItems,
-                          double unitPrice,
-                          String region,
-                          String description,
-                          Customer customer)
+                                     double unitPrice,
+                                     String region,
+                                     String description,
+                                     Customer customer,
+                                     String country,
+                                     String priority,
+                                     String storeID)
     {
         return generate(minItems, maxItems,
                         unitPrice,
                         region,
                         description,
                         customer,
-                        ZonedDateTime.now());
+                        ZonedDateTime.now(),
+                        country,
+                        priority,
+                        storeID);
     }
 
     public Order generate(int minItems, int maxItems,
@@ -140,7 +170,10 @@ public class OrderGenerator extends Generator<Order> {
                           String region,
                           String description,
                           Customer customer,
-                          ZonedDateTime timestamp)
+                          ZonedDateTime timestamp,
+                          String country,
+                          String priority,
+                          String storeID)
     {
         int quantity = Generators.randomInt(minItems, maxItems);
         if (customer == null) {
@@ -153,7 +186,10 @@ public class OrderGenerator extends Generator<Order> {
                          description,
                          unitPrice, quantity,
                          region,
-                         timestamp);
+                         timestamp,
+                         country,
+                         priority,
+                         storeID);
     }
 
 
@@ -162,7 +198,10 @@ public class OrderGenerator extends Generator<Order> {
         double unitPrice = Generators.randomPrice(minPrice, maxPrice);
         String description = productGenerator.generate().getDescription();
         String region = Generators.randomItem(regions);
+        String country = Generators.randomItem(countries);
         Customer customer = new Customer(faker);
+        String priority = Generators.randomItem(priorities);
+        String storeID = Generators.randomItem(storeIDs);
 
         int quantity = Generators.randomInt(minOrders, maxOrders);
 
@@ -172,7 +211,10 @@ public class OrderGenerator extends Generator<Order> {
                          description,
                          unitPrice, quantity,
                          region,
-                         timestamp);
+                         timestamp,
+                         country,
+                         priority,
+                         storeID);
     }
 
     /**

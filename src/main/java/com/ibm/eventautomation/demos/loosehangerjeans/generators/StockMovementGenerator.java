@@ -55,6 +55,7 @@ public class StockMovementGenerator extends Generator<StockMovement> {
 
         return new StockMovement(UUID.randomUUID().toString(),
                                  formatTimestamp(timestamp),
+                                 // random warehouse
                                  Generators.randomItem(warehouses),
                                  productGenerator.generate().getDescription(),
                                  // stock movement quantities are always

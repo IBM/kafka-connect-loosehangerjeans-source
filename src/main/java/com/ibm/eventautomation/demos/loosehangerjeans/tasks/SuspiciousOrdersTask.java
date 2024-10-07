@@ -131,8 +131,11 @@ public class SuspiciousOrdersTask extends DatagenTimerTask {
                           largeOrderMinItems, largeOrderMaxItems,
                           initialOrder.getUnitPrice(),
                           initialOrder.getRegion(),
+                          initialOrder.getCountry(),
                           initialOrder.getDescription(),
-                          cancellationMinDelay, cancellationMaxDelay);
+                          cancellationMinDelay, cancellationMaxDelay,
+                          initialOrder.getPriority(),
+                          initialOrder.getStoreID());
 
             suspiciousOrderDelay += delay;
         }
@@ -144,6 +147,9 @@ public class SuspiciousOrdersTask extends DatagenTimerTask {
             Generators.randomPrice(initialOrder.getUnitPrice() - maxPriceVariation,
                                    initialOrder.getUnitPrice() - 0.01),
             initialOrder.getRegion(),
-            initialOrder.getDescription());
+            initialOrder.getCountry(),
+            initialOrder.getDescription(),
+            initialOrder.getPriority(),
+            initialOrder.getStoreID());
     }
 }
