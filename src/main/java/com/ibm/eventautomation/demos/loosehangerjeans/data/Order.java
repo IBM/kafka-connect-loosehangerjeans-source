@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
+import org.apache.kafka.connect.header.ConnectHeaders;
 
 /**
  * Represents an event for a new order that has been placed by
@@ -51,6 +52,13 @@ public class Order extends LoosehangerData {
     /** location of the customer */
     private String region;
 
+    /** country code of the order **/
+    private String countryCode;
+
+    private String priority;
+
+    private String storeId;
+
     /** schema for the events - all fields are required */
     private static final Schema SCHEMA = SchemaBuilder.struct()
         .name("order")
@@ -65,7 +73,7 @@ public class Order extends LoosehangerData {
             .field("ordertime",   Schema.STRING_SCHEMA)
         .build();
 
-    public Order(String id, String timestamp, Customer customer, String description, double unitPrice, int quantity, String region, ZonedDateTime recordTimestamp) {
+    public Order(String id, String timestamp, Customer customer, String description, double unitPrice, int quantity, String region, ZonedDateTime recordTimestamp, String countryCode, String priority, String storeId) {
         super(recordTimestamp);
 
         this.id = id;
@@ -75,11 +83,22 @@ public class Order extends LoosehangerData {
         this.unitPrice = unitPrice;
         this.quantity = quantity;
         this.region = region;
+        this.countryCode = countryCode;
+        this.priority = priority;
+        this.storeId = storeId;
     }
 
     @Override
     protected String getKey() {
-        return id;
+        return countryCode;
+    }
+
+    @Override
+    public ConnectHeaders getHeaders() {
+        ConnectHeaders headers = new ConnectHeaders();
+        headers.addString("priority", priority);
+        headers.addString("storeid", storeId);
+        return headers;
     }
 
     @Override
@@ -117,10 +136,20 @@ public class Order extends LoosehangerData {
     public Customer getCustomer() {
         return customer;
     }
+    public String getCountryCode() {
+        return countryCode;
+    }
+    public String getPriority() {
+        return priority;
+    }
+    public String getStoreId() {
+        return storeId;
+    }
 
     @Override
     public String toString() {
         return "Order [id=" + id + ", timestamp=" + timestamp + ", customer=" + customer + ", description="
                 + description + ", unitPrice=" + unitPrice + ", quantity=" + quantity + ", region=" + region + "]";
     }
+
 }

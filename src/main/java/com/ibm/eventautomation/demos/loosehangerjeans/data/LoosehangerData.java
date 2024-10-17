@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Struct;
+import org.apache.kafka.connect.header.ConnectHeaders;
 import org.apache.kafka.connect.source.SourceRecord;
 
 /**
@@ -54,7 +55,8 @@ public abstract class LoosehangerData {
                                 topicName, topicPartition,
                                 Schema.STRING_SCHEMA, getKey(),
                                 getValueSchema(), getValue(),
-                                timestamp);
+                                timestamp,
+                                getHeaders());
     }
 
     /**
@@ -67,5 +69,10 @@ public abstract class LoosehangerData {
 
     public static Map<String, Object> partition(String origin) {
         return Collections.singletonMap("partition", origin);
+    }
+
+    /** Headers for the message */
+    public ConnectHeaders getHeaders() {
+        return new ConnectHeaders();
     }
 }
