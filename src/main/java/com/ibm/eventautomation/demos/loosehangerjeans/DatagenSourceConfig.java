@@ -17,7 +17,9 @@ package com.ibm.eventautomation.demos.loosehangerjeans;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigDef.Importance;
@@ -50,6 +52,7 @@ public class DatagenSourceConfig {
     private static final String CONFIG_GROUP_LOCATIONS = "Locations";
     public static final String CONFIG_LOCATIONS_REGIONS    = "locations.regions";
     public static final String CONFIG_LOCATIONS_WAREHOUSES = "locations.warehouses";
+    public static final String CONFIG_LOCATIONS_REGIONS_COUNTRIES_MAP = "locations.regions.countries";
 
     private static final String CONFIG_GROUP_PRODUCTS = "Products";
     public static final String CONFIG_PRODUCTS_SIZES     = "products.sizes";
@@ -161,6 +164,9 @@ public class DatagenSourceConfig {
     private static final String CONFIG_GROUP_BEHAVIOR = "Behavior";
     public static final String CONFIG_BEHAVIOR_STARTUPHISTORY = "startup.history.enabled";
 
+    public static final String CONFIG_GROUP_PRIORITIES = "Priorities";
+    public static final String CONFIG_PRIORITIES = "priorities.priority";
+
     public static final ConfigDef CONFIG_DEF = new ConfigDef()
         //
         // format to use
@@ -269,6 +275,23 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "List of warehouses to use for generated locations. Warehouse names cannot contain spaces.",
                     CONFIG_GROUP_LOCATIONS, 2, Width.MEDIUM, "Warehouses")
+        .define(CONFIG_LOCATIONS_REGIONS_COUNTRIES_MAP,
+                    Type.STRING,
+                    "EMEA:BE,FR,CH,GB,DE;APAC:ID,SG,BN,PH;ANZ:AU,NZ;NA:CN,US,MX;SA:PY,BR,UY",
+                    new ValidRegionToCountriesMap(),
+                    Importance.LOW,
+                    "Mapping of countries to region",
+                    CONFIG_GROUP_LOCATIONS, 3, Width.MEDIUM, "Region wise country list")
+        //
+        // How to generate priorities
+        //
+        .define(CONFIG_PRIORITIES,
+                Type.LIST,
+                Arrays.asList("normal", "high", "urgent"),
+                new ValidTermsList(),
+                Importance.LOW,
+                "List of priorities for orders.",
+                CONFIG_GROUP_PRIORITIES, 1, Width.MEDIUM, "Priority")
         //
         // How to generate product names
         //
@@ -908,5 +931,55 @@ public class DatagenSourceConfig {
         public String toString() {
             return "List containing at least one element, where all elements don't have a space.";
         }
+    }
+
+    private static class ValidRegionToCountriesMap implements Validator {
+        @Override
+        public void ensureValid(final String name, final Object value) {
+            Map<String, List<String>> parsedMap = parseCountriesList((String)value);
+            if (parsedMap.isEmpty()) {
+                throw new ConfigException(name, value, "must contain at least one region");
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "Expected format is REGION1:COUNTRY1,COUNTRY2,COUNTRY3;REGION2:COUNTRY4,COUNTRY5";
+        }
+    }
+
+
+    /*
+     * expected input: "REGION1:COUNTRY1,COUNTRY2,COUNTRY3;REGION2:COUNTRY4,COUNTRY5"
+     * expected output:
+     *   {
+     *       "REGION1": [ "COUNTRY1", "COUNTRY2", "COUNTRY3" ],
+     *       "REGION2": [ "COUNTRY4", "COUNTRY5" ]
+     *   }
+     */
+    public static Map<String, List<String>> parseCountriesList(String input) {
+        NonEmptyString regionNameValidator = new NonEmptyString();
+        ValidTermsList countriesListValidator = new ValidTermsList();
+
+        Map<String, List<String>> regionToCountries = new HashMap<>();
+        String[] regionsWithCountries = input.split(";");
+        for (String regionWithCountries : regionsWithCountries) {
+            String[] parts = regionWithCountries.split(":");
+            if (parts.length != 2) {
+                throw new ConfigException("Expected format is REGION1:COUNTRY1,COUNTRY2,COUNTRY3;REGION2:COUNTRY4,COUNTRY5");
+            }
+
+            // check the region
+            String region = parts[0];
+            regionNameValidator.ensureValid("region", region);
+
+            // check the list of countries for this region
+            List<String> countries = Arrays.asList(parts[1].split(","));
+            countriesListValidator.ensureValid(region, countries);
+
+            // both look good - add to the map
+            regionToCountries.put(region, countries);
+        }
+        return regionToCountries;
     }
 }

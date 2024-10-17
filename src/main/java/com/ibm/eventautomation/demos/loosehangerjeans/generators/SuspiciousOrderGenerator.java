@@ -76,7 +76,10 @@ public class SuspiciousOrderGenerator {
                                                            initialOrder.getRegion(),
                                                            initialOrder.getDescription(),
                                                            initialOrder.getCustomer(),
-                                                           nextTimestamp);
+                                                           nextTimestamp,
+                                                           initialOrder.getCountryCode(),
+                                                           initialOrder.getPriority(),
+                                                           initialOrder.getStoreId());
                 history.add(largeOrder);
 
                 // cancel the order after a short delay
@@ -102,7 +105,10 @@ public class SuspiciousOrderGenerator {
                             initialOrder.getRegion(),
                             initialOrder.getDescription(),
                             Generators.randomItem(customers),
-                            nextTimestamp);
+                            nextTimestamp,
+                            initialOrder.getCountryCode(),
+                            initialOrder.getPriority(),
+                            initialOrder.getStoreId());
                 history.add(smallOrder);
             }
 
