@@ -277,7 +277,7 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_LOCATIONS, 2, Width.MEDIUM, "Warehouses")
         .define(CONFIG_LOCATIONS_REGIONS_COUNTRIES_MAP,
                     Type.STRING,
-                    "EMEA:BE,FR,CH,GB,DE;APAC:ID,SG,BN,PH;ANZ:AU,NZ;NA:CN,US,MX;SA:PY,BR,UY",
+                    "NA:CA,US,MX;SA:BR,PY,UY;EMEA:BE,FR,CH,GB,DE,ES;APAC:ID,SG,BN,PH;ANZ:AU,NZ",
                     new ValidRegionToCountriesMap(),
                     Importance.LOW,
                     "Mapping of countries to region",

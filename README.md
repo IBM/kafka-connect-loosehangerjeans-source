@@ -369,6 +369,13 @@ spec:
     # locations that are referred to in generated events
     #
     locations.regions: NA,SA,EMEA,APAC,ANZ
+    # countries in each region
+    #  NA   : CA (Canada), US (United States), MX (Mexico)
+    #  SA   : BR (Brazil), PY (Paraguay), UY (Uruguay)
+    #  EMEA : BE (Belgium), FR (France), CH (Switzerland), GB (United Kingdom), DE (Germany), ES (Spain)
+    #  APAC : ID (Indonesia), SG (Singapore), BN (Brunei), PH (Philippines)
+    #  ANZ  : AU (Australia), NZ (New Zealand)
+    locations.regions.countries: NA:CA,US,MX;SA:BR,PY,UY;EMEA:BE,FR,CH,GB,DE,ES;APAC:ID,SG,BN,PH;ANZ:AU,NZ
     locations.warehouses: North,South,West,East,Central
 ```
 
