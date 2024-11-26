@@ -68,8 +68,8 @@ public class SensorReadingGenerator extends Generator<SensorReading> {
     }
 
     private String generateSensorId() {
-        int floor  = Generators.randomInt(0, 3);
-        int sensor = Generators.randomInt(10, 30);
+        int floor  = Generators.randomInt(0, 2);
+        int sensor = Generators.randomInt(10, 20);
         return Generators.randomItem(Locations.BUILDINGS) + "-" +
                floor + "-" +
                sensor;
