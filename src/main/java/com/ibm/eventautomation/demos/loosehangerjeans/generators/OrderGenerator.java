@@ -18,8 +18,6 @@ package com.ibm.eventautomation.demos.loosehangerjeans.generators;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.kafka.common.config.AbstractConfig;

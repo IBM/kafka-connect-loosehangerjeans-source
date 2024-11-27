@@ -49,8 +49,8 @@ public class BadgeInGenerator extends Generator<BadgeIn> {
 
 
     private String generateDoorId() {
-        int floor = Generators.randomInt(0, 3);
-        int door  = Generators.randomInt(10, 60);
+        int floor = Generators.randomInt(0, 2);
+        int door  = Generators.randomInt(10, 25);
         return Generators.randomItem(Locations.BUILDINGS) + "-" +
                floor + "-" +
                door;

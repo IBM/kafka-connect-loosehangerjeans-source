@@ -8,7 +8,7 @@
     <groupId>com.ibm.eventautomation.demos</groupId>
     <artifactId>kafka-connect-loosehangerjeans-source</artifactId>
     <description>Kafka Connect source connector used for generating simulated events for demos and tests</description>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
 
     <developers>
         <developer>
