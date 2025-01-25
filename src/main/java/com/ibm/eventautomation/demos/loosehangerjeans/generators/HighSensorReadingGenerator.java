@@ -42,14 +42,14 @@ public class HighSensorReadingGenerator extends SensorReadingGenerator {
     private final static String SENSOR_ID = generateSensorId();
 
     /** minimum temperature used when reporting high temperatures */
-    private final static double HIGH_TEMP_MIN = 24.0;
+    private final static double HIGH_TEMP_MIN = 23.0;
     /** maximum temperature used when reporting high temperatures */
-    private final static double HIGH_TEMP_MAX = 39.0;
+    private final static double HIGH_TEMP_MAX = 40.0;
     /** maximum temperature increase between readings */
     private final static double MAX_TEMP_INCREASE = 1;
 
     /** minimum humidity percentage when reporting high humidities */
-    private final static int HIGH_HUMIDITY_MIN = 60;
+    private final static int HIGH_HUMIDITY_MIN = 56;
     /** maximum humidity percentage when reporting high humidities */
     private final static int HIGH_HUMIDITY_MAX = 75;
     /** maximum humidity increase between readings */
@@ -125,7 +125,7 @@ public class HighSensorReadingGenerator extends SensorReadingGenerator {
     }
 
     private static boolean shouldEndHighReadings() {
-        return Generators.shouldDo(0.1);
+        return Generators.shouldDo(0.08);
     }
 
     private void resetHighTemperatureSeries() {

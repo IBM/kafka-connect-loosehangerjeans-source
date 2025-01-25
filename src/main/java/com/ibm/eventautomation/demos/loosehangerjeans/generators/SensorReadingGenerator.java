@@ -46,7 +46,7 @@ public class SensorReadingGenerator extends Generator<SensorReading> {
     /** minimum humidity percentage for randomly selected humidity reading */
     protected final static int HUMIDITY_MIN = 41;
     /** maximum humidity percentage for randomly selected humidity reading */
-    protected final static int HUMIDITY_MAX = 59;
+    protected final static int HUMIDITY_MAX = 58;
 
 
     public SensorReadingGenerator(AbstractConfig config)
