@@ -39,21 +39,25 @@ public class SensorReadingGenerator extends Generator<SensorReading> {
     private static final String TIMESTAMP_FORMAT = "EEE MMM dd HH:mm:ss zzz yyyy";
 
     /** minimum temperature for randomly selected temperature reading */
-    private final static double TEMP_MIN = 19.5;
+    protected final static double TEMP_MIN = 19.5;
     /** maximum temperature for randomly selected temperature reading */
-    private final static double TEMP_MAX = 23.5;
+    protected final static double TEMP_MAX = 23.5;
 
     /** minimum humidity percentage for randomly selected humidity reading */
-    private final static int HUMIDITY_MIN = 41;
+    protected final static int HUMIDITY_MIN = 41;
     /** maximum humidity percentage for randomly selected humidity reading */
-    private final static int HUMIDITY_MAX = 59;
+    protected final static int HUMIDITY_MAX = 59;
 
 
     public SensorReadingGenerator(AbstractConfig config)
     {
-        super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_SENSORREADINGS),
-              config.getInt(DatagenSourceConfig.CONFIG_DELAYS_SENSORREADINGS),
-              config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_SENSORREADINGS),
+        this(config.getInt(DatagenSourceConfig.CONFIG_TIMES_SENSORREADINGS),
+             config.getInt(DatagenSourceConfig.CONFIG_DELAYS_SENSORREADINGS),
+             config.getDouble(DatagenSourceConfig.CONFIG_DUPLICATE_SENSORREADINGS));
+    }
+
+    protected SensorReadingGenerator(int intervalMs, int delaySecs, double duplicatesRatio) {
+        super(intervalMs, delaySecs, duplicatesRatio,
               DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT).withZone(ZoneId.systemDefault()));
     }
 
@@ -67,7 +71,7 @@ public class SensorReadingGenerator extends Generator<SensorReading> {
                                  timestamp);
     }
 
-    private String generateSensorId() {
+    protected static String generateSensorId() {
         int floor  = Generators.randomInt(0, 2);
         int sensor = Generators.randomInt(10, 20);
         return Generators.randomItem(Locations.BUILDINGS) + "-" +

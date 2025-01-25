@@ -44,7 +44,11 @@ public class SensorReadingTask extends TimerTask {
 
 
     public SensorReadingTask(AbstractConfig config, Queue<SourceRecord> queue) {
-        this.generator = new SensorReadingGenerator(config);
+        this(new SensorReadingGenerator(config), queue, config);
+    }
+
+    protected SensorReadingTask(SensorReadingGenerator generator, Queue<SourceRecord> queue, AbstractConfig config) {
+        this.generator = generator;
         this.queue = queue;
         this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_SENSORREADINGS);
     }

@@ -42,6 +42,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.SensorReading;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.StockMovement;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.BadgeInGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.CancellationGenerator;
+import com.ibm.eventautomation.demos.loosehangerjeans.generators.HighSensorReadingGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.NewCustomerGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OnlineOrderGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OrderGenerator;
@@ -129,7 +130,14 @@ public class DatagenHistoryGenerator {
         log.debug("generating historical sensor records");
         final String TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_SENSORREADINGS);
 
-        for (SensorReading reading : new SensorReadingGenerator(config).generateHistory()) {
+        List<SensorReading> readings = new SensorReadingGenerator(config).generateHistory();
+        List<SensorReading> highReadings = new HighSensorReadingGenerator(config).generateHistory();
+        readings.addAll(highReadings);
+        Collections.sort(readings, (r1, r2) -> {
+            return r1.recordTimestamp().compareTo(r2.recordTimestamp());
+        });
+
+        for (SensorReading reading : readings) {
             SourceRecord record = reading.createSourceRecord(TOPIC);
             historicalRecords.add(record);
         }

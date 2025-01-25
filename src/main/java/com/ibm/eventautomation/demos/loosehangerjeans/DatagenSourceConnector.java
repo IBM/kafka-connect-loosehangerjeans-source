@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class DatagenSourceConnector extends SourceConnector {
 
-    protected static final String VERSION = "0.1.5";
+    protected static final String VERSION = "0.2.0";
 
     private final Logger log = LoggerFactory.getLogger(DatagenSourceConnector.class);
 

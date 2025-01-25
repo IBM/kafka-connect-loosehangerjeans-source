@@ -150,16 +150,17 @@ public class DatagenSourceConfig {
     public static final String CONFIG_DUPLICATE_PRODUCTREVIEWS = "duplicates.productreviews.ratio";
 
     private static final String CONFIG_GROUP_TIMES = "Timings";
-    public static final String CONFIG_TIMES_ORDERS           = "timings.ms.orders";
-    public static final String CONFIG_TIMES_FALSEPOSITIVES   = "timings.ms.falsepositives";
-    public static final String CONFIG_TIMES_SUSPICIOUSORDERS = "timings.ms.suspiciousorders";
-    public static final String CONFIG_TIMES_STOCKMOVEMENTS   = "timings.ms.stockmovements";
-    public static final String CONFIG_TIMES_BADGEINS         = "timings.ms.badgeins";
-    public static final String CONFIG_TIMES_NEWCUSTOMERS     = "timings.ms.newcustomers";
-    public static final String CONFIG_TIMES_SENSORREADINGS   = "timings.ms.sensorreadings";
-    public static final String CONFIG_TIMES_ONLINEORDERS     = "timings.ms.onlineorders";
-    public static final String CONFIG_TIMES_RETURNREQUESTS   = "timings.ms.returnrequests";
-    public static final String CONFIG_TIMES_PRODUCTREVIEWS   = "timings.ms.productreviews";
+    public static final String CONFIG_TIMES_ORDERS             = "timings.ms.orders";
+    public static final String CONFIG_TIMES_FALSEPOSITIVES     = "timings.ms.falsepositives";
+    public static final String CONFIG_TIMES_SUSPICIOUSORDERS   = "timings.ms.suspiciousorders";
+    public static final String CONFIG_TIMES_STOCKMOVEMENTS     = "timings.ms.stockmovements";
+    public static final String CONFIG_TIMES_BADGEINS           = "timings.ms.badgeins";
+    public static final String CONFIG_TIMES_NEWCUSTOMERS       = "timings.ms.newcustomers";
+    public static final String CONFIG_TIMES_SENSORREADINGS     = "timings.ms.sensorreadings";
+    public static final String CONFIG_TIMES_HIGHSENSORREADINGS = "timings.ms.highsensorreadings";
+    public static final String CONFIG_TIMES_ONLINEORDERS       = "timings.ms.onlineorders";
+    public static final String CONFIG_TIMES_RETURNREQUESTS     = "timings.ms.returnrequests";
+    public static final String CONFIG_TIMES_PRODUCTREVIEWS     = "timings.ms.productreviews";
 
     private static final String CONFIG_GROUP_BEHAVIOR = "Behavior";
     public static final String CONFIG_BEHAVIOR_STARTUPHISTORY = "startup.history.enabled";
@@ -880,29 +881,36 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Delay, in milliseconds, between each sensor reading that should be generated.",
                     CONFIG_GROUP_TIMES, 7, Width.MEDIUM, "Sensor readings delay")
+        .define(CONFIG_TIMES_HIGHSENSORREADINGS,
+                    Type.INT,
+                    18_000, // 18 seconds
+                    Range.atLeast(4_000),  // 4 seconds
+                    Importance.LOW,
+                    "Delay, in milliseconds, between each sensor reading that should be generated for a problematic sensor that periodically emits very high and increasing readings.",
+                    CONFIG_GROUP_TIMES, 8, Width.MEDIUM, "High sensor readings delay")
         .define(CONFIG_TIMES_ONLINEORDERS,
                     Type.INT,
                     30_000, // 30 seconds
                     Range.atLeast(500),
                     Importance.LOW,
                     "Delay, in milliseconds, between each online order that should be generated.",
-                    CONFIG_GROUP_TIMES, 8, Width.MEDIUM, "Online orders delay")
+                    CONFIG_GROUP_TIMES, 9, Width.MEDIUM, "Online orders delay")
         .define(CONFIG_TIMES_RETURNREQUESTS,
                     Type.INT,
                     300_000, // 5 minutes
                     Range.atLeast(60_000), // 1 minute
                     Importance.LOW,
                     "Delay, in milliseconds, between each return request that should be generated.",
-                    CONFIG_GROUP_TIMES, 9, Width.MEDIUM, "Return requests delay")
+                    CONFIG_GROUP_TIMES, 10, Width.MEDIUM, "Return requests delay")
         .define(CONFIG_TIMES_PRODUCTREVIEWS,
                     Type.INT,
                     60_000, // 1 minute
                     Range.atLeast(30_000), // 30 seconds
                     Importance.LOW,
                     "Delay, in milliseconds, between each product review that should be generated.",
-                    CONFIG_GROUP_TIMES, 10, Width.MEDIUM, "Product reviews delay")
+                    CONFIG_GROUP_TIMES, 11, Width.MEDIUM, "Product reviews delay")
         //
-        // How frequently to generate messages
+        // Startup behaviour
         //
         .define(CONFIG_BEHAVIOR_STARTUPHISTORY,
                     Type.BOOLEAN,

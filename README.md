@@ -122,6 +122,9 @@ spec:
     timings.ms.newcustomers: 543400       # a little over 9 minutes
     # sensor reading events
     timings.ms.sensorreadings: 27000      # every 27 seconds
+    # sensor reading events
+    #  from a single sensor that periodically generates very high and increasing readings (before returning to a normal range)
+    timings.ms.highsensorreadings: 18000  # every 18 seconds
     # online orders
     timings.ms.onlineorders: 30000        # every 30 seconds
     # return requests

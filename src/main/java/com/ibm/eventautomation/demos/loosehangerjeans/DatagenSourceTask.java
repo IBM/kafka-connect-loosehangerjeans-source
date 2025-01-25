@@ -27,6 +27,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductGenerato
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductReviewGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.BadgeInTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.FalsePositivesTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.HighSensorReadingTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NewCustomerTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NormalOrdersTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.OnlineOrdersTask;
@@ -117,6 +118,8 @@ public class DatagenSourceTask extends SourceTask {
         // IoT sensor readings
         SensorReadingTask sensorReadings = new SensorReadingTask(config, queue);
         generateTimer.scheduleAtFixedRate(sensorReadings, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_SENSORREADINGS));
+        HighSensorReadingTask highSensorReadings = new HighSensorReadingTask(config, queue);
+        generateTimer.scheduleAtFixedRate(highSensorReadings, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_HIGHSENSORREADINGS));
 
         // online orders
         // create online orders and out-of-stock events
