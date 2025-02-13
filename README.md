@@ -133,8 +133,8 @@ spec:
     timings.ms.returnrequests: 300000     # every 5 minutes
     # product reviews
     timings.ms.productreviews: 60000      # every 1 minute
-	# transactions
-	timings.ms.transactions: 20000        # every 20 seconds
+    # transactions
+    timings.ms.transactions: 20000        # every 20 seconds
 
     #
     # how much of a delay to introduce when producing events
