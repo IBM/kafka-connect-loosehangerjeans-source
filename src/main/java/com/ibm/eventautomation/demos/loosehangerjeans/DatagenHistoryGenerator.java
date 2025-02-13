@@ -1,5 +1,5 @@
 /**
- * Copyright 2024 IBM Corp. All Rights Reserved.
+ * Copyright 2024, 2025 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.data.ProductReview;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.ReturnRequest;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.SensorReading;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.StockMovement;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.Transaction;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.BadgeInGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.CancellationGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.HighSensorReadingGenerator;
@@ -53,10 +54,12 @@ import com.ibm.eventautomation.demos.loosehangerjeans.generators.ReturnRequestGe
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.SensorReadingGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.StockMovementGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.SuspiciousOrderGenerator;
+import com.ibm.eventautomation.demos.loosehangerjeans.generators.TransactionGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.FalsePositivesTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NewCustomerTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NormalOrdersTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SuspiciousOrdersTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.TransactionTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 /**
@@ -96,6 +99,7 @@ public class DatagenHistoryGenerator {
         addOnlineOrderRecords(historicalRecords, config);
         addOrderAndCancellationRecords(historicalRecords, config);
         addReturnsRecords(historicalRecords, config);
+        addTransactionRecords(historicalRecords, config);
 
         Collections.sort(historicalRecords, (r1, r2) -> {
             return Math.toIntExact(r1.timestamp() - r2.timestamp());
@@ -141,6 +145,16 @@ public class DatagenHistoryGenerator {
             SourceRecord record = reading.createSourceRecord(TOPIC);
             historicalRecords.add(record);
         }
+    }
+
+    private void addTransactionRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+    	log.debug("generating historical transaction records");
+    	final String TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_TRANSACTIONS);
+
+    	for (Transaction transaction : new TransactionGenerator(config).generateHistory()) {
+    		SourceRecord record = transaction.createSourceRecord(TOPIC, TransactionTask.class.getName());
+    		historicalRecords.add(record);
+    	}
     }
 
     private void addStockMovementRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {

@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 IBM Corp. All Rights Reserved.
+ * Copyright 2023, 2025 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,10 @@ public class Generators {
 
     public static int randomInt(int min, int max) {
         return RNG.nextInt(min, max + 1);
+    }
+
+    public static boolean randomBoolean() {
+    	return RNG.nextBoolean();
     }
 
     /**

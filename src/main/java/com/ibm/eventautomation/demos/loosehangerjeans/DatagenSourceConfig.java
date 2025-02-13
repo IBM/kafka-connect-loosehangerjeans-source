@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 IBM Corp. All Rights Reserved.
+ * Copyright 2023, 2025 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TOPICNAME_OUTOFSTOCKS    = "topic.name.outofstocks";
     public static final String CONFIG_TOPICNAME_RETURNREQUESTS = "topic.name.returnrequests";
     public static final String CONFIG_TOPICNAME_PRODUCTREVIEWS = "topic.name.productreviews";
+    public static final String CONFIG_TOPICNAME_TRANSACTIONS   = "topic.name.transactions";
 
     private static final String CONFIG_GROUP_LOCATIONS = "Locations";
     public static final String CONFIG_LOCATIONS_REGIONS    = "locations.regions";
@@ -125,6 +126,11 @@ public class DatagenSourceConfig {
     public static final String CONFIG_PRODUCTREVIEWS_MIN_DELAY                          = "productreviews.delay.ms.min";
     public static final String CONFIG_PRODUCTREVIEWS_MAX_DELAY                          = "productreviews.delay.ms.max";
 
+    private static final String CONFIG_GROUP_TRANSACTIONS = "Transactions";
+    public static final String CONFIG_TRANSACTIONS_IDS        = "transactions.max.ids";
+    public static final String CONFIG_TRANSACTIONS_AMOUNT_MIN = "transactions.amount.min";
+    public static final String CONFIG_TRANSACTIONS_AMOUNT_MAX = "transactions.amount.max";
+
     private static final String CONFIG_GROUP_DELAYS = "Event delays";
     public static final String CONFIG_DELAYS_ORDERS         = "eventdelays.orders.secs.max";
     public static final String CONFIG_DELAYS_CANCELLATIONS  = "eventdelays.cancellations.secs.max";
@@ -136,6 +142,7 @@ public class DatagenSourceConfig {
     public static final String CONFIG_DELAYS_OUTOFSTOCKS    = "eventdelays.outofstocks.secs.max";
     public static final String CONFIG_DELAYS_RETURNREQUESTS   = "eventdelays.returnrequests.secs.max";
     public static final String CONFIG_DELAYS_PRODUCTREVIEWS   = "eventdelays.productreviews.secs.max";
+    public static final String CONFIG_DELAYS_TRANSACTIONS     = "eventdelays.transactions.secs.max";
 
     private static final String CONFIG_GROUP_DUPLICATES = "Duplicate events";
     public static final String CONFIG_DUPLICATE_ORDERS         = "duplicates.orders.ratio";
@@ -148,6 +155,7 @@ public class DatagenSourceConfig {
     public static final String CONFIG_DUPLICATE_OUTOFSTOCKS    = "duplicates.outofstocks.ratio";
     public static final String CONFIG_DUPLICATE_RETURNREQUESTS = "duplicates.returnrequests.ratio";
     public static final String CONFIG_DUPLICATE_PRODUCTREVIEWS = "duplicates.productreviews.ratio";
+    public static final String CONFIG_DUPLICATE_TRANSACTIONS   = "duplicates.transactions.ratio";
 
     private static final String CONFIG_GROUP_TIMES = "Timings";
     public static final String CONFIG_TIMES_ORDERS             = "timings.ms.orders";
@@ -161,6 +169,7 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TIMES_ONLINEORDERS       = "timings.ms.onlineorders";
     public static final String CONFIG_TIMES_RETURNREQUESTS     = "timings.ms.returnrequests";
     public static final String CONFIG_TIMES_PRODUCTREVIEWS     = "timings.ms.productreviews";
+    public static final String CONFIG_TIMES_TRANSACTIONS       = "timings.ms.transactions";
 
     private static final String CONFIG_GROUP_BEHAVIOR = "Behavior";
     public static final String CONFIG_BEHAVIOR_STARTUPHISTORY = "startup.history.enabled";
@@ -259,6 +268,14 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Name of the topic to use for product review events",
                     CONFIG_GROUP_TOPICNAMES, 10, Width.LONG, "Product reviews topic")
+        .define(CONFIG_TOPICNAME_TRANSACTIONS,
+	                Type.STRING,
+	                "TRANSACTIONS",
+	                new NonEmptyString(),
+	                Importance.LOW,
+	                "Name of the topic to use for transaction events",
+	                CONFIG_GROUP_TOPICNAMES, 11, Width.LONG, "Transactions topic")
+
         //
         // how to generate locations
         //
@@ -683,6 +700,32 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Maximum delay before a product review event is generated after a return request has been issued, in milliseconds. Must be at least 120000.",
                     CONFIG_GROUP_PRODUCTREVIEWS, 4, Width.SHORT, "Max product review event delay")
+
+        //
+        // Generating transactions
+        //
+        .define(CONFIG_TRANSACTIONS_IDS,
+        		    Type.INT,
+        		    5,
+        		    Range.atLeast(1),
+        		    Importance.LOW,
+        		    "Number of transactions identifiers",
+        		    CONFIG_GROUP_TRANSACTIONS, 1, Width.SHORT, "Number of transaction identifiers")
+        .define(CONFIG_TRANSACTIONS_AMOUNT_MIN,
+        			Type.DOUBLE,
+        			100,
+        			Range.atLeast(100),
+        			Importance.LOW,
+        			"Minimum amount of a transaction",
+        			CONFIG_GROUP_TRANSACTIONS, 2, Width.SHORT, "Min transaction amount")
+        .define(CONFIG_TRANSACTIONS_AMOUNT_MAX,
+        			Type.DOUBLE,
+        			1000,
+        			Range.between(100, 1000),
+        			Importance.LOW,
+        			"Maximum amount of a transaction",
+        			CONFIG_GROUP_TRANSACTIONS, 3, Width.SHORT, "Max transaction amount")
+
         //
         // how long to delay messages before producing them to Kafka
         //
@@ -733,7 +776,7 @@ public class DatagenSourceConfig {
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
-                    "Maximum delay (in *seconds*) to produce new online order events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    "Maximum delay (in *seconds*) to produce new online order events <(this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 7, Width.SHORT, "Online order events - max produce delay")
         .define(CONFIG_DELAYS_OUTOFSTOCKS,
                     Type.INT,
@@ -756,6 +799,14 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Maximum delay (in *seconds*) to produce new product review events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 10, Width.SHORT, "Product review events - max produce delay")
+        .define(CONFIG_DELAYS_TRANSACTIONS,
+        			Type.INT,
+                    0, // payload time matching event time by default
+                    Range.between(0, 900),  // up to 15 mins max
+                    Importance.LOW,
+                    "Maximum delay (in *seconds*) to produce transaction events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    CONFIG_GROUP_DELAYS, 11, Width.SHORT, "Transaction events - max produce delay")
+
         //
         // likelihood of producing duplicate messages
         //
@@ -829,6 +880,14 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Ratio of product review events that should be duplicated. Must be between 0 and 1.",
                     CONFIG_GROUP_DUPLICATES, 10, Width.SHORT, "Duplicate product review events ratio")
+        .define(CONFIG_DUPLICATE_TRANSACTIONS,
+        			Type.DOUBLE,
+                    0,   // don't create duplicate events by default
+                    Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
+                    Importance.LOW,
+                    "Ratio of transaction events that should be duplicated. Must be between 0 and 1.",
+                    CONFIG_GROUP_DUPLICATES, 11, Width.SHORT, "Duplicate transaction events ratio")
+
         //
         // How frequently to generate messages
         //
@@ -909,6 +968,14 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Delay, in milliseconds, between each product review that should be generated.",
                     CONFIG_GROUP_TIMES, 11, Width.MEDIUM, "Product reviews delay")
+        .define(CONFIG_TIMES_TRANSACTIONS,
+	                Type.INT,
+	                20_000, // 20 seconds
+	                Range.atLeast(5_000),  // 5 seconds
+	                Importance.LOW,
+	                "Delay, in milliseconds, between each transaction that should be generated.",
+	                CONFIG_GROUP_TIMES, 12, Width.MEDIUM, "Sensor readings delay")
+
         //
         // Startup behaviour
         //

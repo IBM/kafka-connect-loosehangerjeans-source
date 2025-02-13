@@ -16,6 +16,7 @@ It produces messages simulating the following events:
 | `STOCK.NOSTOCK`   | A product has run out-of-stock                        |
 | `PRODUCT.RETURNS` | A return request has been issued                      |
 | `PRODUCT.REVIEWS` | A product review has been posted                      |
+| `TRANSACTIONS`    | A transaction has been posted                         |
 
 
 Avro schemas and sample messages for each of these topics can be found in the `./doc` folder.
@@ -82,6 +83,7 @@ spec:
     topic.name.outofstocks: STOCK.NOSTOCK
     topic.name.returnrequests: PRODUCT.RETURNS
     topic.name.productreviews: PRODUCT.REVIEWS
+    topic.name.transactions: TRANSACTIONS
 
     #
     # startup behavior
@@ -131,6 +133,8 @@ spec:
     timings.ms.returnrequests: 300000     # every 5 minutes
     # product reviews
     timings.ms.productreviews: 60000      # every 1 minute
+	# transactions
+	timings.ms.transactions: 20000        # every 20 seconds
 
     #
     # how much of a delay to introduce when producing events
@@ -169,6 +173,8 @@ spec:
     eventdelays.returnrequests.secs.max: 0      # payload time matches event time by default
     # product reviews
     eventdelays.productreviews.secs.max: 0      # payload time matches event time by default
+	# transactions
+	eventdelays.transactions.secs.max: 0        # payload time matches event time by default
 
     #
     # how many events should be duplicated
@@ -202,6 +208,8 @@ spec:
     duplicates.returnrequests.ratio: 0      # events not duplicated
     # product reviews
     duplicates.productreviews.ratio: 0      # events not duplicated
+	# transactions
+	duplicates.transactions.ratio: 0        # events not duplicated
 
     #
     # product names to use in events
@@ -380,6 +388,17 @@ spec:
     #  ANZ  : AU (Australia), NZ (New Zealand)
     locations.regions.countries: NA:CA,US,MX;SA:BR,PY,UY;EMEA:BE,FR,CH,GB,DE,ES;APAC:ID,SG,BN,PH;ANZ:AU,NZ
     locations.warehouses: North,South,West,East,Central
+    
+    #
+    # transactions
+    #
+    #  these events are intended to represent transaction requests
+    #
+    transactions.max.ids: 5
+    # minimum amount of a transaction
+    transactions.amount.min: 100.0
+    # maximum amount of a transaction
+    transactions.amount.max: 1000.0
 ```
 
 For example, if you want to theme the demo to be based on products in a different industry, you could adjust product sizes/materials/styles/name to match your demo (the options don't need to actually be "sizes", "materials" or "styles" - they just need to be lists that will make sense when combined into a single string).
