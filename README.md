@@ -173,8 +173,8 @@ spec:
     eventdelays.returnrequests.secs.max: 0      # payload time matches event time by default
     # product reviews
     eventdelays.productreviews.secs.max: 0      # payload time matches event time by default
-	# transactions
-	eventdelays.transactions.secs.max: 0        # payload time matches event time by default
+    # transactions
+    eventdelays.transactions.secs.max: 0        # payload time matches event time by default
 
     #
     # how many events should be duplicated
@@ -208,8 +208,8 @@ spec:
     duplicates.returnrequests.ratio: 0      # events not duplicated
     # product reviews
     duplicates.productreviews.ratio: 0      # events not duplicated
-	# transactions
-	duplicates.transactions.ratio: 0        # events not duplicated
+    # transactions
+    duplicates.transactions.ratio: 0        # events not duplicated
 
     #
     # product names to use in events
