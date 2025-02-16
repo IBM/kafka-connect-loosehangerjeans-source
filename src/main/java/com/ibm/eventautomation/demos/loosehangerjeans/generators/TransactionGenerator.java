@@ -67,8 +67,8 @@ public class TransactionGenerator extends Generator<Transaction> {
 
     @Override
     protected Transaction generateEvent(ZonedDateTime timestamp) {
-
         final Transaction transaction;
+        final TransactionState newState;
 
         String id = Generators.randomItem(transactionIds);
 
@@ -76,7 +76,6 @@ public class TransactionGenerator extends Generator<Transaction> {
         if (transactionStatuses.containsKey(id)) {
             final LinkedList<TransactionState> states = transactionStatuses.get(id);
             final TransactionState state = states.getLast();
-            final TransactionState newState;
 
             // transition started -> processing
             if (state == TransactionState.STARTED) {
@@ -111,24 +110,19 @@ public class TransactionGenerator extends Generator<Transaction> {
                 transactionStatuses.put(id, states);
             }
 
-            transaction = new Transaction(id,
-                                          newState.name(),
-                                          Generators.randomDouble(minAmount, maxAmount),
-                                          formatTimestamp(timestamp),
-                                          timestamp);
         // new transaction
         } else {
             final LinkedList<TransactionState> states = new LinkedList<>();
-            final TransactionState newState = TransactionState.STARTED;
+            newState = TransactionState.STARTED;
             states.add(newState);
             transactionStatuses.put(id, states);
-
-            transaction = new Transaction(id,
-                                          newState.name(),
-                                          Generators.randomDouble(minAmount, maxAmount),
-                                          formatTimestamp(timestamp),
-                                          timestamp);
         }
+
+        transaction = new Transaction(id,
+                                      newState.name(),
+                                      Generators.randomDouble(minAmount, maxAmount),
+                                      formatTimestamp(timestamp),
+                                      timestamp);
         return transaction;
     }
 }
