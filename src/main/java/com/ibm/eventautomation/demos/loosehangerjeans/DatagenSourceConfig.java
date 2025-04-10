@@ -38,16 +38,17 @@ public class DatagenSourceConfig {
     public static final String CONFIG_FORMATS_TIMESTAMPS_LTZ    = "formats.timestamps.ltz";
 
     private static final String CONFIG_GROUP_TOPICNAMES = "Topic names";
-    public static final String CONFIG_TOPICNAME_ORDERS         = "topic.name.orders";
-    public static final String CONFIG_TOPICNAME_CANCELLATIONS  = "topic.name.cancellations";
-    public static final String CONFIG_TOPICNAME_STOCKMOVEMENTS = "topic.name.stockmovements";
-    public static final String CONFIG_TOPICNAME_BADGEINS       = "topic.name.badgeins";
-    public static final String CONFIG_TOPICNAME_CUSTOMERS      = "topic.name.newcustomers";
-    public static final String CONFIG_TOPICNAME_SENSORREADINGS = "topic.name.sensorreadings";
-    public static final String CONFIG_TOPICNAME_ONLINEORDERS   = "topic.name.onlineorders";
-    public static final String CONFIG_TOPICNAME_OUTOFSTOCKS    = "topic.name.outofstocks";
-    public static final String CONFIG_TOPICNAME_RETURNREQUESTS = "topic.name.returnrequests";
-    public static final String CONFIG_TOPICNAME_PRODUCTREVIEWS = "topic.name.productreviews";
+    public static final String CONFIG_TOPICNAME_ORDERS                  = "topic.name.orders";
+    public static final String CONFIG_TOPICNAME_CANCELLATIONS           = "topic.name.cancellations";
+    public static final String CONFIG_TOPICNAME_STOCKMOVEMENTS          = "topic.name.stockmovements";
+    public static final String CONFIG_TOPICNAME_BADGEINS                = "topic.name.badgeins";
+    public static final String CONFIG_TOPICNAME_CUSTOMERS               = "topic.name.newcustomers";
+    public static final String CONFIG_TOPICNAME_SENSORREADINGS          = "topic.name.sensorreadings";
+    public static final String CONFIG_TOPICNAME_ONLINEORDERS            = "topic.name.onlineorders";
+    public static final String CONFIG_TOPICNAME_OUTOFSTOCKS             = "topic.name.outofstocks";
+    public static final String CONFIG_TOPICNAME_RETURNREQUESTS          = "topic.name.returnrequests";
+    public static final String CONFIG_TOPICNAME_PRODUCTREVIEWS          = "topic.name.productreviews";
+    public static final String CONFIG_TOPICNAME_ABANDONEDSHOPPINGCARTS  = "topic.name.abandonedshoppingcarts";
 
     private static final String CONFIG_GROUP_LOCATIONS = "Locations";
     public static final String CONFIG_LOCATIONS_REGIONS    = "locations.regions";
@@ -125,42 +126,53 @@ public class DatagenSourceConfig {
     public static final String CONFIG_PRODUCTREVIEWS_MIN_DELAY                          = "productreviews.delay.ms.min";
     public static final String CONFIG_PRODUCTREVIEWS_MAX_DELAY                          = "productreviews.delay.ms.max";
 
+    private static final String CONFIG_GROUP_ABANDONEDSHOPPINGCARTS = "Abandoned shopping carts";
+    public static final String CONFIG_ABANDONEDSHOPPINGCARTS_PRODUCTS_MIN           = "abandonedshoppingcarts.products.min";
+    public static final String CONFIG_ABANDONEDSHOPPINGCARTS_PRODUCTS_MAX           = "abandonedshoppingcarts.products.max";
+    public static final String CONFIG_ABANDONEDSHOPPINGCARTS_CUSTOMER_EMAILS_MIN    = "abandonedshoppingcarts.customer.emails.min";
+    public static final String CONFIG_ABANDONEDSHOPPINGCARTS_CUSTOMER_EMAILS_MAX    = "abandonedshoppingcarts.customer.emails.max";
+    public static final String CONFIG_ABANDONEDSHOPPINGCARTS_PRODUCT_RATIO          = "abandonedshoppingcarts.product.ratio";
+
+
     private static final String CONFIG_GROUP_DELAYS = "Event delays";
-    public static final String CONFIG_DELAYS_ORDERS         = "eventdelays.orders.secs.max";
-    public static final String CONFIG_DELAYS_CANCELLATIONS  = "eventdelays.cancellations.secs.max";
-    public static final String CONFIG_DELAYS_STOCKMOVEMENTS = "eventdelays.stockmovements.secs.max";
-    public static final String CONFIG_DELAYS_BADGEINS       = "eventdelays.badgeins.secs.max";
-    public static final String CONFIG_DELAYS_NEWCUSTOMERS   = "eventdelays.newcustomers.secs.max";
-    public static final String CONFIG_DELAYS_SENSORREADINGS = "eventdelays.sensorreadings.secs.max";
-    public static final String CONFIG_DELAYS_ONLINEORDERS   = "eventdelays.onlineorders.secs.max";
-    public static final String CONFIG_DELAYS_OUTOFSTOCKS    = "eventdelays.outofstocks.secs.max";
-    public static final String CONFIG_DELAYS_RETURNREQUESTS   = "eventdelays.returnrequests.secs.max";
-    public static final String CONFIG_DELAYS_PRODUCTREVIEWS   = "eventdelays.productreviews.secs.max";
+    public static final String CONFIG_DELAYS_ORDERS                 = "eventdelays.orders.secs.max";
+    public static final String CONFIG_DELAYS_CANCELLATIONS          = "eventdelays.cancellations.secs.max";
+    public static final String CONFIG_DELAYS_STOCKMOVEMENTS         = "eventdelays.stockmovements.secs.max";
+    public static final String CONFIG_DELAYS_BADGEINS               = "eventdelays.badgeins.secs.max";
+    public static final String CONFIG_DELAYS_NEWCUSTOMERS           = "eventdelays.newcustomers.secs.max";
+    public static final String CONFIG_DELAYS_SENSORREADINGS         = "eventdelays.sensorreadings.secs.max";
+    public static final String CONFIG_DELAYS_ONLINEORDERS           = "eventdelays.onlineorders.secs.max";
+    public static final String CONFIG_DELAYS_OUTOFSTOCKS            = "eventdelays.outofstocks.secs.max";
+    public static final String CONFIG_DELAYS_RETURNREQUESTS         = "eventdelays.returnrequests.secs.max";
+    public static final String CONFIG_DELAYS_PRODUCTREVIEWS         = "eventdelays.productreviews.secs.max";
+    public static final String CONFIG_DELAYS_ABANDONEDSHOPPINGCARTS = "eventdelays.abandonedshoppingcarts.secs.max";
 
     private static final String CONFIG_GROUP_DUPLICATES = "Duplicate events";
-    public static final String CONFIG_DUPLICATE_ORDERS         = "duplicates.orders.ratio";
-    public static final String CONFIG_DUPLICATE_CANCELLATIONS  = "duplicates.cancellations.ratio";
-    public static final String CONFIG_DUPLICATE_STOCKMOVEMENTS = "duplicates.stockmovements.ratio";
-    public static final String CONFIG_DUPLICATE_BADGEINS       = "duplicates.badgeins.ratio";
-    public static final String CONFIG_DUPLICATE_NEWCUSTOMERS   = "duplicates.newcustomers.ratio";
-    public static final String CONFIG_DUPLICATE_SENSORREADINGS = "duplicates.sensorreadings.ratio";
-    public static final String CONFIG_DUPLICATE_ONLINEORDERS   = "duplicates.onlineorders.ratio";
-    public static final String CONFIG_DUPLICATE_OUTOFSTOCKS    = "duplicates.outofstocks.ratio";
-    public static final String CONFIG_DUPLICATE_RETURNREQUESTS = "duplicates.returnrequests.ratio";
-    public static final String CONFIG_DUPLICATE_PRODUCTREVIEWS = "duplicates.productreviews.ratio";
+    public static final String CONFIG_DUPLICATE_ORDERS                  = "duplicates.orders.ratio";
+    public static final String CONFIG_DUPLICATE_CANCELLATIONS           = "duplicates.cancellations.ratio";
+    public static final String CONFIG_DUPLICATE_STOCKMOVEMENTS          = "duplicates.stockmovements.ratio";
+    public static final String CONFIG_DUPLICATE_BADGEINS                = "duplicates.badgeins.ratio";
+    public static final String CONFIG_DUPLICATE_NEWCUSTOMERS            = "duplicates.newcustomers.ratio";
+    public static final String CONFIG_DUPLICATE_SENSORREADINGS          = "duplicates.sensorreadings.ratio";
+    public static final String CONFIG_DUPLICATE_ONLINEORDERS            = "duplicates.onlineorders.ratio";
+    public static final String CONFIG_DUPLICATE_OUTOFSTOCKS             = "duplicates.outofstocks.ratio";
+    public static final String CONFIG_DUPLICATE_RETURNREQUESTS          = "duplicates.returnrequests.ratio";
+    public static final String CONFIG_DUPLICATE_PRODUCTREVIEWS          = "duplicates.productreviews.ratio";
+    public static final String CONFIG_DUPLICATE_ABANDONEDSHOPPINGCARTS  = "duplicates.abandonedshoppingcarts.ratio";
 
     private static final String CONFIG_GROUP_TIMES = "Timings";
-    public static final String CONFIG_TIMES_ORDERS             = "timings.ms.orders";
-    public static final String CONFIG_TIMES_FALSEPOSITIVES     = "timings.ms.falsepositives";
-    public static final String CONFIG_TIMES_SUSPICIOUSORDERS   = "timings.ms.suspiciousorders";
-    public static final String CONFIG_TIMES_STOCKMOVEMENTS     = "timings.ms.stockmovements";
-    public static final String CONFIG_TIMES_BADGEINS           = "timings.ms.badgeins";
-    public static final String CONFIG_TIMES_NEWCUSTOMERS       = "timings.ms.newcustomers";
-    public static final String CONFIG_TIMES_SENSORREADINGS     = "timings.ms.sensorreadings";
-    public static final String CONFIG_TIMES_HIGHSENSORREADINGS = "timings.ms.highsensorreadings";
-    public static final String CONFIG_TIMES_ONLINEORDERS       = "timings.ms.onlineorders";
-    public static final String CONFIG_TIMES_RETURNREQUESTS     = "timings.ms.returnrequests";
-    public static final String CONFIG_TIMES_PRODUCTREVIEWS     = "timings.ms.productreviews";
+    public static final String CONFIG_TIMES_ORDERS                  = "timings.ms.orders";
+    public static final String CONFIG_TIMES_FALSEPOSITIVES          = "timings.ms.falsepositives";
+    public static final String CONFIG_TIMES_SUSPICIOUSORDERS        = "timings.ms.suspiciousorders";
+    public static final String CONFIG_TIMES_STOCKMOVEMENTS          = "timings.ms.stockmovements";
+    public static final String CONFIG_TIMES_BADGEINS                = "timings.ms.badgeins";
+    public static final String CONFIG_TIMES_NEWCUSTOMERS            = "timings.ms.newcustomers";
+    public static final String CONFIG_TIMES_SENSORREADINGS          = "timings.ms.sensorreadings";
+    public static final String CONFIG_TIMES_HIGHSENSORREADINGS      = "timings.ms.highsensorreadings";
+    public static final String CONFIG_TIMES_ONLINEORDERS            = "timings.ms.onlineorders";
+    public static final String CONFIG_TIMES_RETURNREQUESTS          = "timings.ms.returnrequests";
+    public static final String CONFIG_TIMES_PRODUCTREVIEWS          = "timings.ms.productreviews";
+    public static final String CONFIG_TIMES_ABANDONEDSHOPPINGCARTS  = "timings.ms.abandonedshoppingcarts";
 
     private static final String CONFIG_GROUP_BEHAVIOR = "Behavior";
     public static final String CONFIG_BEHAVIOR_STARTUPHISTORY = "startup.history.enabled";
@@ -259,6 +271,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Name of the topic to use for product review events",
                     CONFIG_GROUP_TOPICNAMES, 10, Width.LONG, "Product reviews topic")
+        .define(CONFIG_TOPICNAME_ABANDONEDSHOPPINGCARTS,
+                    Type.STRING,
+                    "ABANDONED.SHOPPING.CARTS",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for abandoned shopping cart events",
+                    CONFIG_GROUP_TOPICNAMES, 10, Width.LONG, "Abandoned shopping carts topic")
         //
         // how to generate locations
         //
@@ -684,6 +703,44 @@ public class DatagenSourceConfig {
                     "Maximum delay before a product review event is generated after a return request has been issued, in milliseconds. Must be at least 120000.",
                     CONFIG_GROUP_PRODUCTREVIEWS, 4, Width.SHORT, "Max product review event delay")
         //
+        // Generating abandoned shopping carts
+        //
+        .define(CONFIG_ABANDONEDSHOPPINGCARTS_PRODUCTS_MIN,
+                    Type.INT,
+                    1,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Minimum number of products in an abandoned shopping cart. Must be greater than 0.",
+                    CONFIG_GROUP_ABANDONEDSHOPPINGCARTS, 1, Width.SHORT, "Min product count")
+        .define(CONFIG_ABANDONEDSHOPPINGCARTS_PRODUCTS_MAX,
+                    Type.INT,
+                    5,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Maximum number of products in an abandoned shopping cart. Must be greater than 0.",
+                    CONFIG_GROUP_ABANDONEDSHOPPINGCARTS, 2, Width.SHORT, "Max product count")
+        .define(CONFIG_ABANDONEDSHOPPINGCARTS_CUSTOMER_EMAILS_MIN,
+                    Type.INT,
+                    1,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Minimum number of emails for a customer in an abandoned shopping cart. Must be greater than 0.",
+                    CONFIG_GROUP_ABANDONEDSHOPPINGCARTS, 3, Width.SHORT, "Min customer email count")
+        .define(CONFIG_ABANDONEDSHOPPINGCARTS_CUSTOMER_EMAILS_MAX,
+                    Type.INT,
+                    2,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Maximum number of emails for a customer in an abandoned shopping cart. Must be greater than 0.",
+                    CONFIG_GROUP_ABANDONEDSHOPPINGCARTS, 4, Width.SHORT, "Max customer email count")
+        .define(CONFIG_ABANDONEDSHOPPINGCARTS_PRODUCT_RATIO,
+                    Type.DOUBLE,
+                    0.75,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Ratio of total available products that are considered for abandoned shopping carts. Must be between 0 and 1.",
+                    CONFIG_GROUP_ABANDONEDSHOPPINGCARTS, 5, Width.SHORT, "Product ratio")
+        //
         // how long to delay messages before producing them to Kafka
         //
         .define(CONFIG_DELAYS_ORDERS,
@@ -756,6 +813,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Maximum delay (in *seconds*) to produce new product review events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 10, Width.SHORT, "Product review events - max produce delay")
+        .define(CONFIG_DELAYS_ABANDONEDSHOPPINGCARTS,
+                    Type.INT,
+                    0, // payload time matching event time by default
+                    Range.between(0, 900),  // up to 15 mins max
+                    Importance.LOW,
+                    "Maximum delay (in *seconds*) to produce new abandoned shopping cart events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    CONFIG_GROUP_DELAYS, 10, Width.SHORT, "Abandoned shopping cart events - max produce delay")
         //
         // likelihood of producing duplicate messages
         //
@@ -829,6 +893,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Ratio of product review events that should be duplicated. Must be between 0 and 1.",
                     CONFIG_GROUP_DUPLICATES, 10, Width.SHORT, "Duplicate product review events ratio")
+        .define(CONFIG_DUPLICATE_ABANDONEDSHOPPINGCARTS,
+                    Type.DOUBLE,
+                    0,   // don't create duplicate events by default
+                    Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
+                    Importance.LOW,
+                    "Ratio of abandoned shopping cart events that should be duplicated. Must be between 0 and 1.",
+                    CONFIG_GROUP_DUPLICATES, 10, Width.SHORT, "Duplicate abandoned shopping cart events ratio")
         //
         // How frequently to generate messages
         //
@@ -909,6 +980,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Delay, in milliseconds, between each product review that should be generated.",
                     CONFIG_GROUP_TIMES, 11, Width.MEDIUM, "Product reviews delay")
+        .define(CONFIG_TIMES_ABANDONEDSHOPPINGCARTS,
+                    Type.INT,
+                    60_000, // 1 minute
+                    Range.atLeast(30_000), // 30 seconds
+                    Importance.LOW,
+                    "Delay, in milliseconds, between each abandoned shopping cart that should be generated.",
+                    CONFIG_GROUP_TIMES, 11, Width.MEDIUM, "Abandoned carts delay")
         //
         // Startup behaviour
         //

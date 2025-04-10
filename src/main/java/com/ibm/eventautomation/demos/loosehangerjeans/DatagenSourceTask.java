@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductReviewGenerator;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.AbandonedShoppingCartsTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.BadgeInTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.FalsePositivesTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.HighSensorReadingTask;
@@ -137,6 +138,10 @@ public class DatagenSourceTask extends SourceTask {
         // product reviews
         ProductReviewsTask productReviews = new ProductReviewsTask(config, queue, productReviewGenerator);
         generateTimer.scheduleAtFixedRate(productReviews, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_PRODUCTREVIEWS));
+
+        // abandoned shopping carts
+        AbandonedShoppingCartsTask abandonedShoppingCarts = new AbandonedShoppingCartsTask(config, queue);
+        generateTimer.scheduleAtFixedRate(abandonedShoppingCarts, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_ABANDONEDSHOPPINGCARTS));
     }
 
 

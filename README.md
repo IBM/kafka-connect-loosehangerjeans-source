@@ -4,18 +4,19 @@ Kafka Connect source connector used for generating simulated events for demos an
 
 It produces messages simulating the following events:
 
-| **Topic name**    | **Description**                                       |
-|-------------------|-------------------------------------------------------|
-| `DOOR.BADGEIN`    | An employee using their id badge to go through a door |
-| `CANCELLATIONS`   | An order being cancelled                              |
-| `CUSTOMERS.NEW`   | A new customer has registered on the website          |
-| `ORDERS.NEW`      | An order has been placed                              |
-| `SENSOR.READINGS` | A sensor reading captured from an IoT sensor          |
-| `STOCK.MOVEMENT`  | Stock shipment received by a warehouse                |
-| `ORDERS.ONLINE`   | An online order has been placed                       |
-| `STOCK.NOSTOCK`   | A product has run out-of-stock                        |
-| `PRODUCT.RETURNS` | A return request has been issued                      |
-| `PRODUCT.REVIEWS` | A product review has been posted                      |
+| **Topic name**             | **Description**                                                                               |
+|----------------------------|-----------------------------------------------------------------------------------------------|
+| `DOOR.BADGEIN`             | An employee using their id badge to go through a door                                         |
+| `CANCELLATIONS`            | An order being cancelled                                                                      |
+| `CUSTOMERS.NEW`            | A new customer has registered on the website                                                  |
+| `ORDERS.NEW`               | An order has been placed                                                                      |
+| `SENSOR.READINGS`          | A sensor reading captured from an IoT sensor                                                  |
+| `STOCK.MOVEMENT`           | Stock shipment received by a warehouse                                                        |
+| `ORDERS.ONLINE`            | An online order has been placed                                                               |
+| `STOCK.NOSTOCK`            | A product has run out-of-stock                                                                |
+| `PRODUCT.RETURNS`          | A return request has been issued                                                              |
+| `PRODUCT.REVIEWS`          | A product review has been posted                                                              |
+| `ABANDONED.SHOPPING.CARTS` | A customer has added items to their shopping cart but left it without completing the purchase |
 
 
 Avro schemas and sample messages for each of these topics can be found in the `./doc` folder.
@@ -368,6 +369,21 @@ spec:
     productreviews.delay.ms.min: 300000   # 5 minutes
     productreviews.delay.ms.max: 3600000  # 1 hour
 
+    #
+    # abandoned shopping carts
+    #
+    # these events are intended to represent shopping carts that were abandoned before checkout,
+    #
+    # number of products to include in an abandoned shopping cart: between 1 and 5 (inclusive)
+    abandonedshoppingcarts.products.min: 1
+    abandonedshoppingcarts.products.max: 5
+    # number of emails for the customer who abandoned the shopping cart: between 1 and 2 (inclusive)
+    abandonedshoppingcarts.customer.emails.min: 1
+    abandonedshoppingcarts.customer.emails.max: 2
+    # ratio of total available products that are considered for abandoned shopping carts
+    #   between 0.0 and 1.0 : 0.0 means no products are eligible to be included
+    #                         1.0 means all products are eligible
+    abandonedshoppingcarts.product.ratio: 0.75
     #
     # locations that are referred to in generated events
     #

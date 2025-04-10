@@ -44,7 +44,7 @@ public class AbandonedShoppingCart extends LoosehangerData {
     private final String abandonTime;
 
     /** Email address of the customer */
-    private final String email;
+    private final List<String> emails;
 
     /** Details of the customer who abandoned the cart */
     private final OnlineCustomer customer;
@@ -58,26 +58,26 @@ public class AbandonedShoppingCart extends LoosehangerData {
             .version(1)
             .field("cartId",         Schema.STRING_SCHEMA)
             .field("abandonTime",    Schema.STRING_SCHEMA)
-            .field("email",          Schema.STRING_SCHEMA)
+            .field("emails",         SchemaBuilder.array(Schema.STRING_SCHEMA).build())
             .field("customer",       OnlineCustomer.SCHEMA)
             .field("products",       SchemaBuilder.array(Product.SCHEMA))
             .build();
 
     /** Creates an {@link AbandonedShoppingCart} using the provided details */
-    public AbandonedShoppingCart(String cartId, String abandonTime, String email, OnlineCustomer customer,
+    public AbandonedShoppingCart(String cartId, String abandonTime, List<String> emails, OnlineCustomer customer,
                                  List<Product> products, ZonedDateTime recordTimestamp) {
         super(recordTimestamp);
         this.cartId = cartId;
         this.abandonTime = abandonTime;
-        this.email = email;
+        this.emails = emails;
         this.customer = customer;
         this.products = products;
     }
 
     /** Creates an {@link AbandonedShoppingCart} with a generated cart ID */
-    public AbandonedShoppingCart(String abandonTime, String email, OnlineCustomer customer,
+    public AbandonedShoppingCart(String abandonTime, List<String> emails, OnlineCustomer customer,
                                  List<Product> products, ZonedDateTime recordTimestamp) {
-        this(UUID.randomUUID().toString(), abandonTime, email, customer, products, recordTimestamp);
+        this(UUID.randomUUID().toString(), abandonTime, emails, customer, products, recordTimestamp);
     }
 
     public String getCartId() {
@@ -88,8 +88,8 @@ public class AbandonedShoppingCart extends LoosehangerData {
         return abandonTime;
     }
 
-    public String getEmail() {
-        return email;
+    public List<String> getEmails() {
+        return emails;
     }
 
     public OnlineCustomer getCustomer() {
@@ -119,7 +119,7 @@ public class AbandonedShoppingCart extends LoosehangerData {
         Struct struct = new Struct(SCHEMA);
         struct.put("cartId", cartId);
         struct.put("abandonTime", abandonTime);
-        struct.put("email", email);
+        struct.put("emails", customer.getEmails());
         struct.put("customer", customer.toStruct());
         struct.put("products", products.stream().map(Product::toStruct).collect(Collectors.toList()));
         return struct;
@@ -128,7 +128,7 @@ public class AbandonedShoppingCart extends LoosehangerData {
     @Override
     public String toString() {
         return "AbandonedShoppingCart [cartId=" + cartId + ", abandonTime=" + abandonTime
-                + ", email=" + email + ", customer=" + customer
+                + ", emails=" + Arrays.toString(emails.toArray()) + ", customer=" + customer
                 + ", products=" + Arrays.toString(products.toArray()) + "]";
     }
 }
