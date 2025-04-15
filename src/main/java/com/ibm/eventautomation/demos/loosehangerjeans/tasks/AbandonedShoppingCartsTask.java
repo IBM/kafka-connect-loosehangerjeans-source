@@ -45,6 +45,7 @@ public class AbandonedShoppingCartsTask extends TimerTask {
 
     public AbandonedShoppingCartsTask(AbstractConfig config,
                                       Queue<SourceRecord> queue) {
+        // fixme
         this.abandonedShoppingCartGenerator = new AbandonedShoppingCartGenerator(config);
         this.queue = queue;
 
