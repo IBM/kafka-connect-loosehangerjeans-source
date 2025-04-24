@@ -58,7 +58,7 @@ public class TransactionGenerator extends Generator<Transaction> {
               config.getString(DatagenSourceConfig.CONFIG_FORMATS_TIMESTAMPS));
 
         this.transactionIds = IntStream.range(1, config.getInt(DatagenSourceConfig.CONFIG_TRANSACTIONS_IDS))
-                                       .mapToObj(String::valueOf)
+                                       .mapToObj(number -> "T" + number)
                                        .collect(Collectors.toList());
 
         this.minAmount = config.getDouble(DatagenSourceConfig.CONFIG_TRANSACTIONS_AMOUNT_MIN);
