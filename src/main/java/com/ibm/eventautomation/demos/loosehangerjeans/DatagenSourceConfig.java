@@ -269,12 +269,12 @@ public class DatagenSourceConfig {
                     "Name of the topic to use for product review events",
                     CONFIG_GROUP_TOPICNAMES, 10, Width.LONG, "Product reviews topic")
         .define(CONFIG_TOPICNAME_TRANSACTIONS,
-	                Type.STRING,
-	                "TRANSACTIONS",
-	                new NonEmptyString(),
-	                Importance.LOW,
-	                "Name of the topic to use for transaction events",
-	                CONFIG_GROUP_TOPICNAMES, 11, Width.LONG, "Transactions topic")
+                    Type.STRING,
+                    "TRANSACTIONS",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for transaction events",
+                    CONFIG_GROUP_TOPICNAMES, 11, Width.LONG, "Transactions topic")
 
         //
         // how to generate locations
@@ -705,26 +705,26 @@ public class DatagenSourceConfig {
         // Generating transactions
         //
         .define(CONFIG_TRANSACTIONS_IDS,
-        		    Type.INT,
-        		    5,
-        		    Range.atLeast(1),
-        		    Importance.LOW,
-        		    "Number of transactions identifiers",
-        		    CONFIG_GROUP_TRANSACTIONS, 1, Width.SHORT, "Number of transaction identifiers")
+                    Type.INT,
+                    5,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Number of transactions identifiers",
+                    CONFIG_GROUP_TRANSACTIONS, 1, Width.SHORT, "Number of transaction identifiers")
         .define(CONFIG_TRANSACTIONS_AMOUNT_MIN,
-        			Type.DOUBLE,
-        			100,
-        			Range.atLeast(100),
-        			Importance.LOW,
-        			"Minimum amount of a transaction",
-        			CONFIG_GROUP_TRANSACTIONS, 2, Width.SHORT, "Min transaction amount")
+                    Type.DOUBLE,
+                    100,
+                    Range.atLeast(100),
+                    Importance.LOW,
+                    "Minimum amount of a transaction",
+                    CONFIG_GROUP_TRANSACTIONS, 2, Width.SHORT, "Min transaction amount")
         .define(CONFIG_TRANSACTIONS_AMOUNT_MAX,
-        			Type.DOUBLE,
-        			1000,
-        			Range.between(100, 1000),
-        			Importance.LOW,
-        			"Maximum amount of a transaction",
-        			CONFIG_GROUP_TRANSACTIONS, 3, Width.SHORT, "Max transaction amount")
+                    Type.DOUBLE,
+                    1000,
+                    Range.between(100, 1000),
+                    Importance.LOW,
+                    "Maximum amount of a transaction",
+                    CONFIG_GROUP_TRANSACTIONS, 3, Width.SHORT, "Max transaction amount")
 
         //
         // how long to delay messages before producing them to Kafka
@@ -800,7 +800,7 @@ public class DatagenSourceConfig {
                     "Maximum delay (in *seconds*) to produce new product review events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 10, Width.SHORT, "Product review events - max produce delay")
         .define(CONFIG_DELAYS_TRANSACTIONS,
-        			Type.INT,
+                    Type.INT,
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
@@ -881,7 +881,7 @@ public class DatagenSourceConfig {
                     "Ratio of product review events that should be duplicated. Must be between 0 and 1.",
                     CONFIG_GROUP_DUPLICATES, 10, Width.SHORT, "Duplicate product review events ratio")
         .define(CONFIG_DUPLICATE_TRANSACTIONS,
-        			Type.DOUBLE,
+                    Type.DOUBLE,
                     0,   // don't create duplicate events by default
                     Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
                     Importance.LOW,
@@ -969,12 +969,12 @@ public class DatagenSourceConfig {
                     "Delay, in milliseconds, between each product review that should be generated.",
                     CONFIG_GROUP_TIMES, 11, Width.MEDIUM, "Product reviews delay")
         .define(CONFIG_TIMES_TRANSACTIONS,
-	                Type.INT,
-	                20_000, // 20 seconds
-	                Range.atLeast(5_000),  // 5 seconds
-	                Importance.LOW,
-	                "Delay, in milliseconds, between each transaction that should be generated.",
-	                CONFIG_GROUP_TIMES, 12, Width.MEDIUM, "Sensor readings delay")
+                    Type.INT,
+                    20_000, // 20 seconds
+                    Range.atLeast(5_000),  // 5 seconds
+                    Importance.LOW,
+                    "Delay, in milliseconds, between each transaction that should be generated.",
+                    CONFIG_GROUP_TIMES, 12, Width.MEDIUM, "Sensor readings delay")
 
         //
         // Startup behaviour
