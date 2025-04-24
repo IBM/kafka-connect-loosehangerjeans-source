@@ -24,10 +24,19 @@ import java.time.ZonedDateTime;
 
 /**
  * Information about a transaction.
+ * 
+ * A commercial website has to perform financial transactions with its bank.
+ * Each transaction allows to transfer money in several steps instead of a single huge transfer. 
+ * Each step of the transaction generates an event containing the unique identifier of the transaction, 
+ * the transmitted amount of money, a timestamp and the state of the transaction that can be one of STARTED, PROCESSING or COMPLETED.
+ * 
+ * Assuming that valid transactions are composed of four transaction event with states STARTED, PROCESSING, PROCESSING and COMPLETED
+ * respectively, it is possible to use the detect pattern node of IBM Event Processing to detect if a transaction does not yield
+ * an event with a state COMPLETED in a given timeframe.
  */
 public class Transaction extends LoosehangerData {
 
-	public static final String PARTITION = "transaction";
+    public static final String PARTITION = "transaction";
 
     /** Unique ID for this event. */
     private String id;

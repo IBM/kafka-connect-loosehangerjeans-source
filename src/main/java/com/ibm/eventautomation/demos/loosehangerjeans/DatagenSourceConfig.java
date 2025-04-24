@@ -776,7 +776,7 @@ public class DatagenSourceConfig {
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
-                    "Maximum delay (in *seconds*) to produce new online order events <(this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    "Maximum delay (in *seconds*) to produce new online order events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 7, Width.SHORT, "Online order events - max produce delay")
         .define(CONFIG_DELAYS_OUTOFSTOCKS,
                     Type.INT,

@@ -34,7 +34,7 @@ import java.util.stream.IntStream;
  */
 public class TransactionGenerator extends Generator<Transaction> {
 
-    /** transition states. */
+    /** transaction states. */
     enum TransactionState {
         STARTED, PROCESSING, COMPLETED
     }

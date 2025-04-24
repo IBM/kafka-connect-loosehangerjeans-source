@@ -35,7 +35,7 @@ public class TransactionTask extends TimerTask {
      */
     private Queue<SourceRecord> queue;
 
-	/** Name of the topic to produce transaction to. */
+    /** Name of the topic to produce transaction to. */
     private String topicname;
 
 
@@ -48,13 +48,13 @@ public class TransactionTask extends TimerTask {
         this.queue = queue;
         this.topicname = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_TRANSACTIONS);
     }
-	@Override
-	public void run() {
+    @Override
+    public void run() {
         SourceRecord rec = generator.generate().createSourceRecord(topicname);
         queue.add(rec);
 
         if (generator.shouldDuplicate()) {
             queue.add(rec);
         }
-	}
+    }
 }
