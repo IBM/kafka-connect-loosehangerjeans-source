@@ -40,7 +40,7 @@ public class TransactionGenerator extends Generator<Transaction> {
     }
 
     /** status of generated transactions. */
-    protected static Map<String, LinkedList<TransactionState>> transactionStatuses = new HashMap<>();;
+    protected static Map<String, LinkedList<TransactionState>> transactionStatuses = new HashMap<>();
 
     /** transaction context keys. */
     protected final List<String> transactionIds;
@@ -65,6 +65,15 @@ public class TransactionGenerator extends Generator<Transaction> {
         this.maxAmount = config.getDouble(DatagenSourceConfig.CONFIG_TRANSACTIONS_AMOUNT_MAX);
     }
 
+    /**
+     * Generation of sequences of transaction events.
+     * For each transactionId, the sequence can be either
+     *   STARTED -> PROCESSING -> PROCESSING -> COMPLETED
+     * or
+     *   STARTED -> PROCESSING -> PROCESSING
+     * The purpose is to be able to detect a pattern like this
+     *   (1 x STARTED) followedBy (2 x PROCESSING) notFollowedBy (1 x COMPLETED) within a timeframe
+     */
     @Override
     protected Transaction generateEvent(ZonedDateTime timestamp) {
         final Transaction transaction;
@@ -77,13 +86,13 @@ public class TransactionGenerator extends Generator<Transaction> {
             final LinkedList<TransactionState> states = transactionStatuses.get(id);
             final TransactionState state = states.getLast();
 
-            // transition started -> processing
+            // transition STARTED -> PROCESSING
             if (state == TransactionState.STARTED) {
                 newState = TransactionState.PROCESSING;
                 states.add(newState);
                 transactionStatuses.put(id, states);
 
-            // transition processing -> processing or processing -> completed
+            // transition PROCESSING -> PROCESSING or PROCESSING -> COMPLETED
             } else if (state == TransactionState.PROCESSING) {
                 if (states.stream().filter(s -> s.equals(TransactionState.PROCESSING)).count() < 2) {
                     newState = TransactionState.PROCESSING;
