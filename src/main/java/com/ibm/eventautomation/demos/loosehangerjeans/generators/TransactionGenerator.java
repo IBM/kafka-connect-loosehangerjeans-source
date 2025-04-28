@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -52,6 +51,9 @@ public class TransactionGenerator extends Generator<Transaction> {
     /** maximum amount for randomly selected transaction. */
     protected final double maxAmount;
 
+    /** ratio of transactions that should be complete and valid */
+    protected final double validTransactionsRatio;
+
     public TransactionGenerator(AbstractConfig config) {
         super(config.getInt(DatagenSourceConfig.CONFIG_TIMES_TRANSACTIONS),
               config.getInt(DatagenSourceConfig.CONFIG_DELAYS_TRANSACTIONS),
@@ -64,14 +66,17 @@ public class TransactionGenerator extends Generator<Transaction> {
 
         this.minAmount = config.getDouble(DatagenSourceConfig.CONFIG_TRANSACTIONS_AMOUNT_MIN);
         this.maxAmount = config.getDouble(DatagenSourceConfig.CONFIG_TRANSACTIONS_AMOUNT_MAX);
+        this.validTransactionsRatio = config.getDouble(DatagenSourceConfig.CONFIG_TRANSACTIONS_VALID_RATIO);
     }
 
     /**
      * Generation of sequences of transaction events.
+     *
      * For each transactionId, the sequence can be either
      *   STARTED -> PROCESSING -> PROCESSING -> COMPLETED
      * or
      *   STARTED -> PROCESSING -> PROCESSING
+     *
      * The purpose is to be able to detect a pattern like this
      *   (1 x STARTED) followedBy (2 x PROCESSING) notFollowedBy (1 x COMPLETED) within a timeframe
      */
@@ -101,7 +106,7 @@ public class TransactionGenerator extends Generator<Transaction> {
                     transactionStatuses.put(id, states);
                 } else {
                     // randomly generates a transaction completed before closing the transaction
-                    if (new Random().nextDouble() <= 0.2) {
+                    if (Generators.shouldDo(validTransactionsRatio)) {
                         newState = TransactionState.COMPLETED;
                         transactionStatuses.remove(id);
 

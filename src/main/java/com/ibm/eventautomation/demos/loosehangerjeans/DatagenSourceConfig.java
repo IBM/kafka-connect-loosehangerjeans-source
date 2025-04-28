@@ -127,9 +127,10 @@ public class DatagenSourceConfig {
     public static final String CONFIG_PRODUCTREVIEWS_MAX_DELAY                          = "productreviews.delay.ms.max";
 
     private static final String CONFIG_GROUP_TRANSACTIONS = "Transactions";
-    public static final String CONFIG_TRANSACTIONS_IDS        = "transactions.max.ids";
-    public static final String CONFIG_TRANSACTIONS_AMOUNT_MIN = "transactions.amount.min";
-    public static final String CONFIG_TRANSACTIONS_AMOUNT_MAX = "transactions.amount.max";
+    public static final String CONFIG_TRANSACTIONS_IDS         = "transactions.max.ids";
+    public static final String CONFIG_TRANSACTIONS_AMOUNT_MIN  = "transactions.amount.min";
+    public static final String CONFIG_TRANSACTIONS_AMOUNT_MAX  = "transactions.amount.max";
+    public static final String CONFIG_TRANSACTIONS_VALID_RATIO = "transactions.valid.ratio";
 
     private static final String CONFIG_GROUP_DELAYS = "Event delays";
     public static final String CONFIG_DELAYS_ORDERS         = "eventdelays.orders.secs.max";
@@ -725,6 +726,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Maximum amount of a transaction",
                     CONFIG_GROUP_TRANSACTIONS, 3, Width.SHORT, "Max transaction amount")
+        .define(CONFIG_TRANSACTIONS_VALID_RATIO,
+                    Type.DOUBLE,
+                    0.8,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Ratio of transactions that are valid and complete. Must be between 0 (no transactions are valid) and 1 (all transactions are valid)",
+                    CONFIG_GROUP_TRANSACTIONS, 4, Width.SHORT, "Valid transactions ratio")
 
         //
         // how long to delay messages before producing them to Kafka

@@ -388,7 +388,7 @@ spec:
     #  ANZ  : AU (Australia), NZ (New Zealand)
     locations.regions.countries: NA:CA,US,MX;SA:BR,PY,UY;EMEA:BE,FR,CH,GB,DE,ES;APAC:ID,SG,BN,PH;ANZ:AU,NZ
     locations.warehouses: North,South,West,East,Central
-    
+
     #
     # transactions
     #
@@ -399,6 +399,10 @@ spec:
     transactions.amount.min: 100.0
     # maximum amount of a transaction
     transactions.amount.max: 1000.0
+    # ratio of the transactions that should be a complete sequence of
+    #  STARTED -> PROCESSING -> PROCESSING -> COMPLETED
+    transactions.valid.ratio: 0.8  # 80% of transactions are complete
+                                   # 20% of transactions omit an event
 ```
 
 For example, if you want to theme the demo to be based on products in a different industry, you could adjust product sizes/materials/styles/name to match your demo (the options don't need to actually be "sizes", "materials" or "styles" - they just need to be lists that will make sense when combined into a single string).
