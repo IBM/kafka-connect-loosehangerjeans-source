@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -100,7 +101,7 @@ public class TransactionGenerator extends Generator<Transaction> {
                     transactionStatuses.put(id, states);
                 } else {
                     // randomly generates a transaction completed before closing the transaction
-                    if (Generators.randomBoolean()) {
+                    if (new Random().nextDouble() <= 0.2) {
                         newState = TransactionState.COMPLETED;
                         transactionStatuses.remove(id);
 
