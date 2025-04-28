@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 IBM Corp. All Rights Reserved.
+ * Copyright 2023, 2025 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class DatagenSourceConnector extends SourceConnector {
 
-    protected static final String VERSION = "0.2.1";
+    protected static final String VERSION = "0.3.0";
 
     private final Logger log = LoggerFactory.getLogger(DatagenSourceConnector.class);
 

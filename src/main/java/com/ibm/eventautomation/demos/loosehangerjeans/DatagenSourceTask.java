@@ -36,6 +36,8 @@ import com.ibm.eventautomation.demos.loosehangerjeans.tasks.ReturnRequestsTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SensorReadingTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.StockMovementsTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SuspiciousOrdersTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.TransactionTask;
+
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
@@ -137,6 +139,10 @@ public class DatagenSourceTask extends SourceTask {
         // product reviews
         ProductReviewsTask productReviews = new ProductReviewsTask(config, queue, productReviewGenerator);
         generateTimer.scheduleAtFixedRate(productReviews, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_PRODUCTREVIEWS));
+
+        // transactions
+        TransactionTask transactions = new TransactionTask(config, queue);
+        generateTimer.scheduleAtFixedRate(transactions, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_TRANSACTIONS));
     }
 
 
