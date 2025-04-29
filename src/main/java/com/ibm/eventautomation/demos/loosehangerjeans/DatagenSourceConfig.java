@@ -707,7 +707,7 @@ public class DatagenSourceConfig {
         //
         .define(CONFIG_TRANSACTIONS_IDS,
                     Type.INT,
-                    5,
+                    6,
                     Range.atLeast(1),
                     Importance.LOW,
                     "Number of transactions identifiers",
