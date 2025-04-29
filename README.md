@@ -394,7 +394,7 @@ spec:
     #
     #  these events are intended to represent transaction requests
     #
-    transactions.max.ids: 5
+    transactions.max.ids: 6
     # minimum amount of a transaction
     transactions.amount.min: 100.0
     # maximum amount of a transaction
