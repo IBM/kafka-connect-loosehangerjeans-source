@@ -38,17 +38,18 @@ public class DatagenSourceConfig {
     public static final String CONFIG_FORMATS_TIMESTAMPS_LTZ    = "formats.timestamps.ltz";
 
     private static final String CONFIG_GROUP_TOPICNAMES = "Topic names";
-    public static final String CONFIG_TOPICNAME_ORDERS         = "topic.name.orders";
-    public static final String CONFIG_TOPICNAME_CANCELLATIONS  = "topic.name.cancellations";
-    public static final String CONFIG_TOPICNAME_STOCKMOVEMENTS = "topic.name.stockmovements";
-    public static final String CONFIG_TOPICNAME_BADGEINS       = "topic.name.badgeins";
-    public static final String CONFIG_TOPICNAME_CUSTOMERS      = "topic.name.newcustomers";
-    public static final String CONFIG_TOPICNAME_SENSORREADINGS = "topic.name.sensorreadings";
-    public static final String CONFIG_TOPICNAME_ONLINEORDERS   = "topic.name.onlineorders";
-    public static final String CONFIG_TOPICNAME_OUTOFSTOCKS    = "topic.name.outofstocks";
-    public static final String CONFIG_TOPICNAME_RETURNREQUESTS = "topic.name.returnrequests";
-    public static final String CONFIG_TOPICNAME_PRODUCTREVIEWS = "topic.name.productreviews";
-    public static final String CONFIG_TOPICNAME_TRANSACTIONS   = "topic.name.transactions";
+    public static final String CONFIG_TOPICNAME_ORDERS           = "topic.name.orders";
+    public static final String CONFIG_TOPICNAME_CANCELLATIONS    = "topic.name.cancellations";
+    public static final String CONFIG_TOPICNAME_STOCKMOVEMENTS   = "topic.name.stockmovements";
+    public static final String CONFIG_TOPICNAME_BADGEINS         = "topic.name.badgeins";
+    public static final String CONFIG_TOPICNAME_CUSTOMERS        = "topic.name.newcustomers";
+    public static final String CONFIG_TOPICNAME_SENSORREADINGS   = "topic.name.sensorreadings";
+    public static final String CONFIG_TOPICNAME_ONLINEORDERS     = "topic.name.onlineorders";
+    public static final String CONFIG_TOPICNAME_OUTOFSTOCKS      = "topic.name.outofstocks";
+    public static final String CONFIG_TOPICNAME_RETURNREQUESTS   = "topic.name.returnrequests";
+    public static final String CONFIG_TOPICNAME_PRODUCTREVIEWS   = "topic.name.productreviews";
+    public static final String CONFIG_TOPICNAME_TRANSACTIONS     = "topic.name.transactions";
+    public static final String CONFIG_TOPICNAME_ABANDONEDORDERS  = "topic.name.abandonedorders";
 
     private static final String CONFIG_GROUP_LOCATIONS = "Locations";
     public static final String CONFIG_LOCATIONS_REGIONS    = "locations.regions";
@@ -132,31 +133,39 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TRANSACTIONS_AMOUNT_MAX  = "transactions.amount.max";
     public static final String CONFIG_TRANSACTIONS_VALID_RATIO = "transactions.valid.ratio";
 
+    private static final String CONFIG_GROUP_ABANDONEDORDERS = "Abandoned orders";
+    public static final String CONFIG_ABANDONEDORDERS_PRODUCTS_MIN           = "abandonedorders.products.min";
+    public static final String CONFIG_ABANDONEDORDERS_PRODUCTS_MAX           = "abandonedorders.products.max";
+    public static final String CONFIG_ABANDONEDORDERS_CUSTOMER_EMAILS_MIN    = "abandonedorders.customer.emails.min";
+    public static final String CONFIG_ABANDONEDORDERS_CUSTOMER_EMAILS_MAX    = "abandonedorders.customer.emails.max";
+
     private static final String CONFIG_GROUP_DELAYS = "Event delays";
-    public static final String CONFIG_DELAYS_ORDERS         = "eventdelays.orders.secs.max";
-    public static final String CONFIG_DELAYS_CANCELLATIONS  = "eventdelays.cancellations.secs.max";
-    public static final String CONFIG_DELAYS_STOCKMOVEMENTS = "eventdelays.stockmovements.secs.max";
-    public static final String CONFIG_DELAYS_BADGEINS       = "eventdelays.badgeins.secs.max";
-    public static final String CONFIG_DELAYS_NEWCUSTOMERS   = "eventdelays.newcustomers.secs.max";
-    public static final String CONFIG_DELAYS_SENSORREADINGS = "eventdelays.sensorreadings.secs.max";
-    public static final String CONFIG_DELAYS_ONLINEORDERS   = "eventdelays.onlineorders.secs.max";
-    public static final String CONFIG_DELAYS_OUTOFSTOCKS    = "eventdelays.outofstocks.secs.max";
+    public static final String CONFIG_DELAYS_ORDERS           = "eventdelays.orders.secs.max";
+    public static final String CONFIG_DELAYS_CANCELLATIONS    = "eventdelays.cancellations.secs.max";
+    public static final String CONFIG_DELAYS_STOCKMOVEMENTS   = "eventdelays.stockmovements.secs.max";
+    public static final String CONFIG_DELAYS_BADGEINS         = "eventdelays.badgeins.secs.max";
+    public static final String CONFIG_DELAYS_NEWCUSTOMERS     = "eventdelays.newcustomers.secs.max";
+    public static final String CONFIG_DELAYS_SENSORREADINGS   = "eventdelays.sensorreadings.secs.max";
+    public static final String CONFIG_DELAYS_ONLINEORDERS     = "eventdelays.onlineorders.secs.max";
+    public static final String CONFIG_DELAYS_OUTOFSTOCKS      = "eventdelays.outofstocks.secs.max";
     public static final String CONFIG_DELAYS_RETURNREQUESTS   = "eventdelays.returnrequests.secs.max";
     public static final String CONFIG_DELAYS_PRODUCTREVIEWS   = "eventdelays.productreviews.secs.max";
     public static final String CONFIG_DELAYS_TRANSACTIONS     = "eventdelays.transactions.secs.max";
+    public static final String CONFIG_DELAYS_ABANDONEDORDERS  = "eventdelays.abandonedorders.secs.max";
 
     private static final String CONFIG_GROUP_DUPLICATES = "Duplicate events";
-    public static final String CONFIG_DUPLICATE_ORDERS         = "duplicates.orders.ratio";
-    public static final String CONFIG_DUPLICATE_CANCELLATIONS  = "duplicates.cancellations.ratio";
-    public static final String CONFIG_DUPLICATE_STOCKMOVEMENTS = "duplicates.stockmovements.ratio";
-    public static final String CONFIG_DUPLICATE_BADGEINS       = "duplicates.badgeins.ratio";
-    public static final String CONFIG_DUPLICATE_NEWCUSTOMERS   = "duplicates.newcustomers.ratio";
-    public static final String CONFIG_DUPLICATE_SENSORREADINGS = "duplicates.sensorreadings.ratio";
-    public static final String CONFIG_DUPLICATE_ONLINEORDERS   = "duplicates.onlineorders.ratio";
-    public static final String CONFIG_DUPLICATE_OUTOFSTOCKS    = "duplicates.outofstocks.ratio";
-    public static final String CONFIG_DUPLICATE_RETURNREQUESTS = "duplicates.returnrequests.ratio";
-    public static final String CONFIG_DUPLICATE_PRODUCTREVIEWS = "duplicates.productreviews.ratio";
-    public static final String CONFIG_DUPLICATE_TRANSACTIONS   = "duplicates.transactions.ratio";
+    public static final String CONFIG_DUPLICATE_ORDERS          = "duplicates.orders.ratio";
+    public static final String CONFIG_DUPLICATE_CANCELLATIONS   = "duplicates.cancellations.ratio";
+    public static final String CONFIG_DUPLICATE_STOCKMOVEMENTS  = "duplicates.stockmovements.ratio";
+    public static final String CONFIG_DUPLICATE_BADGEINS        = "duplicates.badgeins.ratio";
+    public static final String CONFIG_DUPLICATE_NEWCUSTOMERS    = "duplicates.newcustomers.ratio";
+    public static final String CONFIG_DUPLICATE_SENSORREADINGS  = "duplicates.sensorreadings.ratio";
+    public static final String CONFIG_DUPLICATE_ONLINEORDERS    = "duplicates.onlineorders.ratio";
+    public static final String CONFIG_DUPLICATE_OUTOFSTOCKS     = "duplicates.outofstocks.ratio";
+    public static final String CONFIG_DUPLICATE_RETURNREQUESTS  = "duplicates.returnrequests.ratio";
+    public static final String CONFIG_DUPLICATE_PRODUCTREVIEWS  = "duplicates.productreviews.ratio";
+    public static final String CONFIG_DUPLICATE_TRANSACTIONS    = "duplicates.transactions.ratio";
+    public static final String CONFIG_DUPLICATE_ABANDONEDORDERS = "duplicates.abandonedorders.ratio";
 
     private static final String CONFIG_GROUP_TIMES = "Timings";
     public static final String CONFIG_TIMES_ORDERS             = "timings.ms.orders";
@@ -171,6 +180,7 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TIMES_RETURNREQUESTS     = "timings.ms.returnrequests";
     public static final String CONFIG_TIMES_PRODUCTREVIEWS     = "timings.ms.productreviews";
     public static final String CONFIG_TIMES_TRANSACTIONS       = "timings.ms.transactions";
+    public static final String CONFIG_TIMES_ABANDONEDORDERS    = "timings.ms.abandonedorders";
 
     private static final String CONFIG_GROUP_BEHAVIOR = "Behavior";
     public static final String CONFIG_BEHAVIOR_STARTUPHISTORY = "startup.history.enabled";
@@ -277,6 +287,13 @@ public class DatagenSourceConfig {
                     "Name of the topic to use for transaction events",
                     CONFIG_GROUP_TOPICNAMES, 11, Width.LONG, "Transactions topic")
 
+        .define(CONFIG_TOPICNAME_ABANDONEDORDERS,
+                    Type.STRING,
+                    "ORDERS.ABANDONED",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for abandoned order events",
+                    CONFIG_GROUP_TOPICNAMES, 12, Width.LONG, "Abandoned orders topic")
         //
         // how to generate locations
         //
@@ -735,6 +752,37 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_TRANSACTIONS, 4, Width.SHORT, "Valid transactions ratio")
 
         //
+        // Generating abandoned orders
+        //
+        .define(CONFIG_ABANDONEDORDERS_PRODUCTS_MIN,
+                    Type.INT,
+                    1,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Minimum number of products in an abandoned order. Must be greater than 0.",
+                    CONFIG_GROUP_ABANDONEDORDERS, 1, Width.SHORT, "Min product count")
+        .define(CONFIG_ABANDONEDORDERS_PRODUCTS_MAX,
+                    Type.INT,
+                    5,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Maximum number of products in an abandoned order. Must be greater than 0.",
+                    CONFIG_GROUP_ABANDONEDORDERS, 2, Width.SHORT, "Max product count")
+        .define(CONFIG_ABANDONEDORDERS_CUSTOMER_EMAILS_MIN,
+                    Type.INT,
+                    1,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Minimum number of emails for a customer in an abandoned order. Must be greater than 0.",
+                    CONFIG_GROUP_ABANDONEDORDERS, 3, Width.SHORT, "Min customer email count")
+        .define(CONFIG_ABANDONEDORDERS_CUSTOMER_EMAILS_MAX,
+                    Type.INT,
+                    2,
+                    Range.atLeast(1),
+                    Importance.LOW,
+                    "Maximum number of emails for a customer in an abandoned order. Must be greater than 0.",
+                    CONFIG_GROUP_ABANDONEDORDERS, 4, Width.SHORT, "Max customer email count")
+        //
         // how long to delay messages before producing them to Kafka
         //
         .define(CONFIG_DELAYS_ORDERS,
@@ -814,6 +862,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Maximum delay (in *seconds*) to produce transaction events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 11, Width.SHORT, "Transaction events - max produce delay")
+        .define(CONFIG_DELAYS_ABANDONEDORDERS,
+                    Type.INT,
+                    0, // payload time matching event time by default
+                    Range.between(0, 900),  // up to 15 mins max
+                    Importance.LOW,
+                    "Maximum delay (in *seconds*) to produce new abandoned order events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
+                    CONFIG_GROUP_DELAYS, 12, Width.SHORT, "Abandoned order events - max produce delay")
 
         //
         // likelihood of producing duplicate messages
@@ -895,6 +950,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Ratio of transaction events that should be duplicated. Must be between 0 and 1.",
                     CONFIG_GROUP_DUPLICATES, 11, Width.SHORT, "Duplicate transaction events ratio")
+       .define(CONFIG_DUPLICATE_ABANDONEDORDERS,
+                    Type.DOUBLE,
+                    0,   // don't create duplicate events by default
+                    Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
+                    Importance.LOW,
+                    "Ratio of abandoned order events that should be duplicated. Must be between 0 and 1.",
+                    CONFIG_GROUP_DUPLICATES, 12, Width.SHORT, "Duplicate abandoned order events ratio")
 
         //
         // How frequently to generate messages
@@ -983,6 +1045,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Delay, in milliseconds, between each transaction that should be generated.",
                     CONFIG_GROUP_TIMES, 12, Width.MEDIUM, "Sensor readings delay")
+        .define(CONFIG_TIMES_ABANDONEDORDERS,
+                    Type.INT,
+                    300_000, // 5 minutes
+                    Range.atLeast(500),
+                    Importance.LOW,
+                    "Delay, in milliseconds, between each abandoned order that should be generated.",
+                    CONFIG_GROUP_TIMES, 13, Width.MEDIUM, "Abandoned orders delay")
 
         //
         // Startup behaviour

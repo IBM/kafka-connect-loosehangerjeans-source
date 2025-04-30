@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.ibm.eventautomation.demos.loosehangerjeans.data.AbandonedOrder;
+import com.ibm.eventautomation.demos.loosehangerjeans.generators.AbandonedOrderGenerator;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTaskContext;
@@ -100,6 +102,7 @@ public class DatagenHistoryGenerator {
         addOrderAndCancellationRecords(historicalRecords, config);
         addReturnsRecords(historicalRecords, config);
         addTransactionRecords(historicalRecords, config);
+        addAbandonedOrderRecords(historicalRecords, config);
 
         Collections.sort(historicalRecords, (r1, r2) -> {
             return Math.toIntExact(r1.timestamp() - r2.timestamp());
@@ -167,26 +170,15 @@ public class DatagenHistoryGenerator {
         }
     }
 
-    private void addOnlineOrderRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
-        log.debug("generating historical online order records");
-        final String ONLINEORDERS_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ONLINEORDERS);
-        final String OUTOFSTOCK_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_OUTOFSTOCKS);
+    private void addAbandonedOrderRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+        log.debug("generating historical abandoned order records");
+        final String TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ABANDONEDORDERS);
 
-        OnlineOrderGenerator onlineOrderGenerator = new OnlineOrderGenerator(config);
-        OutOfStockGenerator outOfStockGenerator = new OutOfStockGenerator(config);
+        AbandonedOrderGenerator abandonedOrderGenerator = new AbandonedOrderGenerator(config);
 
-        for (OnlineOrder order : onlineOrderGenerator.generateHistory()) {
-            SourceRecord orderRecord = order.createSourceRecord(ONLINEORDERS_TOPIC);
-            historicalRecords.add(orderRecord);
-
-            if (onlineOrderGenerator.shouldGenerateOutOfStockEvent()) {
-                SourceRecord outOfStockRecord = outOfStockGenerator.generate(order).createSourceRecord(OUTOFSTOCK_TOPIC);
-                historicalRecords.add(outOfStockRecord);
-
-                if (outOfStockGenerator.shouldDuplicate()) {
-                    historicalRecords.add(outOfStockRecord);
-                }
-            }
+        for (AbandonedOrder abandonedOrder : abandonedOrderGenerator.generateHistory()) {
+            SourceRecord abandonedOrderRecord = abandonedOrder.createSourceRecord(TOPIC);
+            historicalRecords.add(abandonedOrderRecord);
         }
     }
 
@@ -267,6 +259,29 @@ public class DatagenHistoryGenerator {
         }
     }
 
+    private void addOnlineOrderRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+        log.debug("generating historical online order records");
+        final String ONLINEORDERS_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ONLINEORDERS);
+        final String OUTOFSTOCK_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_OUTOFSTOCKS);
+
+        OnlineOrderGenerator onlineOrderGenerator = new OnlineOrderGenerator(config);
+        OutOfStockGenerator outOfStockGenerator = new OutOfStockGenerator(config);
+
+        for (OnlineOrder order : onlineOrderGenerator.generateHistory()) {
+            SourceRecord orderRecord = order.createSourceRecord(ONLINEORDERS_TOPIC);
+            historicalRecords.add(orderRecord);
+
+            if (onlineOrderGenerator.shouldGenerateOutOfStockEvent()) {
+                SourceRecord outOfStockRecord = outOfStockGenerator.generate(order).createSourceRecord(OUTOFSTOCK_TOPIC);
+                historicalRecords.add(outOfStockRecord);
+
+                if (outOfStockGenerator.shouldDuplicate()) {
+                    historicalRecords.add(outOfStockRecord);
+                }
+            }
+        }
+    }
+
 
     private List<Map<String, Object>> getExpectedPartitions() {
         return List.of(
@@ -280,7 +295,8 @@ public class DatagenHistoryGenerator {
             LoosehangerData.partition(ProductReview.PARTITION),
             LoosehangerData.partition(ReturnRequest.PARTITION),
             LoosehangerData.partition(SensorReading.PARTITION),
-            LoosehangerData.partition(StockMovement.PARTITION)
+            LoosehangerData.partition(StockMovement.PARTITION),
+            LoosehangerData.partition(AbandonedOrder.PARTITION)
         );
     }
 

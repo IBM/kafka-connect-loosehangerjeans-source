@@ -4,19 +4,20 @@ Kafka Connect source connector used for generating simulated events for demos an
 
 It produces messages simulating the following events:
 
-| **Topic name**    | **Description**                                       |
-|-------------------|-------------------------------------------------------|
-| `DOOR.BADGEIN`    | An employee using their id badge to go through a door |
-| `CANCELLATIONS`   | An order being cancelled                              |
-| `CUSTOMERS.NEW`   | A new customer has registered on the website          |
-| `ORDERS.NEW`      | An order has been placed                              |
-| `SENSOR.READINGS` | A sensor reading captured from an IoT sensor          |
-| `STOCK.MOVEMENT`  | Stock shipment received by a warehouse                |
-| `ORDERS.ONLINE`   | An online order has been placed                       |
-| `STOCK.NOSTOCK`   | A product has run out-of-stock                        |
-| `PRODUCT.RETURNS` | A return request has been issued                      |
-| `PRODUCT.REVIEWS` | A product review has been posted                      |
-| `TRANSACTIONS`    | A transaction has been posted                         |
+| **Topic name**      | **Description**                                                                            |
+|---------------------|--------------------------------------------------------------------------------------------|
+| `DOOR.BADGEIN`      | An employee using their id badge to go through a door                                      |
+| `CANCELLATIONS`     | An order being cancelled                                                                   |
+| `CUSTOMERS.NEW`     | A new customer has registered on the website                                               |
+| `ORDERS.NEW`        | An order has been placed                                                                   |
+| `SENSOR.READINGS`   | A sensor reading captured from an IoT sensor                                               |
+| `STOCK.MOVEMENT`    | Stock shipment received by a warehouse                                                     |
+| `ORDERS.ONLINE`     | An online order has been placed                                                            |
+| `STOCK.NOSTOCK`     | A product has run out-of-stock                                                             |
+| `PRODUCT.RETURNS`   | A return request has been issued                                                           |
+| `PRODUCT.REVIEWS`   | A product review has been posted                                                           |
+| `TRANSACTIONS`      | A transaction has been posted                                                              |
+| `ORDERS.ABANDONED`  | A customer has added products to his/her order but left it without completing the purchase |
 
 
 Avro schemas and sample messages for each of these topics can be found in the `./doc` folder.
@@ -84,6 +85,7 @@ spec:
     topic.name.returnrequests: PRODUCT.RETURNS
     topic.name.productreviews: PRODUCT.REVIEWS
     topic.name.transactions: TRANSACTIONS
+    topic.name.abandonedorders: ORDERS.ABANDONED
 
     #
     # startup behavior
@@ -135,6 +137,8 @@ spec:
     timings.ms.productreviews: 60000      # every 1 minute
     # transactions
     timings.ms.transactions: 20000        # every 20 seconds
+    # abandoned orders
+    timings.ms.abandonedorders: 300000    # every 5 minutes
 
     #
     # how much of a delay to introduce when producing events
@@ -175,6 +179,8 @@ spec:
     eventdelays.productreviews.secs.max: 0      # payload time matches event time by default
     # transactions
     eventdelays.transactions.secs.max: 0        # payload time matches event time by default
+    # abandoned orders
+    eventdelays.abandonedorders.secs.max: 0     # payload time matches event time by default
 
     #
     # how many events should be duplicated
@@ -210,6 +216,8 @@ spec:
     duplicates.productreviews.ratio: 0      # events not duplicated
     # transactions
     duplicates.transactions.ratio: 0        # events not duplicated
+    # abandoned orders
+    duplicates.abandonedorders.ratio: 0     # events not duplicated
 
     #
     # product names to use in events
@@ -375,6 +383,18 @@ spec:
     # how long after a return request should the product review happen (in milliseconds)
     productreviews.delay.ms.min: 300000   # 5 minutes
     productreviews.delay.ms.max: 3600000  # 1 hour
+
+    #
+    # abandoned orders
+    #
+    # these events are intended to represent orders that were abandoned before checkout.
+    #
+    # number of products to include in an abandoned order: between 1 and 5 (inclusive)
+    abandonedorders.products.min: 1
+    abandonedorders.products.max: 5
+    # number of emails for the customer who abandoned the order: between 1 and 2 (inclusive)
+    abandonedorders.customer.emails.min: 1
+    abandonedorders.customer.emails.max: 2
 
     #
     # locations that are referred to in generated events
