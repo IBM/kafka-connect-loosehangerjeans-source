@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 IBM Corp. All Rights Reserved.
+ * Copyright 2023, 2025 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,8 +144,9 @@ public class DatagenSourceTask extends SourceTask {
         // transactions
         TransactionTask transactions = new TransactionTask(config, queue);
         generateTimer.scheduleAtFixedRate(transactions, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_TRANSACTIONS));
+
         // abandoned orders
-        AbandonedOrdersTask abandonedOrders = new AbandonedOrdersTask(config, queue, generateTimer);
+        AbandonedOrdersTask abandonedOrders = new AbandonedOrdersTask(config, queue);
         generateTimer.scheduleAtFixedRate(abandonedOrders, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_ABANDONEDORDERS));
     }
 

@@ -23,7 +23,6 @@ import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 
 import java.util.Queue;
-import java.util.Timer;
 import java.util.TimerTask;
 
 /**
@@ -41,18 +40,12 @@ public class AbandonedOrdersTask extends TimerTask {
      */
     private final Queue<SourceRecord> queue;
 
-    /** Timer used to schedule message-generation tasks. */
-    private final Timer timer;
-
     /** Name of the topic to produce abandoned order events to. */
     private final String abandonedOrderTopicName;
 
-    public AbandonedOrdersTask(AbstractConfig config,
-                            Queue<SourceRecord> queue,
-                            Timer generateTimer) {
+    public AbandonedOrdersTask(AbstractConfig config, Queue<SourceRecord> queue) {
         this.abandonedOrderGenerator = new AbandonedOrderGenerator(config);
         this.queue = queue;
-        this.timer = generateTimer;
         this.abandonedOrderTopicName = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ABANDONEDORDERS);
     }
 
