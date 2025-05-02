@@ -109,11 +109,11 @@ public class ProductReviewGenerator extends Generator<ProductReview> {
                 .setHeader()
                 .setSkipHeaderRecord(true)
                 .setIgnoreSurroundingSpaces(true)
-                .build();
+                .get();
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("data/reviews.csv");
         Reader reader = inputStream != null ? new InputStreamReader(inputStream) : null;
         if (reader != null) {
-            try (CSVParser parser = new CSVParser(reader, format)) {
+            try (CSVParser parser = CSVParser.builder().setFormat(format).setReader(reader).get()) {
                 return parser.getRecords().stream().map(this::getReviewFromRecord).collect(Collectors.toList());
             } catch (IOException e) {
                 throw new RuntimeException("Error while parsing sample reviews", e);
