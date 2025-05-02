@@ -27,19 +27,81 @@ public class Generators {
     private final static Random RNG = new Random();
 
 
+    /**
+     * Returns a randomly-selected item from the provided list.
+     *
+     * Note that the ordering of the list will be significant for this. The random
+     * selection is skewed to select items towards the centre of the list more
+     * frequently than the items at the start or end of the list. The intention for
+     * this behaviour is to mimic something like a normal distribution.
+     */
     public static <T> T randomItem(List<T> list) {
-        return list.get(RNG.nextInt(list.size()));
+        final int listSize = list.size();
+        final double r = (RNG.nextDouble() + RNG.nextDouble() + RNG.nextDouble()) / 3.0;
+
+        int listIndex = (int) (r * listSize);
+        listIndex = Math.min(listIndex, listSize - 1);
+
+        return list.get(listIndex);
     }
 
+
+    /**
+     * Returns a randomly-selected value from the provided range.
+     *
+     * The randomness is skewed to generate values towards the centre of the range
+     * more frequently than values closer to the min or max. The intention for
+     * this behaviour is to mimic something like a normal distribution.
+     *
+     * The returned value will be rounded to two-decimal-places to create a
+     * believable financial price value.
+     */
     public static double randomPrice(double min, double max) {
-        double randomValue = min + (max - min) * RNG.nextDouble();
+        final double r = (RNG.nextDouble() + RNG.nextDouble() + RNG.nextDouble()) / 3.0;
+        final double randomValue = min + (max - min) * r;
+
         return Math.round(randomValue * 100.0) / 100.0;
     }
 
+
+    /**
+     * Returns a randomly-generated value from the provided range.
+     *
+     * The randomness is skewed to generate values towards the centre of the range
+     * more frequently than values closer to the min or max. The intention for
+     * this behaviour is to mimic something like a normal distribution.
+     *
+     * The returned value will be rounded to one-decimal-place.
+     */
     public static double randomDouble(double min, double max) {
-        double randomValue = min + (max - min) * RNG.nextDouble();
+        final double r = (RNG.nextDouble() + RNG.nextDouble() + RNG.nextDouble()) / 3.0;
+        final double randomValue = min + (max - min) * r;
+
         return Math.round(randomValue * 10.0) / 10.0;
     }
+
+
+    /**
+     * Returns a randomly-generated value from the provided range.
+     *
+     * The returned value will be rounded to one-decimal-place.
+     *
+     * @param skewed - if true, the randomness is skewed to generate values
+     *                  towards the centre of the range more frequently than
+     *                  values closer to the min or max.
+     *                 if false, randomly generated values will be selected
+     *                  evenly distributed from the range
+     */
+    public static double randomDouble(double min, double max, boolean skewed) {
+        if (!skewed) {
+            final double randomValue = min + (max - min) * RNG.nextDouble();
+            return Math.round(randomValue * 10.0) / 10.0;
+        }
+        else {
+            return randomDouble(min, max);
+        }
+    }
+
 
     public static boolean shouldDo(double ratio) {
         return RNG.nextDouble() < ratio;

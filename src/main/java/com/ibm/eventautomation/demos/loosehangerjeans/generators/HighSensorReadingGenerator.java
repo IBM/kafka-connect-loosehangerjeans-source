@@ -92,7 +92,8 @@ public class HighSensorReadingGenerator extends SensorReadingGenerator {
             temp = Generators.randomDouble(Math.max(highTemperature,
                                                     HIGH_TEMP_MIN),
                                            Math.min(highTemperature + MAX_TEMP_INCREASE,
-                                                    HIGH_TEMP_MAX));
+                                                    HIGH_TEMP_MAX),
+                                           false);
             highTemperature = temp;
 
             // should we continue to report high temperatures?
