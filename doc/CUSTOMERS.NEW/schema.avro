@@ -5,8 +5,10 @@
     "fields": [
         {
             "name": "customerid",
-            "type": "string",
-            "logicalType": "uuid",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            },
             "doc": "unique id for the customer"
         },
         {

@@ -5,14 +5,18 @@
     "fields": [
         {
             "name": "id",
-            "type": "string",
-            "logicalType": "uuid",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            },
             "doc": "id for the cancellation request"
         },
         {
             "name": "orderid",
-            "type": "string",
-            "logicalType": "uuid",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            },
             "doc": "id of the order that was cancelled"
         },
         {

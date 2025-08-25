@@ -5,8 +5,10 @@
     "fields": [
         {
             "name": "recordid",
-            "type": "string",
-            "logicalType": "uuid",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            },
             "doc": "badge event id"
         },
         {

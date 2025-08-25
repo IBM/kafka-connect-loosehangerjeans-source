@@ -5,8 +5,10 @@
     "fields": [
         {
             "name": "movementid",
-            "type": "string",
-            "logicalType": "uuid",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            },
             "doc": "movement record id"
         },
         {

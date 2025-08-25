@@ -5,8 +5,10 @@
     "fields": [
         {
             "name": "id",
-            "type": "string",
-            "logicalType": "uuid",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            },
             "doc": "order id"
         },
         {
@@ -16,8 +18,10 @@
         },
         {
             "name": "customerid",
-            "type": "string",
-            "logicalType": "uuid",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            },
             "doc": "unique id for the customer who made the order"
         },
         {
