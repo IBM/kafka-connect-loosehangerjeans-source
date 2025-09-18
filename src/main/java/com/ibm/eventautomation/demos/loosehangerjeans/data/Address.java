@@ -15,7 +15,7 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
@@ -85,7 +85,7 @@ public class Address {
         }
 
         // Generate the address.
-        com.github.javafaker.Address fakerAddress = faker.address();
+        net.datafaker.providers.base.Address fakerAddress = faker.address();
         return new Address(Integer.valueOf(fakerAddress.streetAddressNumber()),
                 fakerAddress.streetName(),
                 fakerAddress.cityName(),

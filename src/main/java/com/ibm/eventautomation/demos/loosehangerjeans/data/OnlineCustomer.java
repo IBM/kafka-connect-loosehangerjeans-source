@@ -15,9 +15,8 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -66,7 +65,7 @@ public class OnlineCustomer extends Customer {
         String username = faker.name().username();
         String[] nameParts = username.split("\\.");
         // Compute the corresponding full name.
-        String fullName = StringUtils.capitalize(nameParts[0]) + " " + StringUtils.capitalize(nameParts[1]);
+        String fullName = capitalize(nameParts[0]) + " " + capitalize(nameParts[1]);
 
         // Generate some emails randomly for this customer.
         int emailCount = Generators.randomInt(minEmails, maxEmails);
@@ -98,5 +97,15 @@ public class OnlineCustomer extends Customer {
     @Override
     public String toString() {
         return "Customer [id=" + getId() + ", name=" + getName() + ", emails="  + Arrays.toString(emails.toArray()) + "]";
+    }
+
+    private static String capitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        if (str.length() == 1) {
+            return str.toUpperCase();
+        }
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
 }
