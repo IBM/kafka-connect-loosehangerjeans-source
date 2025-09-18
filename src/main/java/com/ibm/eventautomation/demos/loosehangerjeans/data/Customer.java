@@ -17,7 +17,7 @@ package com.ibm.eventautomation.demos.loosehangerjeans.data;
 
 import java.util.UUID;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 
 /**
  * Information about a customer.
