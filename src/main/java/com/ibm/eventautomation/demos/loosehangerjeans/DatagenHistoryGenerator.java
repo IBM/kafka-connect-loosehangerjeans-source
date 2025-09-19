@@ -15,8 +15,8 @@
  */
 package com.ibm.eventautomation.demos.loosehangerjeans;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +92,7 @@ public class DatagenHistoryGenerator {
     {
         log.info("Generating historical events to warm up the topics");
 
-        List<SourceRecord> historicalRecords = new ArrayList<>();
+        DatagenHistory historicalRecords = new DatagenHistory(Instant.now());
 
         addNewCustomerRecords(historicalRecords, config);
         addStockMovementRecords(historicalRecords, config);
