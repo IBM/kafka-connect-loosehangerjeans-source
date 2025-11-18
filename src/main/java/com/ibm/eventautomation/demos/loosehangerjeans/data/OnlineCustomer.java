@@ -36,12 +36,22 @@ public class OnlineCustomer extends Customer {
 
     /** Schema for the events - all fields are required. */
     public static final Schema SCHEMA = SchemaBuilder.struct()
-            .name("onlinecustomer")
-            .version(1)
-            .field("id",        Schema.STRING_SCHEMA)
-            .field("name",      Schema.STRING_SCHEMA)
-            .field("emails",    SchemaBuilder.array(Schema.STRING_SCHEMA).build())
-            .build();
+        .name("onlinecustomer")
+        .version(1)
+        .field("id",        Schema.STRING_SCHEMA)
+        .field("name",      Schema.STRING_SCHEMA)
+        .field("emails",    SchemaBuilder.array(Schema.STRING_SCHEMA).build())
+        .build();
+
+    public static final Schema OPTIONAL_SCHEMA = SchemaBuilder.struct()
+        .name("onlinecustomer")
+        .version(1)
+        .field("id",        Schema.STRING_SCHEMA)
+        .field("name",      Schema.STRING_SCHEMA)
+        .field("emails",    SchemaBuilder.array(Schema.STRING_SCHEMA).build())
+        .optional()
+        .build();
+
 
     /** Creates a customer using the provided details. */
     public OnlineCustomer(String id, String name, List<String> emails) {
@@ -85,9 +95,14 @@ public class OnlineCustomer extends Customer {
         return emails;
     }
 
-    /** Creates a structure record to use in a Kafka event. */
-    public Struct toStruct() {
-        Struct struct = new Struct(SCHEMA);
+    /**
+     * Creates a structure record to use in a Kafka event.
+     *
+     * @param isOptional - true if the customer struct is being used in a place
+     *                      where it is optional, false if it was required
+     */
+    public Struct toStruct(boolean isOptional) {
+        Struct struct = new Struct(isOptional ? OPTIONAL_SCHEMA : SCHEMA);
         struct.put(SCHEMA.field("id"),      getId());
         struct.put(SCHEMA.field("name"),    getName());
         struct.put(SCHEMA.field("emails"),  emails);

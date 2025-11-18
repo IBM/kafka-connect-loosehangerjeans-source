@@ -117,7 +117,7 @@ public class OnlineOrder extends LoosehangerData {
     protected Struct getValue() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),          id);
-        struct.put(SCHEMA.field("customer"),    customer.toStruct());
+        struct.put(SCHEMA.field("customer"),    customer.toStruct(false));
         struct.put(SCHEMA.field("products"),    products);
         struct.put(SCHEMA.field("address"),     address.toStruct());
         struct.put(SCHEMA.field("ordertime"),   timestamp);
