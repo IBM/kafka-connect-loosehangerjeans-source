@@ -31,7 +31,7 @@ import java.util.UUID;
  * The event also includes a shipping and billing address which may
  * be identical.
  */
-public class OnlineOrder extends LoosehangerData {
+public class OnlineOrder extends OnlineActivityData {
 
     public static final String PARTITION = "onlineorder";
 
@@ -62,21 +62,14 @@ public class OnlineOrder extends LoosehangerData {
             .build();
 
     /** Creates an {@link OnlineOrder} using the provided details. */
-    public OnlineOrder(String id, String timestamp, OnlineCustomer customer, List<String> products, OnlineAddress address, ZonedDateTime recordTimestamp) {
+    public OnlineOrder(String timestamp, OnlineCustomer customer, List<String> products, OnlineAddress address, ZonedDateTime recordTimestamp) {
         super(recordTimestamp);
 
-        this.id = id;
+        this.id = UUID.randomUUID().toString();
         this.timestamp = timestamp;
         this.customer = customer;
         this.products = products;
         this.address = address;
-    }
-
-    /** Creates an {@link OnlineOrder} using the provided details.
-     * The ID is generated randomly.
-     * */
-    public OnlineOrder(String timestamp, OnlineCustomer customer, List<String> products, OnlineAddress address, ZonedDateTime recordTimestamp) {
-        this(UUID.randomUUID().toString(), timestamp, customer, products, address, recordTimestamp);
     }
 
     public String getId() {
@@ -117,7 +110,7 @@ public class OnlineOrder extends LoosehangerData {
     protected Struct getValue() {
         Struct struct = new Struct(SCHEMA);
         struct.put(SCHEMA.field("id"),          id);
-        struct.put(SCHEMA.field("customer"),    customer.toStruct());
+        struct.put(SCHEMA.field("customer"),    customer.toStruct(false));
         struct.put(SCHEMA.field("products"),    products);
         struct.put(SCHEMA.field("address"),     address.toStruct());
         struct.put(SCHEMA.field("ordertime"),   timestamp);

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import net.datafaker.Faker;
+import com.ibm.eventautomation.demos.datafaker.LoosehangerFaker;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
 
 
@@ -32,7 +32,7 @@ public abstract class Generator<T> {
     protected static final Locale DEFAULT_LOCALE = Locale.US;
 
     /** Faker utility available for generators to use. */
-    protected final Faker faker = new Faker(DEFAULT_LOCALE);
+    protected final LoosehangerFaker faker = new LoosehangerFaker(DEFAULT_LOCALE);
 
     /**
      * How frequently (on average) the generator should

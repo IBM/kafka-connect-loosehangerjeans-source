@@ -102,6 +102,9 @@ public class Generators {
         }
     }
 
+    public static double randomDouble() {
+        return RNG.nextDouble();
+    }
 
     public static boolean shouldDo(double ratio) {
         return RNG.nextDouble() < ratio;
@@ -113,6 +116,14 @@ public class Generators {
 
     public static boolean randomBoolean() {
     	return RNG.nextBoolean();
+    }
+
+    public static String randomString(String validCharacters, int length) {
+        final StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(validCharacters.charAt(RNG.nextInt(validCharacters.length())));
+        }
+        return sb.toString();
     }
 
     /**

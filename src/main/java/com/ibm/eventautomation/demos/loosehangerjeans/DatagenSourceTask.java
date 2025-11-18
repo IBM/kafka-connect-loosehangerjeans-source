@@ -25,13 +25,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Product;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductReviewGenerator;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.AbandonedOrdersTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.BadgeInTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.FalsePositivesTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.HighSensorReadingTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NewCustomerTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NormalOrdersTask;
-import com.ibm.eventautomation.demos.loosehangerjeans.tasks.OnlineOrdersTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.OnlineActivityTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.ProductReviewsTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.ReturnRequestsTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SensorReadingTask;
@@ -125,8 +124,8 @@ public class DatagenSourceTask extends SourceTask {
         generateTimer.scheduleAtFixedRate(highSensorReadings, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_HIGHSENSORREADINGS));
 
         // online orders
-        // create online orders and out-of-stock events
-        OnlineOrdersTask onlineOrders = new OnlineOrdersTask(config, queue, generateTimer);
+        // create online activity events, including clickstreams, orders, and abandoned cart notifications
+        OnlineActivityTask onlineOrders = new OnlineActivityTask(config, queue, generateTimer);
         generateTimer.scheduleAtFixedRate(onlineOrders, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_ONLINEORDERS));
 
         // return requests
@@ -144,10 +143,6 @@ public class DatagenSourceTask extends SourceTask {
         // transactions
         TransactionTask transactions = new TransactionTask(config, queue);
         generateTimer.scheduleAtFixedRate(transactions, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_TRANSACTIONS));
-
-        // abandoned orders
-        AbandonedOrdersTask abandonedOrders = new AbandonedOrdersTask(config, queue);
-        generateTimer.scheduleAtFixedRate(abandonedOrders, 0, config.getInt(DatagenSourceConfig.CONFIG_TIMES_ABANDONEDORDERS));
     }
 
 
