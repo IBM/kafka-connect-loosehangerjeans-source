@@ -229,8 +229,8 @@ spec:
     #    any or all of these can be modified to theme the demo for a
     #    different industry
     products.sizes: XXS,XS,S,M,L,XL,XXL
-    products.materials: Classic,Retro,Navy,Stonewashed,Acid-washed,Blue,Black,White,Khaki,Denim,Jeggings
-    products.styles: Skinny,Bootcut,Flare,Ripped,Capri,Jogger,Crochet,High-waist,Low-rise,Straight-leg,Boyfriend,Mom,Wide-leg,Jorts,Cargo,Tall
+    products.materials: Classic,Retro,Navy,Stonewashed,Acid-washed,Blue,Black,White,Khaki,Denim,Raw-Denim,Selvedge,Stretch-Denim,Corduroy,Chambray,Twill,Leather,Velvet,Linen-Blend,Organic-Cotton,Recycled-Denim,Overdyed,Coated-Denim,TENCEL,Crochet
+    products.styles: Skinny,Bootcut,Flare,Ripped,Capri,Jogger,High-waist,Low-rise,Straight-leg,Boyfriend,Mom,Wide-leg,Jorts,Cargo,Tall,Relaxed,Slim,Super-skinny,Cropped,Ankle,Bell-bottom,Distressed,Patchwork,Painter,Carpenter,Utility,Paperbag-waist,Raw-hem,Vintage,Tapered,Curvy-fit,Petite,Plus-size,Overalls,Dungarees,Jeggings
     products.name: Jeans
 
     #
