@@ -62,7 +62,7 @@ public class OnlineCustomer extends Customer {
      */
     public static OnlineCustomer create(Faker faker, int minEmails, int maxEmails) {
         // Generate a username randomly for the customer.
-        String username = faker.name().username();
+        String username = faker.credentials().username();
         String[] nameParts = username.split("\\.");
         // Compute the corresponding full name.
         String fullName = capitalize(nameParts[0]) + " " + capitalize(nameParts[1]);

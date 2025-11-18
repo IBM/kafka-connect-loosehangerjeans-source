@@ -43,7 +43,7 @@ public class BadgeInGenerator extends Generator<BadgeIn> {
         return new BadgeIn(UUID.randomUUID().toString(),
                            formatTimestamp(timestamp),
                            generateDoorId(),
-                           faker.name().username(),
+                           faker.credentials().username(),
                            timestamp);
     }
 
