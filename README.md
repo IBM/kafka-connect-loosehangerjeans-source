@@ -132,7 +132,7 @@ spec:
     #  from a single sensor that periodically generates very high and increasing readings (before returning to a normal range)
     timings.ms.highsensorreadings: 18000  # every 18 seconds
     # online activity
-    timings.ms.onlineorders: 5000         # start a new user session every 5 seconds
+    timings.ms.onlineorders: 8000         # start a new user session every 8 seconds
     timings.ms.clicktracking: 15000       # within each active user session, emit a new click event every 15 seconds
     # return requests
     timings.ms.returnrequests: 300000     # every 5 minutes
@@ -325,7 +325,8 @@ spec:
     # Likelihood that a customer will abandon their cart at each step during a user session
     #  between 0.0 and 1.0 : 0.0 means users will never decide to abandon a session before completing a purchase
     #                        1.0 means users will never complete any online purchases
-    onlineorders.abandoned.ratio: 0.2
+    #                        0.1 means for every user activity, there is a 10% chance the user will abandon the session
+    onlineorders.abandoned.ratio: 0.1
     # Likelihood that a customer will already be logged in at the start a new user session
     #  between 0.0 and 1.0 : 0.0 means all users will need an explicit login event before checkout
     #                      : 1.0 means there will be no login events as all users start sessions logged in
@@ -335,12 +336,12 @@ spec:
     #                        1.0 means every click event will include a digital marketing campaign
     onlineorders.marketing.ratio: 0.4
     # maximum number of clickstream events in a single user session
-    onlineorders.clickevents.max: 100
+    onlineorders.clickevents.max: 50
     # Maximum number of concurrent user sessions to generate online events for
     #  (Increasing the time between new user sessions are started (timings.ms.onlineorders) and/or decreasing
     #   the number of events in a single session (onlineorders.clickevents.max) and/or decreasing the number
     #   of abandoned user sessions, etc. can all mean that this maximum is never reached)
-    onlineorders.sessions.max: 50
+    onlineorders.sessions.max: 25
 
 
     #

@@ -585,14 +585,14 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_ONLINEORDERS, 9, Width.LONG, "Base URL")
         .define(CONFIG_ONLINEORDERS_CLICKEVENTS_MAX,
                     Type.INT,
-                    100,
+                    50,
                     Range.atLeast(5),
                     Importance.LOW,
                     "Maximum number of click tracking events to generate for a single user session",
                     CONFIG_GROUP_ONLINEORDERS, 10, Width.SHORT, "Maximum number of click tracking events for online orders")
         .define(CONFIG_ONLINEORDERS_ABANDONED_RATIO,
                     Type.DOUBLE,
-                    0.2,
+                    0.1,
                     Range.between(0, 1),
                     Importance.LOW,
                     "Likelihood that a customer will abandon their cart at each step during a user session",
@@ -613,7 +613,7 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_ONLINEORDERS, 13, Width.SHORT, "Digital marketing ratio")
         .define(CONFIG_ONLINEORDERS_SESSIONS_MAX,
                     Type.INT,
-                    50,
+                    25,
                     Range.atLeast(2),
                     Importance.LOW,
                     "Maximum number of concurrent user sessions to generate online events for",
@@ -1029,7 +1029,7 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_TIMES, 8, Width.MEDIUM, "High sensor readings delay")
         .define(CONFIG_TIMES_ONLINEORDERS,
                     Type.INT,
-                    5_000, // 5 seconds
+                    8_000, // 8 seconds
                     Range.atLeast(500),
                     Importance.LOW,
                     "Delay, in milliseconds, between each online user session that should be started.",
