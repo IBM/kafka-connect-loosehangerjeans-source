@@ -56,9 +56,12 @@
                             "fields": [
                                 {
                                     "name": "type",
-                                    "type": "enum",
-                                    "doc": "Device class",
-                                    "symbols": [ "Desktop", "Mobile", "Tablet" ]
+                                    "type": {
+                                        "type": "enum",
+                                        "name": "DeviceType",
+                                        "symbols": [ "Desktop", "Mobile", "Tablet" ]
+                                    },
+                                    "doc": "Device class"
                                 },
                                 {
                                     "name": "os",
