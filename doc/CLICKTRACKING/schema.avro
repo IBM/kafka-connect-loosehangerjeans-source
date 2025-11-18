@@ -22,23 +22,8 @@
         },
         {
             "name": "type",
-            "type": {
-                "type": "enum",
-                "name": "ClickEventType",
-                "doc": "Types of user action that are tracked on the Loosehanger website",
-                "symbols": [
-                    "PAGE_VIEW",
-                    "SEARCH",
-                    "PRODUCT_VIEW",
-                    "ADD_TO_CART",
-                    "REMOVE_FROM_CART",
-                    "CART_VIEW",
-                    "CHECKOUT_START",
-                    "CHECKOUT_COMPLETE",
-                    "LOGIN"
-                ]
-            },
-            "doc": "Action that the user has taken"
+            "type": "string",
+            "doc": "Action that the user has taken. Valid values: PAGE_VIEW, SEARCH, PRODUCT_VIEW, ADD_TO_CART, REMOVE_FROM_CART, CART_VIEW, CHECKOUT_START, CHECKOUT_COMPLETE, LOGIN"
         },
         {
             "name": "context",
@@ -56,12 +41,8 @@
                             "fields": [
                                 {
                                     "name": "type",
-                                    "type": {
-                                        "type": "enum",
-                                        "name": "DeviceType",
-                                        "symbols": [ "Desktop", "Mobile", "Tablet" ]
-                                    },
-                                    "doc": "Device class"
+                                    "type": "string",
+                                    "doc": "Device class. Valid values: Desktop, Mobile, Tablet"
                                 },
                                 {
                                     "name": "os",
