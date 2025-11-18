@@ -1,0 +1,203 @@
+{
+    "namespace": "com.loosehangerjeans",
+    "type": "record",
+    "name": "ClickEvent",
+    "doc": "Clickstream events for user interactions with the Loosehanger website",
+    "fields": [
+        {
+            "name": "sessionid",
+            "type": {
+                "type": "string",
+                "pattern": "^sess_[a-z0-9]{16}$"
+            },
+            "doc": "ID for the session that this event is a part of. This is a useful ID for correlating individual clicktracking events - all click events that are part of the same user session will have the same session id."
+        },
+        {
+            "name": "eventid",
+            "type": {
+                "type": "string",
+                "pattern": "^[a-z0-9]{12}$"
+            },
+            "doc": "Unique event identifier for this individual click tracking event."
+        },
+        {
+            "name": "type",
+            "type": {
+                "type": "enum",
+                "name": "ClickEventType",
+                "doc": "Types of user action that are tracked on the Loosehanger website",
+                "symbols": [
+                    "PAGE_VIEW",
+                    "SEARCH",
+                    "PRODUCT_VIEW",
+                    "ADD_TO_CART",
+                    "REMOVE_FROM_CART",
+                    "CART_VIEW",
+                    "CHECKOUT_START",
+                    "CHECKOUT_COMPLETE",
+                    "LOGIN"
+                ]
+            },
+            "doc": "Action that the user has taken"
+        },
+        {
+            "name": "context",
+            "type": {
+                "type": "record",
+                "name": "UserContext",
+                "doc": "Information about the device that the user is using to access the website",
+                "fields": [
+                    {
+                        "name": "device",
+                        "type": {
+                            "type": "record",
+                            "name": "Device",
+                            "doc": "Device information",
+                            "fields": [
+                                {
+                                    "name": "type",
+                                    "type": "enum",
+                                    "doc": "Device class",
+                                    "symbols": [ "Desktop", "Mobile", "Tablet" ]
+                                },
+                                {
+                                    "name": "os",
+                                    "type": "string",
+                                    "doc": "Operating system"
+                                },
+                                {
+                                    "name": "resolution",
+                                    "type": "string",
+                                    "doc": "Screen resolution - in the form of width x height (e.g. 1920x1080)"
+                                }
+                            ]
+                        },
+                        "doc": "Information about the user's device"
+                    },
+                    {
+                        "name": "browser",
+                        "type": {
+                            "type": "record",
+                            "name": "Browser",
+                            "doc": "Browser information",
+                            "fields": [
+                                {
+                                    "name": "name",
+                                    "type": "string",
+                                    "doc": "Browser name (e.g. Chrome)"
+                                },
+                                {
+                                    "name": "version",
+                                    "type": "string",
+                                    "doc": "Browser version (e.g. 121.0.0.0)"
+                                },
+                                {
+                                    "name": "useragent",
+                                    "type": "string",
+                                    "doc": "Full user agent string"
+                                },
+                                {
+                                    "name": "enabled",
+                                    "type": {
+                                        "type": "record",
+                                        "name": "BrowserFeatures",
+                                        "doc": "Flags indicating which browser features are enabled",
+                                        "fields": [
+                                            {
+                                                "name": "cookies",
+                                                "type": "boolean",
+                                                "doc": "Whether cookies are enabled"
+                                            },
+                                            {
+                                                "name": "javascript",
+                                                "type": "boolean",
+                                                "doc": "Whether JavaScript is enabled"
+                                            }
+                                        ]
+                                    },
+                                    "doc": "Browser features that are enabled"
+                                }
+                            ]
+                        },
+                        "doc": "Information about the user's browser"
+                    },
+                    {
+                        "name": "ipaddress",
+                        "type": "string",
+                        "doc": "IP address the the user is connecting from"
+                    },
+                    {
+                        "name": "donottrack",
+                        "type": "boolean",
+                        "doc": "Whether the user has Do Not Track enabled"
+                    }
+                ]
+            },
+            "doc": "Context information about the device being used"
+        },
+        {
+            "name": "referrer",
+            "type": [
+                "null",
+                "string"
+            ],
+            "default": null,
+            "doc": "Referring URL. This will be null for requests referred by other pages on the Loosehanger website, or for direct accesses."
+        },
+        {
+            "name": "customer",
+            "type": [
+                "null",
+                {
+                    "type": "record",
+                    "name": "Customer",
+                    "doc": "Customer information",
+                    "fields": [
+                        {
+                            "name": "id",
+                            "type": {
+                                "type": "string",
+                                "logicalType": "uuid"
+                            },
+                            "doc": "Unique customer identifier"
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "doc": "Customer name"
+                        },
+                        {
+                            "name": "emails",
+                            "type": {
+                                "type": "array",
+                                "items": "string"
+                            },
+                            "doc": "Customer email addresses"
+                        }
+                    ]
+                }
+            ],
+            "default": null,
+            "doc": "Customer information. This is optional, and only present for logged-in users. This will be null for anonymous users."
+        },
+        {
+            "name": "url",
+            "type": "string",
+            "doc": "Full URL of the page that was the source of the event"
+        },
+        {
+            "name": "product",
+            "type": [
+                "null",
+                "string"
+            ],
+            "default": null,
+            "doc": "Product name. This will only be included for events related to shopping carts - adding/removing products from the user's basket."
+        },
+        {
+            "name": "timestamp",
+            "type": "string",
+            "doc": "Event timestamp in ISO 8601 format with milliseconds"
+        }
+    ]
+}

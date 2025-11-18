@@ -1,0 +1,34 @@
+{
+    "sessionid": "sess_16kftis8enr1kupr",
+    "eventid": "9fpow5mhfvka",
+    "type": "ADD_TO_CART",
+    "context": {
+        "device": {
+            "type": "Desktop",
+            "os": "macOS 13.0",
+            "resolution": "1440x900"
+        },
+        "browser": {
+            "name": "Opera",
+            "version": "120.0.0.0",
+            "useragent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 OPR/105.0.0.0",
+            "enabled": {
+                "cookies": true,
+                "javascript": true
+            }
+        },
+        "ipaddress": "158.96.9.91",
+        "donottrack": false
+    },
+    "referrer": null,
+    "customer": {
+        "id": "c5d3fd21-18d2-4113-950a-3ed610c58e78",
+        "name": "Renaldo Ward",
+        "emails": [
+            "renaldo.ward@example.com"
+        ]
+    },
+    "url": "https://loosehangerjeans.com/product/9d5c13011b97?fbclid=IwY0pv27jHCw2us9e2dB7xrMhLa&utm_campaign=mar_webinar&utm_medium=organic_social&utm_source=instagram&utm_content=variant_1",
+    "product": "M Raw-Denim Patchwork Jeans",
+    "timestamp": "2025-11-11T15:26:21.128Z"
+}

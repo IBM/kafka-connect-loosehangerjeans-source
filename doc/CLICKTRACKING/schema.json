@@ -1,0 +1,175 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "com.loosehangerjeans.ClickEvent",
+    "title": "ClickEvent",
+    "description": "Clickstream events for user interactions with the Loosehanger website",
+    "type": "object",
+    "required": [
+        "sessionid",
+        "eventid",
+        "type",
+        "context",
+        "url",
+        "timestamp"
+    ],
+    "properties": {
+        "sessionid": {
+            "type": "string",
+            "description": "ID for the session that this event is a part of. This is a useful ID for correlating individual clicktracking events - all click events that are part of the same user session will have the same session id.",
+            "pattern": "^sess_[a-z0-9]{16}$"
+        },
+        "eventid": {
+            "type": "string",
+            "description": "Unique event identifier for this individual click tracking event.",
+            "pattern": "^[a-z0-9]{12}$"
+        },
+        "type": {
+            "type": "string",
+            "description": "Action that the user has taken",
+            "enum": [
+                "PAGE_VIEW",
+                "SEARCH",
+                "PRODUCT_VIEW",
+                "ADD_TO_CART",
+                "REMOVE_FROM_CART",
+                "CART_VIEW",
+                "CHECKOUT_START",
+                "CHECKOUT_COMPLETE",
+                "LOGIN"
+            ]
+        },
+        "context": {
+            "type": "object",
+            "description": "Context information about the device being used",
+            "required": [
+                "device",
+                "browser",
+                "ipaddress",
+                "donottrack"
+            ],
+            "properties": {
+                "device": {
+                    "type": "object",
+                    "description": "Information about the user's device",
+                    "required": [
+                        "type",
+                        "os",
+                        "resolution"
+                    ],
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "Device class",
+                            "enum": [
+                                "Desktop",
+                                "Mobile",
+                                "Tablet"
+                            ]
+                        },
+                        "os": {
+                            "type": "string",
+                            "description": "Operating system"
+                        },
+                        "resolution": {
+                            "type": "string",
+                            "description": "Screen resolution - in the form of width x height (e.g. 1920x1080)"
+                        }
+                    }
+                },
+                "browser": {
+                    "type": "object",
+                    "description": "Information about the user's browser",
+                    "required": [
+                        "name",
+                        "version",
+                        "useragent",
+                        "enabled"
+                    ],
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "Browser name (e.g. Chrome)"
+                        },
+                        "version": {
+                            "type": "string",
+                            "description": "Browser version (e.g. 121.0.0.0)"
+                        },
+                        "useragent": {
+                            "type": "string",
+                            "description": "Full user agent string"
+                        },
+                        "enabled": {
+                            "type": "object",
+                            "description": "Browser features that are enabled",
+                            "required": [
+                                "cookies",
+                                "javascript"
+                            ],
+                            "properties": {
+                                "cookies": {
+                                    "type": "boolean",
+                                    "description": "Whether cookies are enabled"
+                                },
+                                "javascript": {
+                                    "type": "boolean",
+                                    "description": "Whether JavaScript is enabled"
+                                }
+                            }
+                        }
+                    }
+                },
+                "ipaddress": {
+                    "type": "string",
+                    "description": "IP address the the user is connecting from"
+                },
+                "donottrack": {
+                    "type": "boolean",
+                    "description": "Whether the user has Do Not Track enabled"
+                }
+            }
+        },
+        "referrer": {
+            "type": "string",
+            "description": "Referring URL. This will be null for requests referred by other pages on the Loosehanger website, or for direct accesses."
+        },
+        "customer": {
+            "type": "object",
+            "description": "Customer information. This is optional, and only present for logged-in users. This will be null for anonymous users.",
+            "required": [
+                "id",
+                "name",
+                "emails"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Unique customer identifier",
+                    "format": "uuid"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Customer name"
+                },
+                "emails": {
+                    "type": "array",
+                    "description": "Customer email addresses",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "url": {
+            "type": "string",
+            "description": "Full URL of the page that was the source of the event"
+        },
+        "product": {
+            "type": "string",
+            "description": "Product name. This will only be included for events related to shopping carts - adding/removing products from the user's basket."
+        },
+        "timestamp": {
+            "type": "string",
+            "description": "Event timestamp in ISO 8601 format with milliseconds"
+        }
+    }
+}
