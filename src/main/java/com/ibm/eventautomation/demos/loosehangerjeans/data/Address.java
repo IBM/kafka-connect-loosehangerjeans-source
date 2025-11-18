@@ -138,6 +138,6 @@ public class Address {
     public String toString() {
         return "Address [number=" + number + ", street=" + street + ", city=" + city
                 + ", zipcode=" + zipcode + ", country=" + country + ", phones="
-                + phones != null ? Arrays.toString(phones.toArray()) : null + "]";
+                + ((phones == null) ? "" : Arrays.toString(phones.toArray())) + "]";
     }
 }
