@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.ibm.eventautomation.demos.loosehangerjeans.data.AbandonedOrder;
-import com.ibm.eventautomation.demos.loosehangerjeans.generators.AbandonedOrderGenerator;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTaskContext;
@@ -30,10 +28,13 @@ import org.apache.kafka.connect.storage.OffsetStorageReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ibm.eventautomation.demos.loosehangerjeans.data.AbandonedOrder;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.BadgeIn;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Cancellation;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.ClickEvent;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.LoosehangerData;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.NewCustomer;
+import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineActivityData;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OnlineOrder;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.Order;
 import com.ibm.eventautomation.demos.loosehangerjeans.data.OutOfStock;
@@ -47,7 +48,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.generators.BadgeInGenerato
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.CancellationGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.HighSensorReadingGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.NewCustomerGenerator;
-import com.ibm.eventautomation.demos.loosehangerjeans.generators.OnlineOrderGenerator;
+import com.ibm.eventautomation.demos.loosehangerjeans.generators.OnlineActivityGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OrderGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.OutOfStockGenerator;
 import com.ibm.eventautomation.demos.loosehangerjeans.generators.ProductGenerator;
@@ -60,6 +61,7 @@ import com.ibm.eventautomation.demos.loosehangerjeans.generators.TransactionGene
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.FalsePositivesTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NewCustomerTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.NormalOrdersTask;
+import com.ibm.eventautomation.demos.loosehangerjeans.tasks.OnlineActivityTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.SuspiciousOrdersTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.tasks.TransactionTask;
 import com.ibm.eventautomation.demos.loosehangerjeans.utils.Generators;
@@ -98,11 +100,10 @@ public class DatagenHistoryGenerator {
         addStockMovementRecords(historicalRecords, config);
         addBadgeInRecords(historicalRecords, config);
         addSensorReadingRecords(historicalRecords, config);
-        addOnlineOrderRecords(historicalRecords, config);
+        addOnlineActivityRecords(historicalRecords, config);
         addOrderAndCancellationRecords(historicalRecords, config);
         addReturnsRecords(historicalRecords, config);
         addTransactionRecords(historicalRecords, config);
-        addAbandonedOrderRecords(historicalRecords, config);
 
         Collections.sort(historicalRecords, (r1, r2) -> {
             return Math.toIntExact(r1.timestamp() - r2.timestamp());
@@ -167,18 +168,6 @@ public class DatagenHistoryGenerator {
         for (StockMovement movement : new StockMovementGenerator(config).generateHistory()) {
             SourceRecord record = movement.createSourceRecord(TOPIC);
             historicalRecords.add(record);
-        }
-    }
-
-    private void addAbandonedOrderRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
-        log.debug("generating historical abandoned order records");
-        final String TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ABANDONEDORDERS);
-
-        AbandonedOrderGenerator abandonedOrderGenerator = new AbandonedOrderGenerator(config);
-
-        for (AbandonedOrder abandonedOrder : abandonedOrderGenerator.generateHistory()) {
-            SourceRecord abandonedOrderRecord = abandonedOrder.createSourceRecord(TOPIC);
-            historicalRecords.add(abandonedOrderRecord);
         }
     }
 
@@ -259,25 +248,44 @@ public class DatagenHistoryGenerator {
         }
     }
 
-    private void addOnlineOrderRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
-        log.debug("generating historical online order records");
-        final String ONLINEORDERS_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ONLINEORDERS);
-        final String OUTOFSTOCK_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_OUTOFSTOCKS);
 
-        OnlineOrderGenerator onlineOrderGenerator = new OnlineOrderGenerator(config);
+    private void addOnlineActivityRecords(List<SourceRecord> historicalRecords, AbstractConfig config) {
+        log.debug("generating historical online activity records");
+        String CLICK_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_CLICKTRACKING);
+        String ORDER_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ONLINEORDERS);
+        String ABANDON_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_ABANDONEDORDERS);
+        String OOS_TOPIC = config.getString(DatagenSourceConfig.CONFIG_TOPICNAME_OUTOFSTOCKS);
+
+        int sessionInterval = config.getInt(DatagenSourceConfig.CONFIG_TIMES_ONLINEORDERS) / 1000;
+        int clickInterval = config.getInt(DatagenSourceConfig.CONFIG_TIMES_CLICKTRACKING) / 1000;
+
+        OnlineActivityGenerator onlineActivityGenerator = new OnlineActivityGenerator(config);
         OutOfStockGenerator outOfStockGenerator = new OutOfStockGenerator(config);
 
-        for (OnlineOrder order : onlineOrderGenerator.generateHistory()) {
-            SourceRecord orderRecord = order.createSourceRecord(ONLINEORDERS_TOPIC);
-            historicalRecords.add(orderRecord);
+        for (OnlineActivityData activity : onlineActivityGenerator.generateHistory(sessionInterval, clickInterval)) {
+            if (activity == null) {
+                continue;
+            }
 
-            if (onlineOrderGenerator.shouldGenerateOutOfStockEvent()) {
-                SourceRecord outOfStockRecord = outOfStockGenerator.generate(order).createSourceRecord(OUTOFSTOCK_TOPIC);
-                historicalRecords.add(outOfStockRecord);
+            if (activity instanceof ClickEvent) {
+                SourceRecord clickRecord = activity.createSourceRecord(CLICK_TOPIC, OnlineActivityTask.class.getName());
+                historicalRecords.add(clickRecord);
+            }
+            else if (activity instanceof OnlineOrder) {
+                SourceRecord orderRecord = activity.createSourceRecord(ORDER_TOPIC, OnlineActivityTask.class.getName());
+                historicalRecords.add(orderRecord);
 
-                if (outOfStockGenerator.shouldDuplicate()) {
+                if (onlineActivityGenerator.shouldGenerateOutOfStockEvent()) {
+                    SourceRecord outOfStockRecord = outOfStockGenerator.generate((OnlineOrder)activity).createSourceRecord(OOS_TOPIC);
                     historicalRecords.add(outOfStockRecord);
                 }
+            }
+            else if (activity instanceof AbandonedOrder) {
+                SourceRecord abandonRecord = activity.createSourceRecord(ABANDON_TOPIC, OnlineActivityTask.class.getName());
+                historicalRecords.add(abandonRecord);
+            }
+            else {
+                log.error("Unexpected activity type {}", activity.getClass().getCanonicalName());
             }
         }
     }
@@ -296,7 +304,8 @@ public class DatagenHistoryGenerator {
             LoosehangerData.partition(ReturnRequest.PARTITION),
             LoosehangerData.partition(SensorReading.PARTITION),
             LoosehangerData.partition(StockMovement.PARTITION),
-            LoosehangerData.partition(AbandonedOrder.PARTITION)
+            LoosehangerData.partition(AbandonedOrder.PARTITION),
+            LoosehangerData.partition(ClickEvent.PARTITION)
         );
     }
 

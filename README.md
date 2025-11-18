@@ -12,12 +12,13 @@ It produces messages simulating the following events:
 | `ORDERS.NEW`        | An order has been placed                                                                   |
 | `SENSOR.READINGS`   | A sensor reading captured from an IoT sensor                                               |
 | `STOCK.MOVEMENT`    | Stock shipment received by a warehouse                                                     |
-| `ORDERS.ONLINE`     | An online order has been placed                                                            |
 | `STOCK.NOSTOCK`     | A product has run out-of-stock                                                             |
 | `PRODUCT.RETURNS`   | A return request has been issued                                                           |
 | `PRODUCT.REVIEWS`   | A product review has been posted                                                           |
 | `TRANSACTIONS`      | A transaction has been posted                                                              |
-| `ORDERS.ABANDONED`  | A customer has added products to his/her order but left it without completing the purchase |
+| `CLICKTRACKING`     | A user has interacted with the website                                                     |
+| `ORDERS.ONLINE`     | An online order has been placed                                                            |
+| `ORDERS.ABANDONED`  | A customer has added products to an online order but left without completing the purchase  |
 
 
 Avro schemas and sample messages for each of these topics can be found in the `./doc` folder.
@@ -86,6 +87,7 @@ spec:
     topic.name.productreviews: PRODUCT.REVIEWS
     topic.name.transactions: TRANSACTIONS
     topic.name.abandonedorders: ORDERS.ABANDONED
+    topic.name.clicktracking: CLICKTRACKING
 
     #
     # startup behavior
@@ -129,16 +131,15 @@ spec:
     # sensor reading events
     #  from a single sensor that periodically generates very high and increasing readings (before returning to a normal range)
     timings.ms.highsensorreadings: 18000  # every 18 seconds
-    # online orders
-    timings.ms.onlineorders: 30000        # every 30 seconds
+    # online activity
+    timings.ms.onlineorders: 5000         # start a new user session every 5 seconds
+    timings.ms.clicktracking: 15000       # within each active user session, emit a new click event every 15 seconds
     # return requests
     timings.ms.returnrequests: 300000     # every 5 minutes
     # product reviews
     timings.ms.productreviews: 60000      # every 1 minute
     # transactions
     timings.ms.transactions: 20000        # every 20 seconds
-    # abandoned orders
-    timings.ms.abandonedorders: 300000    # every 5 minutes
 
     #
     # how much of a delay to introduce when producing events
@@ -169,8 +170,6 @@ spec:
     eventdelays.newcustomers.secs.max: 0        # payload time matches event time by default
     # sensor readings events
     eventdelays.sensorreadings.secs.max: 300    # payload time can be up to 5 minutes (300 secs) behind event time
-    # online orders
-    eventdelays.onlineorders.secs.max: 0        # payload time matches event time by default
     # out-of-stock events
     eventdelays.outofstocks.secs.max: 0         # payload time matches event time by default
     # return requests
@@ -179,8 +178,6 @@ spec:
     eventdelays.productreviews.secs.max: 0      # payload time matches event time by default
     # transactions
     eventdelays.transactions.secs.max: 0        # payload time matches event time by default
-    # abandoned orders
-    eventdelays.abandonedorders.secs.max: 0     # payload time matches event time by default
 
     #
     # how many events should be duplicated
@@ -218,6 +215,8 @@ spec:
     duplicates.transactions.ratio: 0        # events not duplicated
     # abandoned orders
     duplicates.abandonedorders.ratio: 0     # events not duplicated
+    # clickstream events
+    duplicates.clicktracking.ratio: 0       # events not duplicated
 
     #
     # product names to use in events
@@ -305,7 +304,6 @@ spec:
     #   illustrating the use of complex objects and primitive arrays
     #
     # number of products to include in an online order: between 1 and 5 (inclusive)
-    onlineorders.products.min: 1
     onlineorders.products.max: 5
     # number of emails for the customer who makes an online order: between 1 and 2 (inclusive)
     onlineorders.customer.emails.min: 1
@@ -322,6 +320,28 @@ spec:
     #  between 0.0 and 1.0 : 0.0 means no online order has some product that runs out-of-stock
     #                        1.0 means all online orders have products that run out-of-stock
     onlineorders.outofstock.ratio: 0.22
+    # base web address used for URLs generated for clickstream activity events
+    onlineorders.url: https://loosehangerjeans.com
+    # Likelihood that a customer will abandon their cart at each step during a user session
+    #  between 0.0 and 1.0 : 0.0 means users will never decide to abandon a session before completing a purchase
+    #                        1.0 means users will never complete any online purchases
+    onlineorders.abandoned.ratio: 0.2
+    # Likelihood that a customer will already be logged in at the start a new user session
+    #  between 0.0 and 1.0 : 0.0 means all users will need an explicit login event before checkout
+    #                      : 1.0 means there will be no login events as all users start sessions logged in
+    onlineorders.loggedin.ratio: 0.2
+    # Proportion of user sessions that include a referral from a digital marketing campaign
+    #  between 0.0 and 1.0 : 0.0 means no clickstream events will include digital marketing query parameters
+    #                        1.0 means every click event will include a digital marketing campaign
+    onlineorders.marketing.ratio: 0.4
+    # maximum number of clickstream events in a single user session
+    onlineorders.clickevents.max: 100
+    # Maximum number of concurrent user sessions to generate online events for
+    #  (Increasing the time between new user sessions are started (timings.ms.onlineorders) and/or decreasing
+    #   the number of events in a single session (onlineorders.clickevents.max) and/or decreasing the number
+    #   of abandoned user sessions, etc. can all mean that this maximum is never reached)
+    onlineorders.sessions.max: 50
+
 
     #
     # out-of-stocks
@@ -383,18 +403,6 @@ spec:
     # how long after a return request should the product review happen (in milliseconds)
     productreviews.delay.ms.min: 300000   # 5 minutes
     productreviews.delay.ms.max: 3600000  # 1 hour
-
-    #
-    # abandoned orders
-    #
-    # these events are intended to represent orders that were abandoned before checkout.
-    #
-    # number of products to include in an abandoned order: between 1 and 5 (inclusive)
-    abandonedorders.products.min: 1
-    abandonedorders.products.max: 5
-    # number of emails for the customer who abandoned the order: between 1 and 2 (inclusive)
-    abandonedorders.customer.emails.min: 1
-    abandonedorders.customer.emails.max: 2
 
     #
     # locations that are referred to in generated events

@@ -32,7 +32,7 @@ import java.util.UUID;
  * left in the cart when it was abandoned.
  */
 
-public class AbandonedOrder extends LoosehangerData {
+public class AbandonedOrder extends OnlineActivityData {
 
     public static final String PARTITION = "abandonedorder";
 

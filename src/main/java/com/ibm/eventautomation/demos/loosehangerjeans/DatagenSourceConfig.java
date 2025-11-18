@@ -50,6 +50,7 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TOPICNAME_PRODUCTREVIEWS   = "topic.name.productreviews";
     public static final String CONFIG_TOPICNAME_TRANSACTIONS     = "topic.name.transactions";
     public static final String CONFIG_TOPICNAME_ABANDONEDORDERS  = "topic.name.abandonedorders";
+    public static final String CONFIG_TOPICNAME_CLICKTRACKING    = "topic.name.clicktracking";
 
     private static final String CONFIG_GROUP_LOCATIONS = "Locations";
     public static final String CONFIG_LOCATIONS_REGIONS    = "locations.regions";
@@ -91,7 +92,6 @@ public class DatagenSourceConfig {
     public static final String CONFIG_NEWCUSTOMERS_ORDER_MAX_DELAY = "newcustomers.order.delay.ms.max";
 
     private static final String CONFIG_GROUP_ONLINEORDERS = "Online orders";
-    public static final String CONFIG_ONLINEORDERS_PRODUCTS_MIN         = "onlineorders.products.min";
     public static final String CONFIG_ONLINEORDERS_PRODUCTS_MAX         = "onlineorders.products.max";
     public static final String CONFIG_ONLINEORDERS_CUSTOMER_EMAILS_MIN  = "onlineorders.customer.emails.min";
     public static final String CONFIG_ONLINEORDERS_CUSTOMER_EMAILS_MAX  = "onlineorders.customer.emails.max";
@@ -100,6 +100,12 @@ public class DatagenSourceConfig {
     public static final String CONFIG_ONLINEORDERS_REUSE_ADDRESS_RATIO  = "onlineorders.reuse.address.ratio";
     public static final String CONFIG_ONLINEORDERS_OUTOFSTOCK_RATIO     = "onlineorders.outofstock.ratio";
     public static final String CONFIG_ONLINEORDERS_CITIES               = "onlineorders.cities";
+    public static final String CONFIG_ONLINEORDERS_URL                  = "onlineorders.url";
+    public static final String CONFIG_ONLINEORDERS_CLICKEVENTS_MAX      = "onlineorders.clickevents.max";
+    public static final String CONFIG_ONLINEORDERS_ABANDONED_RATIO      = "onlineorders.abandoned.ratio";
+    public static final String CONFIG_ONLINEORDERS_LOGGEDIN_RATIO       = "onlineorders.loggedin.ratio";
+    public static final String CONFIG_ONLINEORDERS_MARKETING_RATIO      = "onlineorders.marketing.ratio";
+    public static final String CONFIG_ONLINEORDERS_SESSIONS_MAX         = "onlineorders.sessions.max";
 
     private static final String CONFIG_GROUP_OUTOFSTOCKS = "Out-of-stocks";
     public static final String CONFIG_OUTOFSTOCKS_RESTOCKING_MIN_DELAY  = "outofstocks.restocking.delay.days.min";
@@ -133,12 +139,6 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TRANSACTIONS_AMOUNT_MAX  = "transactions.amount.max";
     public static final String CONFIG_TRANSACTIONS_VALID_RATIO = "transactions.valid.ratio";
 
-    private static final String CONFIG_GROUP_ABANDONEDORDERS = "Abandoned orders";
-    public static final String CONFIG_ABANDONEDORDERS_PRODUCTS_MIN           = "abandonedorders.products.min";
-    public static final String CONFIG_ABANDONEDORDERS_PRODUCTS_MAX           = "abandonedorders.products.max";
-    public static final String CONFIG_ABANDONEDORDERS_CUSTOMER_EMAILS_MIN    = "abandonedorders.customer.emails.min";
-    public static final String CONFIG_ABANDONEDORDERS_CUSTOMER_EMAILS_MAX    = "abandonedorders.customer.emails.max";
-
     private static final String CONFIG_GROUP_DELAYS = "Event delays";
     public static final String CONFIG_DELAYS_ORDERS           = "eventdelays.orders.secs.max";
     public static final String CONFIG_DELAYS_CANCELLATIONS    = "eventdelays.cancellations.secs.max";
@@ -146,12 +146,10 @@ public class DatagenSourceConfig {
     public static final String CONFIG_DELAYS_BADGEINS         = "eventdelays.badgeins.secs.max";
     public static final String CONFIG_DELAYS_NEWCUSTOMERS     = "eventdelays.newcustomers.secs.max";
     public static final String CONFIG_DELAYS_SENSORREADINGS   = "eventdelays.sensorreadings.secs.max";
-    public static final String CONFIG_DELAYS_ONLINEORDERS     = "eventdelays.onlineorders.secs.max";
     public static final String CONFIG_DELAYS_OUTOFSTOCKS      = "eventdelays.outofstocks.secs.max";
     public static final String CONFIG_DELAYS_RETURNREQUESTS   = "eventdelays.returnrequests.secs.max";
     public static final String CONFIG_DELAYS_PRODUCTREVIEWS   = "eventdelays.productreviews.secs.max";
     public static final String CONFIG_DELAYS_TRANSACTIONS     = "eventdelays.transactions.secs.max";
-    public static final String CONFIG_DELAYS_ABANDONEDORDERS  = "eventdelays.abandonedorders.secs.max";
 
     private static final String CONFIG_GROUP_DUPLICATES = "Duplicate events";
     public static final String CONFIG_DUPLICATE_ORDERS          = "duplicates.orders.ratio";
@@ -166,6 +164,7 @@ public class DatagenSourceConfig {
     public static final String CONFIG_DUPLICATE_PRODUCTREVIEWS  = "duplicates.productreviews.ratio";
     public static final String CONFIG_DUPLICATE_TRANSACTIONS    = "duplicates.transactions.ratio";
     public static final String CONFIG_DUPLICATE_ABANDONEDORDERS = "duplicates.abandonedorders.ratio";
+    public static final String CONFIG_DUPLICATE_CLICKTRACKING   = "duplicates.clicktracking.ratio";
 
     private static final String CONFIG_GROUP_TIMES = "Timings";
     public static final String CONFIG_TIMES_ORDERS             = "timings.ms.orders";
@@ -180,7 +179,7 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TIMES_RETURNREQUESTS     = "timings.ms.returnrequests";
     public static final String CONFIG_TIMES_PRODUCTREVIEWS     = "timings.ms.productreviews";
     public static final String CONFIG_TIMES_TRANSACTIONS       = "timings.ms.transactions";
-    public static final String CONFIG_TIMES_ABANDONEDORDERS    = "timings.ms.abandonedorders";
+    public static final String CONFIG_TIMES_CLICKTRACKING      = "timings.ms.clicktracking";
 
     private static final String CONFIG_GROUP_BEHAVIOR = "Behavior";
     public static final String CONFIG_BEHAVIOR_STARTUPHISTORY = "startup.history.enabled";
@@ -286,7 +285,6 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Name of the topic to use for transaction events",
                     CONFIG_GROUP_TOPICNAMES, 11, Width.LONG, "Transactions topic")
-
         .define(CONFIG_TOPICNAME_ABANDONEDORDERS,
                     Type.STRING,
                     "ORDERS.ABANDONED",
@@ -294,6 +292,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Name of the topic to use for abandoned order events",
                     CONFIG_GROUP_TOPICNAMES, 12, Width.LONG, "Abandoned orders topic")
+        .define(CONFIG_TOPICNAME_CLICKTRACKING,
+                    Type.STRING,
+                    "CLICKTRACKING",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Name of the topic to use for click tracking events",
+                    CONFIG_GROUP_TOPICNAMES, 13, Width.LONG, "Clicktracking topic")
         //
         // how to generate locations
         //
@@ -515,69 +520,104 @@ public class DatagenSourceConfig {
         //
         // Generating online orders
         //
-        .define(CONFIG_ONLINEORDERS_PRODUCTS_MIN,
-                    Type.INT,
-                    1,
-                    Range.atLeast(1),
-                    Importance.LOW,
-                    "Minimum number of products in an online order. Must be greater than 0.",
-                    CONFIG_GROUP_ONLINEORDERS, 1, Width.SHORT, "Min product count")
         .define(CONFIG_ONLINEORDERS_PRODUCTS_MAX,
                     Type.INT,
                     5,
                     Range.atLeast(1),
                     Importance.LOW,
                     "Maximum number of products in an online order. Must be greater than 0.",
-                    CONFIG_GROUP_ONLINEORDERS, 2, Width.SHORT, "Max product count")
+                    CONFIG_GROUP_ONLINEORDERS, 1, Width.SHORT, "Max product count")
         .define(CONFIG_ONLINEORDERS_CUSTOMER_EMAILS_MIN,
                     Type.INT,
                     1,
                     Range.atLeast(1),
                     Importance.LOW,
                     "Minimum number of emails for a customer in an online order. Must be greater than 0.",
-                    CONFIG_GROUP_ONLINEORDERS, 3, Width.SHORT, "Min customer email count")
+                    CONFIG_GROUP_ONLINEORDERS, 2, Width.SHORT, "Min customer email count")
         .define(CONFIG_ONLINEORDERS_CUSTOMER_EMAILS_MAX,
                     Type.INT,
                     2,
                     Range.atLeast(1),
                     Importance.LOW,
                     "Maximum number of emails for a customer in an online order. Must be greater than 0.",
-                    CONFIG_GROUP_ONLINEORDERS, 4, Width.SHORT, "Max customer email count")
+                    CONFIG_GROUP_ONLINEORDERS, 3, Width.SHORT, "Max customer email count")
         .define(CONFIG_ONLINEORDERS_ADDRESS_PHONES_MIN,
                     Type.INT,
                     0,
                     Range.atLeast(0),
                     Importance.LOW,
                     "Minimum number of phones in an address for an online order. Must be at least 0.",
-                    CONFIG_GROUP_ONLINEORDERS, 5, Width.SHORT, "Min address phone count")
+                    CONFIG_GROUP_ONLINEORDERS, 4, Width.SHORT, "Min address phone count")
         .define(CONFIG_ONLINEORDERS_ADDRESS_PHONES_MAX,
                     Type.INT,
                     2,
                     Range.atLeast(0),
                     Importance.LOW,
                     "Maximum number of phones in an address for an online order. Must be at least 0.",
-                    CONFIG_GROUP_ONLINEORDERS, 6, Width.SHORT, "Max address phone count")
+                    CONFIG_GROUP_ONLINEORDERS, 5, Width.SHORT, "Max address phone count")
         .define(CONFIG_ONLINEORDERS_REUSE_ADDRESS_RATIO,
                     Type.DOUBLE,
                     0.55,
                     Range.between(0, 1),
                     Importance.LOW,
                     "Ratio of orders that use the same address as shipping and billing address. Must be between 0 and 1.",
-                    CONFIG_GROUP_ONLINEORDERS, 7, Width.SHORT, "Reuse address ratio")
+                    CONFIG_GROUP_ONLINEORDERS, 6, Width.SHORT, "Reuse address ratio")
         .define(CONFIG_ONLINEORDERS_OUTOFSTOCK_RATIO,
                     Type.DOUBLE,
                     0.22,
                     Range.between(0, 1),
                     Importance.LOW,
                     "Ratio of orders that have at least one product that runs out-of-stock after the order has been placed. Must be between 0 and 1.",
-                    CONFIG_GROUP_ONLINEORDERS, 8, Width.SHORT, "Out-of-stock product ratio")
+                    CONFIG_GROUP_ONLINEORDERS, 7, Width.SHORT, "Out-of-stock product ratio")
         .define(CONFIG_ONLINEORDERS_CITIES,
                     Type.LIST,
                     new ArrayList<String>(),
                     new NonNullValidator(),
                     Importance.LOW,
                     "List of cities used for generated online orders",
-                    CONFIG_GROUP_ONLINEORDERS, 9, Width.LONG, "Cities for online orders")
+                    CONFIG_GROUP_ONLINEORDERS, 8, Width.LONG, "Cities")
+        .define(CONFIG_ONLINEORDERS_URL,
+                    Type.STRING,
+                    "https://loosehangerjeans.com",
+                    new NonEmptyString(),
+                    Importance.LOW,
+                    "Base URL for generating web addresses for click tracking events",
+                    CONFIG_GROUP_ONLINEORDERS, 9, Width.LONG, "Base URL")
+        .define(CONFIG_ONLINEORDERS_CLICKEVENTS_MAX,
+                    Type.INT,
+                    100,
+                    Range.atLeast(5),
+                    Importance.LOW,
+                    "Maximum number of click tracking events to generate for a single user session",
+                    CONFIG_GROUP_ONLINEORDERS, 10, Width.SHORT, "Maximum number of click tracking events for online orders")
+        .define(CONFIG_ONLINEORDERS_ABANDONED_RATIO,
+                    Type.DOUBLE,
+                    0.2,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Likelihood that a customer will abandon their cart at each step during a user session",
+                    CONFIG_GROUP_ONLINEORDERS, 11, Width.SHORT, "Abandoned cart ratio")
+        .define(CONFIG_ONLINEORDERS_LOGGEDIN_RATIO,
+                    Type.DOUBLE,
+                    0.2,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Likelihood that a customer will already be logged in at the start a new user session",
+                    CONFIG_GROUP_ONLINEORDERS, 12, Width.SHORT, "Logged-in ratio")
+        .define(CONFIG_ONLINEORDERS_MARKETING_RATIO,
+                    Type.DOUBLE,
+                    0.4,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Proportion of user sessions that include a referral from a digital marketing campaign",
+                    CONFIG_GROUP_ONLINEORDERS, 13, Width.SHORT, "Digital marketing ratio")
+        .define(CONFIG_ONLINEORDERS_SESSIONS_MAX,
+                    Type.INT,
+                    50,
+                    Range.atLeast(2),
+                    Importance.LOW,
+                    "Maximum number of concurrent user sessions to generate online events for",
+                    CONFIG_GROUP_ONLINEORDERS, 14, Width.SHORT, "Max online users")
         //
         // Generating out-of-stock events
         //
@@ -761,37 +801,6 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_TRANSACTIONS, 4, Width.SHORT, "Valid transactions ratio")
 
         //
-        // Generating abandoned orders
-        //
-        .define(CONFIG_ABANDONEDORDERS_PRODUCTS_MIN,
-                    Type.INT,
-                    1,
-                    Range.atLeast(1),
-                    Importance.LOW,
-                    "Minimum number of products in an abandoned order. Must be greater than 0.",
-                    CONFIG_GROUP_ABANDONEDORDERS, 1, Width.SHORT, "Min product count")
-        .define(CONFIG_ABANDONEDORDERS_PRODUCTS_MAX,
-                    Type.INT,
-                    5,
-                    Range.atLeast(1),
-                    Importance.LOW,
-                    "Maximum number of products in an abandoned order. Must be greater than 0.",
-                    CONFIG_GROUP_ABANDONEDORDERS, 2, Width.SHORT, "Max product count")
-        .define(CONFIG_ABANDONEDORDERS_CUSTOMER_EMAILS_MIN,
-                    Type.INT,
-                    1,
-                    Range.atLeast(1),
-                    Importance.LOW,
-                    "Minimum number of emails for a customer in an abandoned order. Must be greater than 0.",
-                    CONFIG_GROUP_ABANDONEDORDERS, 3, Width.SHORT, "Min customer email count")
-        .define(CONFIG_ABANDONEDORDERS_CUSTOMER_EMAILS_MAX,
-                    Type.INT,
-                    2,
-                    Range.atLeast(1),
-                    Importance.LOW,
-                    "Maximum number of emails for a customer in an abandoned order. Must be greater than 0.",
-                    CONFIG_GROUP_ABANDONEDORDERS, 4, Width.SHORT, "Max customer email count")
-        //
         // how long to delay messages before producing them to Kafka
         //
         .define(CONFIG_DELAYS_ORDERS,
@@ -836,48 +845,34 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Maximum delay (in *seconds*) to produce sensor reading events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
                     CONFIG_GROUP_DELAYS, 6, Width.SHORT, "Sensor reading events - max produce delay")
-        .define(CONFIG_DELAYS_ONLINEORDERS,
-                    Type.INT,
-                    0, // payload time matching event time by default
-                    Range.between(0, 900),  // up to 15 mins max
-                    Importance.LOW,
-                    "Maximum delay (in *seconds*) to produce new online order events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
-                    CONFIG_GROUP_DELAYS, 7, Width.SHORT, "Online order events - max produce delay")
         .define(CONFIG_DELAYS_OUTOFSTOCKS,
                     Type.INT,
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
                     "Maximum delay (in *seconds*) to produce new out-of-stock events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
-                    CONFIG_GROUP_DELAYS, 8, Width.SHORT, "Out-of-stock events - max produce delay")
+                    CONFIG_GROUP_DELAYS, 7, Width.SHORT, "Out-of-stock events - max produce delay")
         .define(CONFIG_DELAYS_RETURNREQUESTS,
                     Type.INT,
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
                     "Maximum delay (in *seconds*) to produce new return request events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
-                    CONFIG_GROUP_DELAYS, 9, Width.SHORT, "Return request events - max produce delay")
+                    CONFIG_GROUP_DELAYS, 8, Width.SHORT, "Return request events - max produce delay")
         .define(CONFIG_DELAYS_PRODUCTREVIEWS,
                     Type.INT,
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
                     "Maximum delay (in *seconds*) to produce new product review events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
-                    CONFIG_GROUP_DELAYS, 10, Width.SHORT, "Product review events - max produce delay")
+                    CONFIG_GROUP_DELAYS, 9, Width.SHORT, "Product review events - max produce delay")
         .define(CONFIG_DELAYS_TRANSACTIONS,
                     Type.INT,
                     0, // payload time matching event time by default
                     Range.between(0, 900),  // up to 15 mins max
                     Importance.LOW,
                     "Maximum delay (in *seconds*) to produce transaction events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
-                    CONFIG_GROUP_DELAYS, 11, Width.SHORT, "Transaction events - max produce delay")
-        .define(CONFIG_DELAYS_ABANDONEDORDERS,
-                    Type.INT,
-                    0, // payload time matching event time by default
-                    Range.between(0, 900),  // up to 15 mins max
-                    Importance.LOW,
-                    "Maximum delay (in *seconds*) to produce new abandoned order events (this is the maximum difference allowed between the timestamp string in the event payload, and the Kafka message's metadata timestamp)",
-                    CONFIG_GROUP_DELAYS, 12, Width.SHORT, "Abandoned order events - max produce delay")
+                    CONFIG_GROUP_DELAYS, 10, Width.SHORT, "Transaction events - max produce delay")
 
         //
         // likelihood of producing duplicate messages
@@ -966,7 +961,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Ratio of abandoned order events that should be duplicated. Must be between 0 and 1.",
                     CONFIG_GROUP_DUPLICATES, 12, Width.SHORT, "Duplicate abandoned order events ratio")
-
+        .define(CONFIG_DUPLICATE_CLICKTRACKING,
+                    Type.DOUBLE,
+                    0,   // don't create duplicate events by default
+                    Range.between(0.0, 1.0), // ratio should be between 0 (don't create duplicates) and 1 (duplicate every message)
+                    Importance.LOW,
+                    "Ratio of click tracking events that should be duplicated. Must be between 0 and 1.",
+                    CONFIG_GROUP_DUPLICATES, 13, Width.SHORT, "Duplicate clicktracking events ratio")
         //
         // How frequently to generate messages
         //
@@ -1028,11 +1029,11 @@ public class DatagenSourceConfig {
                     CONFIG_GROUP_TIMES, 8, Width.MEDIUM, "High sensor readings delay")
         .define(CONFIG_TIMES_ONLINEORDERS,
                     Type.INT,
-                    30_000, // 30 seconds
+                    5_000, // 5 seconds
                     Range.atLeast(500),
                     Importance.LOW,
-                    "Delay, in milliseconds, between each online order that should be generated.",
-                    CONFIG_GROUP_TIMES, 9, Width.MEDIUM, "Online orders delay")
+                    "Delay, in milliseconds, between each online user session that should be started.",
+                    CONFIG_GROUP_TIMES, 9, Width.MEDIUM, "Online user sessions delay")
         .define(CONFIG_TIMES_RETURNREQUESTS,
                     Type.INT,
                     300_000, // 5 minutes
@@ -1054,14 +1055,13 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Delay, in milliseconds, between each transaction that should be generated.",
                     CONFIG_GROUP_TIMES, 12, Width.MEDIUM, "Sensor readings delay")
-        .define(CONFIG_TIMES_ABANDONEDORDERS,
+        .define(CONFIG_TIMES_CLICKTRACKING,
                     Type.INT,
-                    300_000, // 5 minutes
-                    Range.atLeast(500),
+                    15_000, // 15 seconds
+                    Range.atLeast(5_000),
                     Importance.LOW,
-                    "Delay, in milliseconds, between each abandoned order that should be generated.",
-                    CONFIG_GROUP_TIMES, 13, Width.MEDIUM, "Abandoned orders delay")
-
+                    "Maximum interval, in milliseconds, between clicktracking events generated for a single user session.",
+                    CONFIG_GROUP_TIMES, 13, Width.MEDIUM, "Clicktracking events interval")
         //
         // Startup behaviour
         //
