@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.stream.Collectors;
 
 import org.apache.kafka.common.config.AbstractConfig;
 import org.slf4j.Logger;
@@ -326,11 +327,21 @@ public class OnlineActivityGenerator {
     }
 
     private OnlineActivityData createAbandonedOrder(ZonedDateTime timestamp, SessionState session) {
+        // Process each product in the cart to remove the size (first word)
+        List<String> productsWithoutSize = session.currentCart.stream()
+                .map(product -> {
+                    // Product format: "SIZE MATERIAL STYLE NAME"
+                    int firstSpace = product.indexOf(' ');
+                    // If there is a space, remove the first word (size); else leave as-is
+                    return (firstSpace > 0) ? product.substring(firstSpace + 1).trim() : product;
+                })
+                .collect(Collectors.toList());
+
         return new AbandonedOrder(
-            formatTimestamp(timestamp),
-            session.loggedInUser,
-            new ArrayList<>(session.currentCart),
-            timestamp);
+                formatTimestamp(timestamp),
+                session.loggedInUser,
+                productsWithoutSize,
+                timestamp);
     }
 
     private OnlineActivityData createCartEvent(ZonedDateTime timestamp, SessionState session, String product) {
