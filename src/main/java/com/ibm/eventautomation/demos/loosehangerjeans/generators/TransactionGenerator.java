@@ -40,7 +40,7 @@ public class TransactionGenerator extends Generator<Transaction> {
     }
 
     /** status of generated transactions. */
-    protected static Map<String, LinkedList<TransactionState>> transactionStatuses = new HashMap<>();
+    protected Map<String, LinkedList<TransactionState>> transactionStatuses = new HashMap<>();
 
     /** transaction context keys. */
     protected final List<String> transactionIds;
