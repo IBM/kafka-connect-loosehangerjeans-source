@@ -432,6 +432,16 @@ spec:
     #  STARTED -> PROCESSING -> PROCESSING -> COMPLETED
     transactions.valid.ratio: 0.8  # 80% of transactions are complete
                                    # 20% of transactions omit an event
+
+    #
+    # sensor readings
+    #
+    #  these events are intended to represent IoT sensor readings
+    #
+    # ratio of readings from a single sensor that will represent a glitch
+    #  resulting in likely impossibly high values
+    highsensorreadings.outlier.ratio: 0.0   # 0.0 means the sensor never emits invalid readings
+                                            # 1.0 means every reading (from one sensor) will be invalid
 ```
 
 For example, if you want to theme the demo to be based on products in a different industry, you could adjust product sizes/materials/styles/name to match your demo (the options don't need to actually be "sizes", "materials" or "styles" - they just need to be lists that will make sense when combined into a single string).

@@ -139,6 +139,9 @@ public class DatagenSourceConfig {
     public static final String CONFIG_TRANSACTIONS_AMOUNT_MAX  = "transactions.amount.max";
     public static final String CONFIG_TRANSACTIONS_VALID_RATIO = "transactions.valid.ratio";
 
+    private static final String CONFIG_GROUP_SENSORREADINGS = "Sensor readings";
+    public static final String CONFIG_SENSORREADINGS_OUTLIER_RATIO = "highsensorreadings.outlier.ratio";
+
     private static final String CONFIG_GROUP_DELAYS = "Event delays";
     public static final String CONFIG_DELAYS_ORDERS           = "eventdelays.orders.secs.max";
     public static final String CONFIG_DELAYS_CANCELLATIONS    = "eventdelays.cancellations.secs.max";
@@ -799,6 +802,17 @@ public class DatagenSourceConfig {
                     Importance.LOW,
                     "Ratio of transactions that are valid and complete. Must be between 0 (no transactions are valid) and 1 (all transactions are valid)",
                     CONFIG_GROUP_TRANSACTIONS, 4, Width.SHORT, "Valid transactions ratio")
+
+        //
+        // generating sensor readings
+        //
+        .define(CONFIG_SENSORREADINGS_OUTLIER_RATIO,
+                    Type.DOUBLE,
+                    0.0,
+                    Range.between(0, 1),
+                    Importance.LOW,
+                    "Ratio of sensor readings from one particular sensor ID that will be outliers - generated outside the range of a normal sensor reading - reflecting a glitch or spike in the sensor",
+                    CONFIG_GROUP_SENSORREADINGS, 1, Width.SHORT, "Sensor outliers ratio")
 
         //
         // how long to delay messages before producing them to Kafka
